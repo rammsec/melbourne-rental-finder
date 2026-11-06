@@ -19,10 +19,11 @@ let appData = {
 
 let filterState = {
   search: '',
+  suburb: 'all',
   bedrooms: 'all',
   furnished: 'all',
   leaseTransferOnly: false,
-  strictOnly: true
+  strictOnly: false
 };
 
 function getSavedStatuses() {
@@ -124,6 +125,10 @@ function createListingCardHTML(item) {
           <span>${escapeHtml(item.commute_line || '')}</span>
         </div>
 
+        <div class="station-box">
+          <span>🚉 <strong>Train Station:</strong> ${escapeHtml(item.station_distance_display || 'Near local station')}</span>
+        </div>
+
         <div class="specs-row">
           ${badgePills.join('')}
         </div>
@@ -161,6 +166,13 @@ function renderListings() {
     if (filterState.strictOnly && !item.pass_strict_filter) return false;
     if (filterState.leaseTransferOnly && !item.is_lease_transfer) return false;
 
+    if (filterState.suburb && filterState.suburb !== 'all') {
+      const sub = (item.suburb || '').toLowerCase();
+      const addr = (item.address || '').toLowerCase();
+      const q = filterState.suburb.toLowerCase();
+      if (!sub.includes(q) && !addr.includes(q)) return false;
+    }
+
     if (filterState.bedrooms === '2' && item.bedrooms !== 2) return false;
     if (filterState.bedrooms === '1' && item.bedrooms !== 1) return false;
 
@@ -169,7 +181,7 @@ function renderListings() {
 
     if (filterState.search) {
       const q = filterState.search.toLowerCase();
-      const hay = `${item.title} ${item.suburb} ${item.address} ${item.commute_line} ${item.description}`.toLowerCase();
+      const hay = `${item.title} ${item.suburb} ${item.address} ${item.commute_line} ${item.station_distance_display || ''} ${item.description}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -392,6 +404,14 @@ async function initApp() {
     filterState.search = e.target.value.trim();
     renderListings();
   });
+
+  const suburbEl = document.getElementById('suburb-filter');
+  if (suburbEl) {
+    suburbEl.addEventListener('change', e => {
+      filterState.suburb = e.target.value;
+      renderListings();
+    });
+  }
 
   document.getElementById('bedroom-filter').addEventListener('change', e => {
     filterState.bedrooms = e.target.value;

@@ -31,7 +31,7 @@
       <div class="app-title-group">
         <h1>Melbourne Lease Transfer &amp; Hawthorn Commute Finder</h1>
         <p class="app-subtitle">
-          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Automatically scored for direct train (Belgrave / Lilydale / Alamein) or direct tram (Routes 70 / 75 / 16) access to <strong>Hawthorn</strong>.
+          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong>, including <strong>Clayton, Bayswater, Boronia</strong>, Box Hill, and inner-east corridors.
         </p>
       </div>
       <div class="header-actions">
@@ -58,12 +58,12 @@
       </div>
       <div class="criteria-card">
         <span class="criteria-label">Commute Requirement</span>
-        <span class="criteria-value">Direct to Hawthorn (3122)</span>
-        <span class="criteria-note">Belgrave/Lilydale/Alamein Train • Tram 70, 75, 16</span>
+        <span class="criteria-value">Hawthorn, Clayton, Bayswater, Boronia+</span>
+        <span class="criteria-note">Belgrave, Lilydale, Pakenham Lines • Tram 70, 75, 16</span>
       </div>
       <div class="criteria-card">
         <span class="criteria-label">Matches Found</span>
-        <span class="criteria-value" id="stat-strict-matches">-- Strict Matches</span>
+        <span class="criteria-value" id="stat-strict-matches">-- Listings</span>
         <span class="criteria-note" id="stat-sub-summary">Scanning lease transfers &amp; whole properties</span>
       </div>
     </section>
@@ -71,7 +71,7 @@
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" aria-label="Dashboard Sections">
       <button class="tab-btn active" data-tab="panel-matches" id="tab-matches" type="button">
-        Strict Hawthorn Matches <span class="tab-count" id="count-strict">0</span>
+        All Active Listings <span class="tab-count" id="count-strict">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-shortlist" id="tab-shortlist" type="button">
         My Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
@@ -80,7 +80,7 @@
         FB Marketplace &amp; Post Analyzer
       </button>
       <button class="tab-btn" data-tab="panel-portals" id="tab-portals" type="button">
-        Pre-Filtered Live Search Portals <span class="tab-count" id="count-portals">7</span>
+        Pre-Filtered Live Search Portals <span class="tab-count" id="count-portals">8</span>
       </button>
       <button class="tab-btn" data-tab="panel-corridor" id="tab-corridor" type="button">
         Hawthorn Direct Train/Tram Map
@@ -95,9 +95,24 @@
             type="search"
             id="search-input"
             class="filter-input"
-            placeholder="Filter by suburb, street, tram/train line..."
+            placeholder="Search suburb, station, street..."
             aria-label="Search listings"
           >
+          <select id="suburb-filter" class="filter-select" aria-label="Filter by suburb">
+            <option value="all">All Suburbs (All Corridors)</option>
+            <option value="clayton">Clayton (3168)</option>
+            <option value="bayswater">Bayswater (3153)</option>
+            <option value="boronia">Boronia (3155)</option>
+            <option value="hawthorn">Hawthorn / Hawthorn East</option>
+            <option value="box hill">Box Hill (3128)</option>
+            <option value="camberwell">Camberwell (3124)</option>
+            <option value="richmond">Richmond / Burnley</option>
+            <option value="burwood">Burwood (3125)</option>
+            <option value="surrey hills">Surrey Hills (3127)</option>
+            <option value="blackburn">Blackburn (3130)</option>
+            <option value="nunawading">Nunawading (3131)</option>
+            <option value="ringwood">Ringwood (3134)</option>
+          </select>
           <select id="bedroom-filter" class="filter-select" aria-label="Filter by bedrooms">
             <option value="all">All Entire Places (1–2+ BHK)</option>
             <option value="2">2 BHK Only (Preferred)</option>
@@ -113,8 +128,8 @@
           <button type="button" class="toggle-chip" id="chip-lease-transfer">
             🔄 Lease Transfers Only
           </button>
-          <button type="button" class="toggle-chip active" id="chip-strict-only">
-            ✅ Strict Criteria Only (Hide Rejected)
+          <button type="button" class="toggle-chip" id="chip-strict-only">
+            ✅ Strict 100% Matches Only
           </button>
         </div>
       </div>

@@ -48,10 +48,24 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
     urls = [
         "https://www.gumtree.com.au/s-feed-search/melbourne/lease+transfer/k0c18364l3001317.rss",
         "https://www.gumtree.com.au/s-feed-search/melbourne/lease+break/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/takeover/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/clayton/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/bayswater/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/boronia/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/box-hill/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/hawthorn/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/camberwell/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/richmond/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/burwood/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/surrey-hills/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/blackburn/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/kew/k0c18364l3001317.rss",
+        "https://www.gumtree.com.au/s-feed-search/melbourne/2+bedroom+apartment/k0c18364l3001317.rss",
     ]
 
     for url in urls:
         try:
+            time.sleep(0.4)
             raw = fetch_url(url, timeout=12)
         except Exception as exc:
             print(f"[Gumtree] Skipped {url}: {exc}")

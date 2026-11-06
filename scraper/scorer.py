@@ -115,6 +115,156 @@ def detect_sharehouse(text: str, listing_kind: str = "") -> bool:
     return False
 
 
+SUBURB_STATIONS: Dict[str, str] = {
+    "hawthorn": "Hawthorn Station",
+    "hawthorn east": "Auburn Station",
+    "glenferrie": "Glenferrie Station",
+    "auburn": "Auburn Station",
+    "camberwell": "Camberwell Station",
+    "richmond": "Richmond Station",
+    "burnley": "Burnley Station",
+    "east richmond": "East Richmond Station",
+    "cremorne": "East Richmond Station",
+    "canterbury": "Canterbury Station",
+    "surrey hills": "Union Station",
+    "mont albert": "Union Station",
+    "box hill": "Box Hill Station",
+    "box hill north": "Box Hill Station",
+    "box hill south": "Box Hill Station",
+    "laburnum": "Laburnum Station",
+    "blackburn": "Blackburn Station",
+    "nunawading": "Nunawading Station",
+    "mitcham": "Mitcham Station",
+    "heatherdale": "Heatherdale Station",
+    "ringwood": "Ringwood Station",
+    "ringwood east": "Ringwood East Station",
+    "heathmont": "Heathmont Station",
+    "bayswater": "Bayswater Station",
+    "boronia": "Boronia Station",
+    "ferntree gully": "Ferntree Gully Station",
+    "croydon": "Croydon Station",
+    "clayton": "Clayton Station",
+    "clayton south": "Clayton Station",
+    "oakleigh": "Oakleigh Station",
+    "huntingdale": "Huntingdale Station",
+    "burwood": "Burwood Station",
+    "burwood east": "Burwood Station",
+    "hartwell": "Hartwell Station",
+    "riversdale": "Riversdale Station",
+    "willison": "Willison Station",
+    "ashburton": "Ashburton Station",
+    "alamein": "Alamein Station",
+    "malvern": "Malvern Station",
+    "armadale": "Armadale Station",
+    "toorak": "Toorak Station",
+    "kooyong": "Kooyong Station",
+    "caulfield": "Caulfield Station",
+    "caulfield north": "Caulfield Station",
+    "balaclava": "Balaclava Station",
+    "south yarra": "South Yarra Station",
+    "prahran": "Prahran Station",
+    "windsor": "Windsor Station",
+    "east melbourne": "Jolimont Station",
+    "melbourne": "Flinders Street Station",
+    "melbourne cbd": "Flinders Street Station",
+    "cbd": "Flinders Street Station",
+    "docklands": "Southern Cross Station",
+    "abbotsford": "Collingwood Station",
+    "collingwood": "Collingwood Station",
+    "kew": "Glenferrie Station / Tram 16",
+    "kew east": "Glenferrie Station / Tram 16",
+    "carlton": "Melbourne Central / Tram 16",
+    "st kilda": "Balaclava Station",
+    "st kilda east": "Balaclava Station",
+}
+
+
+def extract_station_distance(suburb: str, full_text: str) -> Dict[str, Any]:
+    """
+    Extract or estimate distance and walking minutes to the nearest train station.
+    Returns dict with station_name, distance_m, walking_mins, display, and is_explicit.
+    """
+    sub_clean = (suburb or "").lower().strip()
+    primary_station = SUBURB_STATIONS.get(
+        sub_clean,
+        f"{suburb.title()} Station" if suburb and "outer" not in sub_clean else "Local Train Station"
+    )
+
+    lower = full_text.lower()
+
+    # 1. Look for explicit metres: e.g. 350m to station, 400 metres from station
+    m_m = re.search(
+        r"\b(\d{2,4})\s*(?:m\b|metres\b|meters\b)\s*(?:walk\s+)?(?:to|from)?\s*(?:the\s+)?(?:([a-z\s]{3,20}?)\s+)?station",
+        lower,
+    )
+    if m_m:
+        dist_m = int(m_m.group(1))
+        st_name = (
+            m_m.group(2).strip().title() + " Station"
+            if m_m.group(2) and len(m_m.group(2).strip()) > 3
+            else primary_station
+        )
+        mins = max(1, round(dist_m / 80))
+        return {
+            "station_name": st_name,
+            "distance_m": dist_m,
+            "walking_mins": mins,
+            "display": f"{dist_m}m to {st_name} ({mins} min walk)",
+            "is_explicit": True,
+        }
+
+    # 2. Look for explicit walking minutes: e.g. 5 min walk to station, 8 minutes to train station
+    m_min = re.search(
+        r"\b(\d{1,2})\s*(?:min\b|mins\b|minute\b|minutes\b)\s*(?:walk\s+to|walk\s+from|to|from)\s*(?:the\s+)?(?:([a-z\s]{3,20}?)\s+)?station",
+        lower,
+    )
+    if m_min:
+        mins = int(m_min.group(1))
+        dist_m = mins * 80
+        st_name = (
+            m_min.group(2).strip().title() + " Station"
+            if m_min.group(2) and len(m_min.group(2).strip()) > 3
+            else primary_station
+        )
+        return {
+            "station_name": st_name,
+            "distance_m": dist_m,
+            "walking_mins": mins,
+            "display": f"~{dist_m}m to {st_name} ({mins} min walk)",
+            "is_explicit": True,
+        }
+
+    # 3. Direct adjacency keywords
+    if any(k in lower for k in ["opposite station", "across from station", "next to station", "steps from station", "at the station"]):
+        return {
+            "station_name": primary_station,
+            "distance_m": 120,
+            "walking_mins": 2,
+            "display": f"~120m to {primary_station} (2 min walk)",
+            "is_explicit": True,
+        }
+
+    if "short walk to station" in lower or "walk to train" in lower:
+        return {
+            "station_name": primary_station,
+            "distance_m": 350,
+            "walking_mins": 4,
+            "display": f"~350m to {primary_station} (4 min walk)",
+            "is_explicit": True,
+        }
+
+    # 4. Standard rental hub estimate for the suburb
+    est_m = 450
+    est_mins = 6
+    return {
+        "station_name": primary_station,
+        "distance_m": est_m,
+        "walking_mins": est_mins,
+        "display": f"~{est_m}m to {primary_station} (~{est_mins} min walk)",
+        "is_explicit": False,
+    }
+
+
 def extract_suburb_info(address: str, title: str = "") -> Tuple[str, Optional[Dict[str, Any]]]:
     """
     Match suburb name from the listing's address against HAWTHORN_DIRECT_SUBURBS.
@@ -368,6 +518,11 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
         score += 5
         badges.append("Bills Included")
 
+    # Station proximity
+    station_info = extract_station_distance(suburb, full_text)
+    if station_info["is_explicit"] or station_info["distance_m"] <= 400:
+        badges.append(f"🚆 {station_info['display']}")
+
     score = min(100, max(0, score))
     pass_strict = len(rejection_reasons) == 0
 
@@ -387,6 +542,11 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
         "commute_mins": commute_info["commute_mins"] if commute_info else 45,
         "commute_tier": commute_info["tier"] if commute_info else 4,
         "has_direct_hawthorn_transit": commute_info is not None,
+        "station_name": station_info["station_name"],
+        "station_distance_m": station_info["distance_m"],
+        "station_walking_mins": station_info["walking_mins"],
+        "station_distance_display": station_info["display"],
+        "station_is_explicit": station_info["is_explicit"],
         "availability_display": avail_display,
         "availability_fit": avail_fit,
         "match_score": score,

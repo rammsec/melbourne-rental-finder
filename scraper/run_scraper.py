@@ -49,27 +49,33 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
     """
     return [
         {
-            "name": "Domain: 2BHK Hawthorn + Direct Train/Tram Suburbs (≤$525 Unfurnished)",
+            "name": "Domain: Hawthorn, Box Hill, Clayton, Bayswater, Boronia (≤$525/wk)",
             "category": "Domain.com.au (Live)",
-            "url": "https://www.domain.com.au/rent/?suburb=hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,kew-vic-3101,richmond-vic-3121,surrey-hills-vic-3127,box-hill-vic-3128,burwood-vic-3125,malvern-vic-3144&bedrooms=2&price=0-525&excludedeposittaken=1&sort=dateupdated-desc",
-            "note": "Launches Domain's live 2-bedroom listings under $525/wk sorted newest first across Hawthorn commute suburbs.",
+            "url": "https://www.domain.com.au/rent/?suburb=hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,kew-vic-3101,richmond-vic-3121,surrey-hills-vic-3127,box-hill-vic-3128,burwood-vic-3125,malvern-vic-3144,clayton-vic-3168,bayswater-vic-3153,boronia-vic-3155&bedrooms=1-2&price=0-525&excludedeposittaken=1&sort=dateupdated-desc",
+            "note": "Live 1-2BR listings under $525/wk across Hawthorn, Box Hill, Clayton, Bayswater, and Boronia corridors.",
         },
         {
-            "name": "Domain: 1–2BHK Furnished along Hawthorn Corridor (≤$560 Furnished)",
+            "name": "Domain: Clayton, Bayswater & Boronia Direct Search (≤$525/wk)",
             "category": "Domain.com.au (Live)",
-            "url": "https://www.domain.com.au/rent/?suburb=hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,kew-vic-3101,richmond-vic-3121,box-hill-vic-3128,malvern-vic-3144,melbourne-vic-3000&bedrooms=1-2&price=0-560&features=furnished&excludedeposittaken=1&sort=dateupdated-desc",
+            "url": "https://www.domain.com.au/rent/?suburb=clayton-vic-3168,bayswater-vic-3153,boronia-vic-3155&bedrooms=1-2&price=0-525&excludedeposittaken=1&sort=dateupdated-desc",
+            "note": "Focused search for Clayton (Pakenham line), Bayswater (Belgrave line), and Boronia (Belgrave line).",
+        },
+        {
+            "name": "Domain: 1–2BHK Furnished along Corridor (≤$560 Furnished)",
+            "category": "Domain.com.au (Live)",
+            "url": "https://www.domain.com.au/rent/?suburb=hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,kew-vic-3101,richmond-vic-3121,box-hill-vic-3128,malvern-vic-3144,clayton-vic-3168,bayswater-vic-3153,boronia-vic-3155,melbourne-vic-3000&bedrooms=1-2&price=0-560&features=furnished&excludedeposittaken=1&sort=dateupdated-desc",
             "note": "Furnished 1-2BR properties up to $560/wk on direct train/tram lines to Hawthorn.",
         },
         {
-            "name": "Realestate.com.au: 2BR Hawthorn & Immediate Suburbs ≤$525/wk",
+            "name": "Realestate.com.au: 2BR Hawthorn, Clayton, Bayswater, Boronia ≤$525/wk",
             "category": "Realestate.com.au (Live)",
-            "url": "https://www.realestate.com.au/rent/with-2-bedrooms-between-0-525-in-hawthorn,+vic+3122%3b+hawthorn+east,+vic+3123%3b+camberwell,+vic+3124%3b+kew,+vic+3101%3b+box+hill,+vic+3128%3b+surrey+hills,+vic+3127/list-1?activeSort=list-date&includeSurrounding=false",
-            "note": "Exact suburb matches on the Belgrave/Lilydale train lines & Tram 16/70/75.",
+            "url": "https://www.realestate.com.au/rent/with-2-bedrooms-between-0-525-in-hawthorn,+vic+3122%3b+hawthorn+east,+vic+3123%3b+camberwell,+vic+3124%3b+kew,+vic+3101%3b+box+hill,+vic+3128%3b+clayton,+vic+3168%3b+bayswater,+vic+3153%3b+boronia,+vic+3155/list-1?activeSort=list-date&includeSurrounding=false",
+            "note": "Exact suburb matches on the Belgrave/Lilydale & Pakenham lines.",
         },
         {
-            "name": "FB Marketplace: 2BR Lease Transfers (Hawthorn & Inner East ≤$560)",
+            "name": "FB Marketplace: Clayton, Bayswater, Boronia & Hawthorn (≤$560)",
             "category": "Facebook Marketplace (Live)",
-            "url": "https://www.facebook.com/marketplace/melbourne/search?query=lease%20transfer%202%20bedroom%20hawthorn%20camberwell%20richmond&maxPrice=560",
+            "url": "https://www.facebook.com/marketplace/melbourne/search?query=lease%20transfer%20clayton%20bayswater%20boronia%20hawthorn&maxPrice=560",
             "note": "Opens Facebook Marketplace under your login. Copy any post text and paste into the 'FB Post Analyzer' tab to score and save it!",
         },
         {
@@ -103,7 +109,7 @@ def main() -> None:
     raw_listings.extend(scrape_gumtree_lease_transfers())
 
     # 2. Scrape live Flatmates Whole Properties (100% real ads with direct URLs)
-    raw_listings.extend(scrape_flatmates_whole_properties(max_pages=2))
+    raw_listings.extend(scrape_flatmates_whole_properties(max_pages=3))
 
     # 3. Scrape live Reddit lease transfers (when accessible)
     raw_listings.extend(scrape_reddit_lease_transfers())
@@ -165,15 +171,16 @@ def main() -> None:
         "",
         "## Top Matching Entire Properties (Direct Train/Tram to Hawthorn)",
         "",
-        "| Score | Rent | Type | Suburb & Direct Transit | Move-In | Direct Link |",
-        "| :---: | :---: | :---: | :--- | :---: | :---: |",
+        "| Score | Rent | Type | Suburb & Direct Transit | Station Proximity | Move-In | Direct Link |",
+        "| :---: | :---: | :---: | :--- | :--- | :---: | :---: |",
     ]
-    for item in strict_matches[:15]:
+    for item in strict_matches[:20]:
         rent_badge = f"${item['weekly_rent']}/wk ({'Furn' if item['is_furnished'] else 'Unfurn'})"
         bed_badge = f"{item['bedrooms']}BHK" + (" 🔄 Lease Transfer" if item["is_lease_transfer"] else "")
         transit = f"**{item['suburb']}** ({item['commute_mode']}, ~{item['commute_mins']}m)"
+        station = item.get("station_distance_display", "Near station")
         digest_lines.append(
-            f"| **{item['match_score']}%** | {rent_badge} | {bed_badge} | {transit} | {item['availability_display']} | [Open Property]({item['url']}) |"
+            f"| **{item['match_score']}%** | {rent_badge} | {bed_badge} | {transit} | {station} | {item['availability_display']} | [Open Property]({item['url']}) |"
         )
 
     DIGEST_FILE.write_text("\n".join(digest_lines) + "\n", encoding="utf-8")

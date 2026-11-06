@@ -433,6 +433,24 @@ body {
   color: var(--text-primary);
 }
 
+.station-box {
+  background: hsla(208, 90%, 95%, 0.7);
+  border-left: 3px solid #2563eb;
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.82rem;
+  color: #1e3a8a;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+[data-theme="dark"] .station-box {
+  background: hsla(217, 45%, 18%, 0.8);
+  border-left-color: #60a5fa;
+  color: #bfdbfe;
+}
+
 .specs-row {
   display: flex;
   flex-wrap: wrap;
