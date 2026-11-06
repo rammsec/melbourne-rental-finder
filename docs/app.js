@@ -454,7 +454,7 @@ async function initApp() {
   });
 
   try {
-    const resp = await fetch('data/listings.json');
+    const resp = await fetch(`data/listings.json?t=${Date.now()}`);
     appData = await resp.json();
   } catch (err) {
     console.error('Error loading listings.json:', err);
