@@ -1,0 +1,44 @@
+name: Daily Melbourne Lease Transfer & Rental Scraper
+
+on:
+  schedule:
+    # Runs daily at 21:00 UTC = 8:00 AM Melbourne AEDT (UTC+11)
+    - cron: '0 21 * * *'
+  workflow_dispatch: # Allows manual 1-click trigger from the GitHub Actions tab
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  scrape-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Melbourne Lease Transfer & Hawthorn Commute Scraper
+        run: |
+          python3 -m scraper.run_scraper
+
+      - name: Publish Daily Digest to Job Summary
+        run: |
+          cat docs/data/digest.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit and Push Updated Listings to GitHub Pages (docs/)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/listings.json docs/data/digest.md
+          if git diff --staged --quiet; then
+            echo "No listing changes to commit."
+          else
+            git commit -m "chore(listings): daily Melbourne rental & lease transfer update [skip ci]"
+            git push
+          fi

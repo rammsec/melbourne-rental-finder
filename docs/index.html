@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Melbourne Lease Transfer & 2BHK Rental Finder — Direct to Hawthorn</title>
+  <meta name="description" content="Daily automated Melbourne rental and lease transfer tracker filtered for entire 1–2BHK properties under $525/$560 per week with direct train or tram commute to Hawthorn.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Critical Lease Timeline Bar -->
+  <header class="deadline-bar" role="banner">
+    <div class="deadline-bar-inner">
+      <div class="timeline-steps">
+        <span class="timeline-pill urgent" id="countdown-pill">⏳ 27 Days to Dec 3 Decision Goal</span>
+        <span class="timeline-pill">🎯 Move-In Window: Dec 5 – Dec 30, 2026</span>
+        <span class="timeline-pill">🏠 Current Contract Ends: Jan 10, 2027</span>
+      </div>
+      <div class="timeline-steps">
+        <span class="timeline-pill" id="last-updated-pill">Updated: Loading...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Title & Quick Actions -->
+    <section class="app-header">
+      <div class="app-title-group">
+        <h1>Melbourne Lease Transfer &amp; Hawthorn Commute Finder</h1>
+        <p class="app-subtitle">
+          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Automatically scored for direct train (Belgrave / Lilydale / Alamein) or direct tram (Routes 70 / 75 / 16) access to <strong>Hawthorn</strong>.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="btn-open-fb-analyzer" type="button">
+          + Paste FB / Fairy Floss Post
+        </button>
+        <a class="btn btn-primary" href="melbourne-rental-finder.tar.gz" download="melbourne-rental-finder.tar.gz">
+          ⬇ Download Project (.tar.gz)
+        </a>
+      </div>
+    </section>
+
+    <!-- User Criteria Strip -->
+    <section class="criteria-strip" aria-label="Active Search Criteria">
+      <div class="criteria-card">
+        <span class="criteria-label">Budget Cap (Weekly)</span>
+        <span class="criteria-value">≤ $525 Unfurn / ≤ $560 Furn</span>
+        <span class="criteria-note">Auto-adjusts cap based on furniture detection</span>
+      </div>
+      <div class="criteria-card">
+        <span class="criteria-label">Property Configuration</span>
+        <span class="criteria-value">2 BHK Preferred (Solo)</span>
+        <span class="criteria-note">Entire place only • Rejects sharehouses &amp; rooms</span>
+      </div>
+      <div class="criteria-card">
+        <span class="criteria-label">Commute Requirement</span>
+        <span class="criteria-value">Direct to Hawthorn (3122)</span>
+        <span class="criteria-note">Belgrave/Lilydale/Alamein Train • Tram 70, 75, 16</span>
+      </div>
+      <div class="criteria-card">
+        <span class="criteria-label">Matches Found</span>
+        <span class="criteria-value" id="stat-strict-matches">-- Strict Matches</span>
+        <span class="criteria-note" id="stat-sub-summary">Scanning lease transfers &amp; whole properties</span>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" aria-label="Dashboard Sections">
+      <button class="tab-btn active" data-tab="panel-matches" id="tab-matches" type="button">
+        Strict Hawthorn Matches <span class="tab-count" id="count-strict">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-shortlist" id="tab-shortlist" type="button">
+        My Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-fb-analyzer" id="tab-fb-analyzer" type="button">
+        FB Marketplace &amp; Post Analyzer
+      </button>
+      <button class="tab-btn" data-tab="panel-portals" id="tab-portals" type="button">
+        Pre-Filtered Live Search Portals <span class="tab-count" id="count-portals">7</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-corridor" id="tab-corridor" type="button">
+        Hawthorn Direct Train/Tram Map
+      </button>
+    </nav>
+
+    <!-- PANEL 1: STRICT MATCHES & ALL SCRAPED LISTINGS -->
+    <section class="panel-section active" id="panel-matches">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <input
+            type="search"
+            id="search-input"
+            class="filter-input"
+            placeholder="Filter by suburb, street, tram/train line..."
+            aria-label="Search listings"
+          >
+          <select id="bedroom-filter" class="filter-select" aria-label="Filter by bedrooms">
+            <option value="all">All Entire Places (1–2+ BHK)</option>
+            <option value="2">2 BHK Only (Preferred)</option>
+            <option value="1">1 BHK / Studio Only</option>
+          </select>
+          <select id="furn-filter" class="filter-select" aria-label="Filter by furnished status">
+            <option value="all">Unfurnished (≤$525) &amp; Furnished (≤$560)</option>
+            <option value="unfurnished">Unfurnished Only (≤$525/wk)</option>
+            <option value="furnished">Furnished Only (≤$560/wk)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <button type="button" class="toggle-chip" id="chip-lease-transfer">
+            🔄 Lease Transfers Only
+          </button>
+          <button type="button" class="toggle-chip active" id="chip-strict-only">
+            ✅ Strict Criteria Only (Hide Rejected)
+          </button>
+        </div>
+      </div>
+
+      <div class="listings-grid" id="listings-container">
+        <!-- Populated dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- PANEL 2: SHORTLIST & TRACKER -->
+    <section class="panel-section" id="panel-shortlist">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>Your Inspection &amp; Lease Transfer Shortlist</h2>
+        <p class="helper-text">
+          Mark any listing as <strong>Interested / Inspecting</strong> or <strong>Applied</strong> using the dropdown on each card. Your statuses are saved locally in your browser so you can track applications before giving your notice on <strong>December 3, 2026</strong>.
+        </p>
+      </div>
+      <div class="listings-grid" id="shortlist-container"></div>
+    </section>
+
+    <!-- PANEL 3: FB MARKETPLACE & FAIRY FLOSS INSTANT ANALYZER -->
+    <section class="panel-section" id="panel-fb-analyzer">
+      <div class="analyzer-grid">
+        <div class="panel-card">
+          <h2>Instant FB Marketplace / Fairy Floss Lease Transfer Scorer</h2>
+          <p class="helper-text">
+            Since Facebook blocks automated bots from reading private groups (like <em>Fairy Floss Real Estate</em> or <em>Melbourne Lease Transfers</em>), paste any FB post or listing text below. It will immediately check the <strong>$525/$560 budget rule</strong>, verify <strong>direct train/tram commute to Hawthorn</strong>, confirm <strong>Dec 5–30 move-in</strong>, and save it to your dashboard.
+          </p>
+          <input
+            type="text"
+            id="fb-post-url"
+            class="filter-input"
+            style="width: 100%; margin-bottom: 0.65rem;"
+            placeholder="Optional: Paste Facebook Marketplace or Group post URL..."
+          >
+          <textarea
+            id="fb-post-text"
+            class="fb-textarea"
+            placeholder="Example: LEASE BREAK in Camberwell 3124! Entire 2 bedroom apartment on Riversdale Rd right near Tram 70 and Camberwell Station. $515 per week unfurnished. Available from December 14th..."
+          ></textarea>
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="btn-score-fb-post">
+              Analyze &amp; Save to My Listings
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-load-sample-fb">
+              Load Example FB Lease Transfer Post
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-card" id="fb-analysis-result-card">
+          <h2>Live Criteria Breakdown</h2>
+          <p class="helper-text">Paste a post on the left and click <strong>Analyze</strong> to see how it scores against your rules.</p>
+          <div id="fb-analysis-output" style="font-size: 0.9rem; color: var(--text-secondary);">
+            <ul style="list-style: none; display: grid; gap: 0.6rem; margin-top: 0.75rem;">
+              <li>✔ <strong>Budget Check:</strong> Unfurnished ≤ $525/wk | Furnished ≤ $560/wk</li>
+              <li>✔ <strong>Solo Entire Property:</strong> 2BHK preferred (auto-flags sharehouses)</li>
+              <li>✔ <strong>Hawthorn Transit:</strong> Checks Belgrave/Lilydale/Alamein train &amp; Tram 70/75/16</li>
+              <li>✔ <strong>Move-in Window:</strong> Dec 5 – Dec 30, 2026 (prior to Jan 10 contract end)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 4: PRE-FILTERED PORTAL DEEP LINKS -->
+    <section class="panel-section" id="panel-portals">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>One-Click Pre-Filtered Search Portals (Hawthorn Corridor)</h2>
+        <p class="helper-text">
+          These links open Facebook Marketplace, Domain, Realestate.com.au, Flatmates (Whole Properties), and Gumtree with your exact filters (<strong>2BHK, ≤$525/$560, Hawthorn + direct transit suburbs, newest first</strong>) already applied.
+        </p>
+      </div>
+      <div class="quick-links-grid" id="portal-links-container"></div>
+    </section>
+
+    <!-- PANEL 5: HAWTHORN DIRECT TRAIN & TRAM SUBURB REFERENCE -->
+    <section class="panel-section" id="panel-corridor">
+      <div class="panel-card">
+        <h2>Direct Train &amp; Tram Suburbs to Hawthorn (Zero Transfers)</h2>
+        <p class="helper-text">
+          Every suburb below has a single-seat train or tram ride straight into Hawthorn (Hawthorn Station, Glenferrie Station, Auburn Station, Burwood Rd, Riversdale Rd, or Glenferrie Rd).
+        </p>
+        <div style="overflow-x: auto;">
+          <table class="corridor-table" id="corridor-table">
+            <thead>
+              <tr>
+                <th>Suburb</th>
+                <th>Postcode</th>
+                <th>Direct Mode</th>
+                <th>Line / Route to Hawthorn</th>
+                <th>Est. Commute</th>
+              </tr>
+            </thead>
+            <tbody id="corridor-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
