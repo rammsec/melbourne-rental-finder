@@ -18,7 +18,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any
 
 
@@ -26,6 +26,39 @@ DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Accept": "*/*",
 }
+
+
+def parse_gumtree_age_to_iso(age_str: str) -> str:
+    """
+    Convert Gumtree age text (e.g. '12 hours ago', 'Yesterday', '05/11/2026')
+    into an accurate ISO-8601 UTC timestamp.
+    """
+    now = datetime.now(timezone.utc)
+    clean = (age_str or "").strip().lower()
+    if not clean or "just now" in clean or "minute" in clean or "recent" in clean:
+        return now.isoformat()
+
+    m_hr = re.search(r"(\d+)\s*hour", clean)
+    if m_hr:
+        return (now - timedelta(hours=int(m_hr.group(1)))).isoformat()
+
+    if "yesterday" in clean:
+        return (now - timedelta(days=1)).isoformat()
+
+    m_day = re.search(r"(\d+)\s*day", clean)
+    if m_day:
+        return (now - timedelta(days=int(m_day.group(1)))).isoformat()
+
+    m_date = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", clean)
+    if m_date:
+        day, month, year = int(m_date.group(1)), int(m_date.group(2)), int(m_date.group(3))
+        try:
+            dt = datetime(year, month, day, 9, 0, 0, tzinfo=timezone.utc)
+            return dt.isoformat()
+        except ValueError:
+            pass
+
+    return now.isoformat()
 
 
 def fetch_url(url: str, headers: Dict[str, str] = None, timeout: int = 12) -> str:
@@ -96,6 +129,7 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
 
             age_m = re.search(r'class="user-ad-row-new-design__age">(.*?)</p>', inner, re.S)
             age = age_m.group(1).strip() if age_m else "Recent"
+            listed_iso = parse_gumtree_age_to_iso(age)
 
             # Check bedrooms
             bed_m = re.search(r'(\d+)\s*Bedrooms?', inner, re.I)
@@ -119,7 +153,7 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
                 "description": desc,
                 "url": f"https://www.gumtree.com.au{href}",
                 "photo": photo,
-                "listed_at": datetime.now(timezone.utc).isoformat(),
+                "listed_at": listed_iso,
                 "listing_kind": "property",
                 "is_lease_transfer": True,
             })

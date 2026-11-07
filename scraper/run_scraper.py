@@ -119,13 +119,14 @@ def main() -> None:
 
     for raw in raw_listings:
         enriched = score_and_classify_listing(raw)
+        # Completely exclude Student Only Accommodation & Rooming Houses
+        if enriched.get("is_student_only"):
+            continue
         lid = enriched["id"]
         if lid not in existing_map:
             enriched["is_new"] = True
-            if enriched["pass_strict_filter"]:
-                new_matches_count += 1
-        else:
-            enriched["is_new"] = existing_map[lid].get("is_new", False)
+        if enriched.get("is_new") and enriched.get("pass_strict_filter"):
+            new_matches_count += 1
         processed_map[lid] = enriched
 
     # Sort: strict matches first, then lease transfers, then score descending, then rent

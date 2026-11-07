@@ -113,18 +113,22 @@
             <option value="nunawading">Nunawading (3131)</option>
             <option value="ringwood">Ringwood (3134)</option>
           </select>
-          <select id="bedroom-filter" class="filter-select" aria-label="Filter by bedrooms">
-            <option value="all">All Entire Places (1–2+ BHK)</option>
-            <option value="2">2 BHK Only (Preferred)</option>
-            <option value="1">1 BHK / Studio Only</option>
+          <select id="bedroom-filter" class="filter-select" aria-label="Filter by BHK">
+            <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
+            <option value="1">1 BHK / Studio</option>
+            <option value="2">2 BHK (Preferred)</option>
+            <option value="3">3 BHK</option>
           </select>
           <select id="furn-filter" class="filter-select" aria-label="Filter by furnished status">
-            <option value="all">Unfurnished (≤$525) &amp; Furnished (≤$560)</option>
-            <option value="unfurnished">Unfurnished Only (≤$525/wk)</option>
+            <option value="all">Furnished &amp; Unfurnished (All)</option>
             <option value="furnished">Furnished Only (≤$560/wk)</option>
+            <option value="unfurnished">Unfurnished Only (≤$525/wk)</option>
           </select>
         </div>
         <div class="filter-group">
+          <button type="button" class="toggle-chip" id="chip-new-only">
+            ✨ New Listings (Last 1–2 Days)
+          </button>
           <button type="button" class="toggle-chip" id="chip-lease-transfer">
             🔄 Lease Transfers Only
           </button>
@@ -136,6 +140,19 @@
 
       <div class="listings-grid" id="listings-container">
         <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Bottom Section for Red-Starred (Skipped / Not Interested) Listings -->
+      <div id="skipped-section" class="skipped-section" style="display: none; margin-top: 2.5rem;">
+        <div class="panel-card skipped-header-card">
+          <div>
+            <h3>🔴 Not Interested / Skipped Properties (<span id="count-skipped">0</span>)</h3>
+            <p class="helper-text">
+              Properties you clicked twice (<strong>Red Star ★</strong>) are moved here so you can skip them next time. Click the red star once more to reset back to normal.
+            </p>
+          </div>
+        </div>
+        <div class="listings-grid skipped-grid" id="skipped-container"></div>
       </div>
     </section>
 

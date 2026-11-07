@@ -22,6 +22,7 @@ let filterState = {
   suburb: 'all',
   bedrooms: 'all',
   furnished: 'all',
+  newOnly: false,
   leaseTransferOnly: false,
   strictOnly: false
 };
@@ -43,6 +44,39 @@ function setSavedStatus(listingId, status) {
   }
   localStorage.setItem(STORAGE_STATUS_KEY, JSON.stringify(current));
   renderAll();
+}
+
+function cycleStarStatus(listingId) {
+  const current = getSavedStatuses();
+  const st = current[listingId] || 'none';
+  // 3-state toggle: Default (none) -> 1st click: Green Star (shortlist) -> 2nd click: Red Star (skipped) -> 3rd click: Reset (none)
+  if (st === 'none') {
+    setSavedStatus(listingId, 'shortlist');
+  } else if (st === 'shortlist' || st === 'inspecting' || st === 'applied') {
+    setSavedStatus(listingId, 'skipped');
+  } else {
+    setSavedStatus(listingId, 'none');
+  }
+}
+
+function isStudentOnlyListing(item) {
+  if (item.is_student_only) return true;
+  const text = `${item.title || ''} ${item.subhead || ''} ${item.description || ''}`.toLowerCase();
+  return /\bstudent\s+only\b|\bstudents\s+only\b|\bstudent\s+accommodation\b|\bunilodge\b|\bsha\.com\.au\b|\bstudent\s+housing\s+australia\b|\bscape\b|\biglu\b|\byugo\b|\brooming\s+house\b|^wanted:/i.test(text);
+}
+
+function isRecentNewListing(item) {
+  if (item.is_new) return true;
+  if (item.listed_at) {
+    const dt = new Date(item.listed_at);
+    if (!isNaN(dt.getTime())) {
+      const ageHours = (Date.now() - dt.getTime()) / (1000 * 60 * 60);
+      if (ageHours >= 0 && ageHours <= 60) return true;
+    }
+  }
+  const sub = (item.subhead || '').toLowerCase();
+  if (sub.includes('hour') || sub.includes('yesterday') || sub.includes('today')) return true;
+  return false;
 }
 
 function getCustomPosts() {
@@ -73,12 +107,37 @@ function getAllMergedListings() {
   const custom = getCustomPosts();
   const base = appData.listings || [];
   const seen = new Set(custom.map(i => i.id));
-  return [...custom, ...base.filter(i => !seen.has(i.id))];
+  return [...custom, ...base.filter(i => !seen.has(i.id))].filter(i => !isStudentOnlyListing(i));
 }
 
 function createListingCardHTML(item) {
   const statuses = getSavedStatuses();
   const userStatus = statuses[item.id] || 'none';
+  const isNew = isRecentNewListing(item);
+
+  const isGreenStar = userStatus === 'shortlist' || userStatus === 'inspecting' || userStatus === 'applied';
+  const isRedStar = userStatus === 'skipped' || userStatus === 'hidden';
+
+  let starBtnClass = 'star-btn';
+  let starIcon = '☆';
+  let starLabel = 'Star';
+  let starTitle = 'Click once for Green Star (Interested), twice for Red Star (Skip to bottom)';
+  if (isGreenStar) {
+    starBtnClass = 'star-btn star-green';
+    starIcon = '★';
+    starLabel = 'Interested';
+    starTitle = 'Green Star (Interested) — Click again for Red Star (Not Interested / Move to bottom)';
+  } else if (isRedStar) {
+    starBtnClass = 'star-btn star-red';
+    starIcon = '★';
+    starLabel = 'Skipped';
+    starTitle = 'Red Star (Skipped) — Click again to reset star';
+  }
+
+  const cardExtraClasses = [
+    isNew ? 'is-new-listing' : '',
+    isGreenStar ? 'is-shortlisted-card' : ''
+  ].filter(Boolean).join(' ');
 
   const scoreClass = item.match_score >= 85 ? '' : item.match_score >= 70 ? 'medium' : 'low';
   const furnLabel = item.is_furnished ? 'Furnished (≤$560 cap)' : 'Unfurnished (≤$525 cap)';
@@ -99,12 +158,25 @@ function createListingCardHTML(item) {
   }
 
   return `
-    <article class="listing-card" data-id="${escapeHtml(item.id)}">
+    <article class="listing-card ${cardExtraClasses}" data-id="${escapeHtml(item.id)}">
       <div class="listing-media">
         <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(item.title)}" loading="lazy">
         <div class="media-top-badges">
-          <span class="score-pill ${scoreClass}">${item.match_score}% Match</span>
-          ${item.is_lease_transfer ? `<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>` : ''}
+          <div class="media-left-badges">
+            <span class="score-pill ${scoreClass}">${item.match_score}% Match</span>
+            ${isNew ? `<span class="new-listing-badge">✨ NEW LISTING</span>` : ''}
+            ${item.is_lease_transfer ? `<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>` : ''}
+          </div>
+          <button
+            type="button"
+            class="${starBtnClass}"
+            data-star-id="${escapeHtml(item.id)}"
+            title="${escapeHtml(starTitle)}"
+            aria-label="${escapeHtml(starTitle)}"
+          >
+            <span class="star-icon">${starIcon}</span>
+            <span>${starLabel}</span>
+          </button>
         </div>
         <div class="price-overlay">
           $${item.weekly_rent || '—'}/wk
@@ -137,11 +209,11 @@ function createListingCardHTML(item) {
 
         <div class="listing-footer">
           <select class="status-select" data-listing-id="${escapeHtml(item.id)}" aria-label="Application status">
-            <option value="none" ${userStatus === 'none' ? 'selected' : ''}>📌 Status: Untracked</option>
-            <option value="shortlist" ${userStatus === 'shortlist' ? 'selected' : ''}>⭐ Shortlisted</option>
+            <option value="none" ${userStatus === 'none' ? 'selected' : ''}>☆ No Star (Default)</option>
+            <option value="shortlist" ${userStatus === 'shortlist' ? 'selected' : ''}>🟢 Green Star (Shortlisted)</option>
             <option value="inspecting" ${userStatus === 'inspecting' ? 'selected' : ''}>🗓️ Booked Inspection</option>
             <option value="applied" ${userStatus === 'applied' ? 'selected' : ''}>✅ Applied for Lease</option>
-            <option value="hidden" ${userStatus === 'hidden' ? 'selected' : ''}>🚫 Hide Listing</option>
+            <option value="skipped" ${(userStatus === 'skipped' || userStatus === 'hidden') ? 'selected' : ''}>🔴 Red Star (Skip to Bottom)</option>
           </select>
 
           <a href="${escapeHtml(item.url || '#')}" target="_blank" rel="noopener" class="btn btn-primary">
@@ -155,16 +227,17 @@ function createListingCardHTML(item) {
 
 function renderListings() {
   const container = document.getElementById('listings-container');
+  const skippedSection = document.getElementById('skipped-section');
+  const skippedContainer = document.getElementById('skipped-container');
+  const countSkippedEl = document.getElementById('count-skipped');
   const shortlistContainer = document.getElementById('shortlist-container');
   const statuses = getSavedStatuses();
   const all = getAllMergedListings();
 
-  const filtered = all.filter(item => {
-    const st = statuses[item.id] || 'none';
-    if (st === 'hidden') return false;
-
+  const matchingFilter = all.filter(item => {
     if (filterState.strictOnly && !item.pass_strict_filter) return false;
     if (filterState.leaseTransferOnly && !item.is_lease_transfer) return false;
+    if (filterState.newOnly && !isRecentNewListing(item)) return false;
 
     if (filterState.suburb && filterState.suburb !== 'all') {
       const sub = (item.suburb || '').toLowerCase();
@@ -173,8 +246,9 @@ function renderListings() {
       if (!sub.includes(q) && !addr.includes(q)) return false;
     }
 
-    if (filterState.bedrooms === '2' && item.bedrooms !== 2) return false;
     if (filterState.bedrooms === '1' && item.bedrooms !== 1) return false;
+    if (filterState.bedrooms === '2' && item.bedrooms !== 2) return false;
+    if (filterState.bedrooms === '3' && item.bedrooms < 3) return false;
 
     if (filterState.furnished === 'unfurnished' && item.is_furnished) return false;
     if (filterState.furnished === 'furnished' && !item.is_furnished) return false;
@@ -187,36 +261,78 @@ function renderListings() {
     return true;
   });
 
-  if (filtered.length === 0) {
+  // Partition into active vs red-starred (skipped) listings
+  const activeListings = [];
+  const skippedListings = [];
+  for (const item of matchingFilter) {
+    const st = statuses[item.id] || 'none';
+    if (st === 'skipped' || st === 'hidden') {
+      skippedListings.push(item);
+    } else {
+      activeListings.push(item);
+    }
+  }
+
+  // Sort active listings so Green Star (shortlisted) or New Listings are easy to spot
+  activeListings.sort((a, b) => {
+    const stA = statuses[a.id] === 'shortlist' ? 1 : 0;
+    const stB = statuses[b.id] === 'shortlist' ? 1 : 0;
+    if (stA !== stB) return stB - stA;
+    return 0;
+  });
+
+  if (activeListings.length === 0) {
     container.innerHTML = `
       <div class="panel-card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem;">
-        <h3>No listings match the current filter combination</h3>
-        <p class="helper-text" style="margin-top: 0.4rem;">Try unchecking "Lease Transfers Only" or "Strict Criteria Only" to see near-matches.</p>
+        <h3>No active listings match the current filter combination</h3>
+        <p class="helper-text" style="margin-top: 0.4rem;">Try clearing a filter chip or check the Skipped section below.</p>
       </div>
     `;
   } else {
-    container.innerHTML = filtered.map(createListingCardHTML).join('');
+    container.innerHTML = activeListings.map(createListingCardHTML).join('');
   }
 
-  // Render Shortlist tab
+  // Render Bottom Skipped (Red Star) Section
+  if (skippedSection && skippedContainer) {
+    if (skippedListings.length > 0) {
+      skippedSection.style.display = 'block';
+      if (countSkippedEl) countSkippedEl.textContent = skippedListings.length;
+      skippedContainer.innerHTML = skippedListings.map(createListingCardHTML).join('');
+    } else {
+      skippedSection.style.display = 'none';
+      skippedContainer.innerHTML = '';
+    }
+  }
+
+  // Render Shortlist tab (Green Star / Inspecting / Applied)
   const shortlisted = all.filter(item => {
     const st = statuses[item.id];
     return st === 'shortlist' || st === 'inspecting' || st === 'applied';
   });
 
-  document.getElementById('count-strict').textContent = filtered.length;
+  document.getElementById('count-strict').textContent = activeListings.length;
   document.getElementById('count-shortlist').textContent = shortlisted.length;
 
   if (shortlisted.length === 0) {
     shortlistContainer.innerHTML = `
       <div class="panel-card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem;">
         <h3>No properties shortlisted yet</h3>
-        <p class="helper-text" style="margin-top: 0.4rem;">Use the status dropdown on any listing card to mark it as Shortlisted, Booked Inspection, or Applied.</p>
+        <p class="helper-text" style="margin-top: 0.4rem;">Click the star button once on any card (turns <strong>Green ★</strong>) or use the status dropdown to shortlist properties.</p>
       </div>
     `;
   } else {
     shortlistContainer.innerHTML = shortlisted.map(createListingCardHTML).join('');
   }
+
+  // Bind 3-state Star button listeners
+  document.querySelectorAll('.star-btn').forEach(btnEl => {
+    btnEl.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const id = btnEl.getAttribute('data-star-id');
+      cycleStarStatus(id);
+    });
+  });
 
   // Bind status dropdown listeners
   document.querySelectorAll('.status-select').forEach(selectEl => {
@@ -422,6 +538,15 @@ async function initApp() {
     filterState.furnished = e.target.value;
     renderListings();
   });
+
+  const chipNew = document.getElementById('chip-new-only');
+  if (chipNew) {
+    chipNew.addEventListener('click', () => {
+      filterState.newOnly = !filterState.newOnly;
+      chipNew.classList.toggle('active', filterState.newOnly);
+      renderListings();
+    });
+  }
 
   const chipLT = document.getElementById('chip-lease-transfer');
   chipLT.addEventListener('click', () => {
