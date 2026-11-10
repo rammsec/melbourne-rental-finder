@@ -33,6 +33,7 @@ from .sources import (
     scrape_gumtree_lease_transfers,
     scrape_flatmates_whole_properties,
     scrape_reddit_lease_transfers,
+    scrape_facebook_marketplace_aligned,
     get_listing_age_days,
     is_outside_melbourne,
 )
@@ -90,10 +91,22 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
             "note": "Exact suburb matches on the Belgrave/Lilydale & Pakenham lines.",
         },
         {
-            "name": "FB Marketplace: Clayton, Bayswater, Boronia & Hawthorn (≤$560)",
+            "name": "FB Marketplace: 2BR Lease Transfers (Ascending Distance)",
             "category": "Facebook Marketplace (Live)",
-            "url": "https://www.facebook.com/marketplace/melbourne/search?query=lease%20transfer%20clayton%20bayswater%20boronia%20hawthorn&maxPrice=560",
-            "note": "Opens Facebook Marketplace under your login. Copy any post text and paste into the 'FB Post Analyzer' tab to score and save it!",
+            "url": "https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom&exact=false",
+            "note": "Primary user search: 2BR lease transfers sorted by distance from Melbourne. Copy and paste promising posts into our analyzer!",
+        },
+        {
+            "name": "FB Marketplace: Hawthorn, Camberwell & Richmond",
+            "category": "Facebook Marketplace (Live)",
+            "url": "https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom%20hawthorn%20camberwell%20richmond&exact=false",
+            "note": "Inner-East direct train/tram corridor (Belgrave/Lilydale Line & Tram 70/75).",
+        },
+        {
+            "name": "FB Marketplace: Clayton, Bayswater & Boronia",
+            "category": "Facebook Marketplace (Live)",
+            "url": "https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom%20clayton%20boronia%20bayswater&exact=false",
+            "note": "Focused search for Clayton (Pakenham Line), Bayswater & Boronia (Belgrave Line).",
         },
         {
             "name": "Fairy Floss Real Estate (Facebook Group)",
@@ -144,6 +157,13 @@ def main() -> None:
         raw_listings.extend(scrape_reddit_lease_transfers())
     except Exception as e:
         print(f"[Warn] Reddit scraper error: {e}")
+        errors_logged += 1
+
+    # 4. Ingest live aligned Facebook Marketplace lease transfer listings
+    try:
+        raw_listings.extend(scrape_facebook_marketplace_aligned())
+    except Exception as e:
+        print(f"[Warn] Facebook Marketplace scraper error: {e}")
         errors_logged += 1
 
     # Ingest existing listings if raw scrape yields fewer items (safety guard)

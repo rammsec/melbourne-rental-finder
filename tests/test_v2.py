@@ -17,7 +17,8 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 from scraper.config import USER_CRITERIA, HAWTHORN_DIRECT_SUBURBS, get_budget_cap
-from scraper.sources import is_outside_melbourne
+from scraper.sources import is_outside_melbourne, scrape_facebook_marketplace_aligned, FB_MARKETPLACE_PRIMARY_URL
+from scraper.run_scraper import build_portal_quick_links
 from scraper.models import Property, ListingSource, ListingSnapshot, PropertyScore, ScraperExecutionLog
 from scraper.dedup import (
     calculate_match_confidence,
@@ -585,5 +586,38 @@ class TestHawthornTransitFilter(unittest.TestCase):
             self.assertFalse(scored.has_direct_hawthorn_transit, f"{sub} should NOT have direct Hawthorn transit")
 
 
+class TestFacebookMarketplaceSource(unittest.TestCase):
+    """Test Facebook Marketplace source ingestion and strict suburb corridor alignment."""
+
+    def test_aligned_facebook_marketplace_ingestion(self):
+        items = scrape_facebook_marketplace_aligned()
+        self.assertGreater(len(items), 0, "Should return verified FB Marketplace listings")
+
+        for item in items:
+            self.assertEqual(item["source"], "Facebook Marketplace")
+            self.assertEqual(item["source_key"], "facebook_marketplace")
+            suburb_clean = item["suburb"].strip().lower()
+            # Must strictly belong to the 27 Hawthorn transit corridors
+            self.assertIn(suburb_clean, HAWTHORN_DIRECT_SUBURBS)
+            # Must not be interstate
+            self.assertFalse(is_outside_melbourne(item.get("address", ""), item.get("title", ""), item.get("description", ""), suburb_clean))
+            # Must satisfy BHK budget rules
+            bedrooms = item.get("bedrooms") or 2
+            is_furn = bool(item.get("is_furnished"))
+            cap = get_budget_cap(bedrooms, is_furn)
+            self.assertLessEqual(item["weekly_rent"], cap)
+            self.assertTrue(item.get("is_lease_transfer"))
+
+    def test_primary_search_url_in_quick_links(self):
+        portal_links = build_portal_quick_links()
+        self.assertGreater(len(portal_links), 0)
+        # The primary FB Marketplace URL must be present in portal quick links
+        fb_links = [l for l in portal_links if "facebook.com" in l["url"]]
+        self.assertGreater(len(fb_links), 0)
+        self.assertEqual(fb_links[0]["url"], FB_MARKETPLACE_PRIMARY_URL)
+        self.assertIn("lease%20transfer%202%20bedroom", fb_links[0]["url"])
+
+
 if __name__ == "__main__":
     unittest.main()
+

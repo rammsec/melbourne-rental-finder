@@ -221,6 +221,9 @@
             <button type="button" class="toggle-chip" id="chip-lease-transfer">
               🔄 Lease Transfers Only
             </button>
+            <button type="button" class="toggle-chip" id="chip-fb-only">
+              🌐 FB Marketplace
+            </button>
             <button type="button" class="toggle-chip" id="chip-budget-only">
               💰 Within Budget Cap
             </button>
@@ -445,8 +448,17 @@
         <div class="panel-card">
           <h2>Instant FB Marketplace / Fairy Floss Lease Transfer Scorer</h2>
           <p class="helper-text">
-            Since Facebook blocks automated bots from reading private groups (like <em>Fairy Floss Real Estate</em> or <em>Melbourne Lease Transfers</em>), paste any FB post or listing text below. It will immediately check the <strong>$525/$560 budget rule</strong>, verify <strong>direct train/tram commute to Hawthorn</strong>, confirm <strong>Dec 5, 2026 – Jan 15, 2027 move-in</strong>, and save it to your dashboard.
+            Facebook blocks automated bots with login walls, but you can browse directly on FB! Open the pre-filtered search below, copy any promising post or listing description, and paste it here. It automatically verifies <strong>suburb alignment with your 27 Hawthorn corridors</strong>, checks your <strong>granular BHK budget rules</strong> (2BHK ≤$560 unfurn / ≤$625 furn), and adds the scored property to your dashboard.
           </p>
+          <a
+            href="https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&amp;query=lease%20transfer%202%20bedroom&amp;exact=false"
+            target="_blank"
+            rel="noopener"
+            class="btn btn-secondary"
+            style="display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 0.85rem;"
+          >
+            <span>↗ Open FB Marketplace 2BR Lease Transfers (Ascending Distance)</span>
+          </a>
           <input
             type="text"
             id="fb-post-url"
@@ -457,7 +469,7 @@
           <textarea
             id="fb-post-text"
             class="fb-textarea"
-            placeholder="Example: LEASE BREAK in Camberwell 3124! Entire 2 bedroom apartment on Riversdale Rd right near Tram 70 and Camberwell Station. $515 per week unfurnished. Available from December 14th..."
+            placeholder="Example: LEASE BREAK in Camberwell 3124! Entire 2 bedroom apartment on Riversdale Rd right near Tram 70 and Camberwell Station. $520 per week unfurnished. Available from December 14th..."
           ></textarea>
           <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
             <button type="button" class="btn btn-primary" id="btn-score-fb-post">
@@ -474,10 +486,10 @@
           <p class="helper-text">Paste a post on the left and click <strong>Analyze</strong> to see how it scores against your rules.</p>
           <div id="fb-analysis-output" style="font-size: 0.9rem; color: var(--text-secondary);">
             <ul style="list-style: none; display: grid; gap: 0.6rem; margin-top: 0.75rem;">
-              <li>✔ <strong>Budget Check:</strong> Unfurnished ≤ $525/wk | Furnished ≤ $560/wk</li>
-              <li>✔ <strong>Solo Entire Property:</strong> 2BHK preferred (auto-flags sharehouses)</li>
-              <li>✔ <strong>Hawthorn Transit:</strong> Checks Belgrave/Lilydale/Alamein train &amp; Tram 70/75/16</li>
-              <li>✔ <strong>Move-in Window:</strong> Dec 5, 2026 – Jan 15, 2027 (extended availability)</li>
+              <li>🚆 <strong>Suburb Alignment:</strong> Checks against 27 direct train/tram corridors to Hawthorn</li>
+              <li>💰 <strong>Budget Rules:</strong> 2BHK ≤ $560 Unfurn / ≤ $625 Furn | 1BHK ≤ $400 Unfurn / ≤ $500 Furn</li>
+              <li>🏠 <strong>Solo Entire Property:</strong> 2BHK preferred (auto-flags sharehouses)</li>
+              <li>📅 <strong>Move-in Window:</strong> Dec 5, 2026 – Jan 15, 2027</li>
             </ul>
           </div>
         </div>

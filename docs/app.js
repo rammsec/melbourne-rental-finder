@@ -34,6 +34,7 @@ let filterState = {
   strictOnly: false,
   verifiedOnly: false,
   directTransitOnly: false,
+  fbOnly: false,
   activeMetric: 'all'
 };
 
@@ -618,6 +619,7 @@ function renderListings() {
     // Filters Bar
     if (filterState.strictOnly && !item.pass_strict_filter) return false;
     if (filterState.leaseTransferOnly && !item.is_lease_transfer) return false;
+    if (filterState.fbOnly && !(item.source || '').toLowerCase().includes('facebook')) return false;
     if (filterState.newOnly && !isRecentNewListing(item)) return false;
     if (filterState.budgetOnly && (item.weekly_rent || 0) > getBudgetCap(item.bedrooms, item.is_furnished)) return false;
 
@@ -1171,6 +1173,7 @@ function resetAllFilters() {
     strictOnly: false,
     verifiedOnly: false,
     directTransitOnly: false,
+    fbOnly: false,
     activeMetric: 'all'
   };
 
@@ -1403,6 +1406,7 @@ async function initApp() {
   bindChip('chip-direct-transit', 'directTransitOnly');
   bindChip('chip-new-only', 'newOnly');
   bindChip('chip-lease-transfer', 'leaseTransferOnly');
+  bindChip('chip-fb-only', 'fbOnly');
   bindChip('chip-budget-only', 'budgetOnly');
   bindChip('chip-strict-only', 'strictOnly');
   bindChip('chip-verified-only', 'verifiedOnly');
@@ -1545,12 +1549,95 @@ async function initApp() {
     });
   }
 
+  function detectSuburbFromText(text, url) {
+    const combined = `${text || ''} ${url || ''}`.toLowerCase();
+
+    // Priority-ordered aligned Hawthorn corridor suburbs (multi-word first)
+    const alignedCorridors = [
+      { name: 'Upper Ferntree Gully', key: 'upper ferntree gully', mins: 42, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3156' },
+      { name: 'Ferntree Gully', key: 'ferntree gully', mins: 39, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3156' },
+      { name: 'Hawthorn East', key: 'hawthorn east', mins: 4, mode: 'Train / Tram 70, 75', line: 'Auburn Station + Tram 70/75', pc: '3123' },
+      { name: 'East Melbourne', key: 'east melbourne', mins: 8, mode: 'Train / Tram 75', line: 'Jolimont Station + Tram 75', pc: '3002' },
+      { name: 'Surrey Hills', key: 'surrey hills', mins: 12, mode: 'Train / Tram 70', line: 'Belgrave/Lilydale Line + Tram 70', pc: '3127' },
+      { name: 'Mont Albert', key: 'mont albert', mins: 13, mode: 'Train', line: 'Belgrave/Lilydale Line (Union Station)', pc: '3127' },
+      { name: 'Ringwood East', key: 'ringwood east', mins: 32, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3135' },
+      { name: 'Clayton South', key: 'clayton south', mins: 29, mode: 'Train', line: 'Clayton corridor via Richmond', pc: '3169' },
+      { name: 'Melbourne CBD', key: 'melbourne cbd', mins: 12, mode: 'Train / Tram', line: 'Direct Train (Flinders St / Loop)', pc: '3000' },
+      { name: 'Hawthorn', key: 'hawthorn', mins: 2, mode: 'Train / Tram 70, 75, 16', line: 'Belgrave/Lilydale/Alamein Line + Tram 70/75/16', pc: '3122' },
+      { name: 'Glenferrie', key: 'glenferrie', mins: 2, mode: 'Train / Tram 16', line: 'Belgrave/Lilydale Line (1 stop) + Tram 16', pc: '3122' },
+      { name: 'Auburn', key: 'auburn', mins: 4, mode: 'Train', line: 'Belgrave/Lilydale Line (2 stops)', pc: '3123' },
+      { name: 'Richmond', key: 'richmond', mins: 4, mode: 'Train / Tram 70, 75', line: 'Belgrave/Lilydale Line (1-2 stops) + Tram 70/75', pc: '3121' },
+      { name: 'Burnley', key: 'burnley', mins: 3, mode: 'Train / Tram 70', line: 'Belgrave/Lilydale Line (1 stop) + Tram 70', pc: '3121' },
+      { name: 'Cremorne', key: 'cremorne', mins: 5, mode: 'Train / Tram 70', line: 'East Richmond/Burnley + Tram 70', pc: '3121' },
+      { name: 'Camberwell', key: 'camberwell', mins: 6, mode: 'Train / Tram 70, 75', line: 'Belgrave/Lilydale Line (3 stops) + Tram 70/75', pc: '3124' },
+      { name: 'Canterbury', key: 'canterbury', mins: 9, mode: 'Train', line: 'Belgrave/Lilydale Line (direct)', pc: '3126' },
+      { name: 'Box Hill', key: 'box hill', mins: 15, mode: 'Train', line: 'Belgrave/Lilydale Express & Direct', pc: '3128' },
+      { name: 'Blackburn', key: 'blackburn', mins: 19, mode: 'Train', line: 'Belgrave/Lilydale Line (direct)', pc: '3130' },
+      { name: 'Nunawading', key: 'nunawading', mins: 22, mode: 'Train', line: 'Belgrave/Lilydale Line (direct)', pc: '3131' },
+      { name: 'Mitcham', key: 'mitcham', mins: 25, mode: 'Train', line: 'Belgrave/Lilydale Line (direct)', pc: '3132' },
+      { name: 'Ringwood', key: 'ringwood', mins: 29, mode: 'Train', line: 'Belgrave/Lilydale Line (direct)', pc: '3134' },
+      { name: 'Heathmont', key: 'heathmont', mins: 32, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3135' },
+      { name: 'Bayswater', key: 'bayswater', mins: 35, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3153' },
+      { name: 'Boronia', key: 'boronia', mins: 36, mode: 'Train', line: 'Belgrave Line (single-seat direct)', pc: '3155' },
+      { name: 'Upwey', key: 'upwey', mins: 45, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3158' },
+      { name: 'Tecoma', key: 'tecoma', mins: 48, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3160' },
+      { name: 'Belgrave', key: 'belgrave', mins: 50, mode: 'Train', line: 'Belgrave Line (direct)', pc: '3160' },
+      { name: 'Croydon', key: 'croydon', mins: 35, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3136' },
+      { name: 'Mooroolbark', key: 'mooroolbark', mins: 38, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3138' },
+      { name: 'Lilydale', key: 'lilydale', mins: 44, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3140' },
+      { name: 'Clayton', key: 'clayton', mins: 26, mode: 'Train', line: 'Pakenham Line (direct connection via Richmond)', pc: '3168' },
+      { name: 'Kew', key: 'kew', mins: 8, mode: 'Tram 16 / Bus 609', line: 'Tram 16 (Glenferrie Rd) / Bus 609 to Hawthorn', pc: '3101' },
+      { name: 'Melbourne', key: 'melbourne', mins: 12, mode: 'Train / Tram', line: 'Direct Train (Flinders St / Loop)', pc: '3000' }
+    ];
+
+    for (const entry of alignedCorridors) {
+      const pattern = new RegExp('\\b' + entry.key.replace(/\s+/g, '\\s+') + '\\b', 'i');
+      if (pattern.test(combined)) {
+        return { ...entry, isAligned: true };
+      }
+    }
+
+    // Check known unaligned / western / northern / distant or interstate suburbs
+    const unalignedSuburbs = [
+      'tarneit', 'werribee', 'point cook', 'hoppers crossing', 'truganina', 'footscray',
+      'sunshine', 'geelong', 'frankston', 'dandenong', 'cranbourne', 'pakenham', 'epping',
+      'craigieburn', 'southbank', 'docklands', 'st kilda', 'prahran', 'south yarra',
+      'canberra', 'sydney', 'surry hills', 'brisbane', 'adelaide', 'perth'
+    ];
+    for (const u of unalignedSuburbs) {
+      const pattern = new RegExp('\\b' + u.replace(/\s+/g, '\\s+') + '\\b', 'i');
+      if (pattern.test(combined)) {
+        const properName = u.replace(/\b\w/g, c => c.toUpperCase());
+        return {
+          name: properName,
+          key: u,
+          mins: 55,
+          mode: 'Multi-transfer / Bus',
+          line: 'Outside direct Hawthorn train/tram corridors',
+          pc: '',
+          isAligned: false
+        };
+      }
+    }
+
+    // Default if suburb is unspecified
+    return {
+      name: 'Melbourne Corridor (Unverified)',
+      key: 'melbourne',
+      mins: 25,
+      mode: 'Train / Tram',
+      line: 'Direct transit verification recommended',
+      pc: '3000',
+      isAligned: false
+    };
+  }
+
   const btnLoadSample = document.getElementById('btn-load-sample-fb');
   if (btnLoadSample) {
     btnLoadSample.addEventListener('click', () => {
-      document.getElementById('fb-post-url').value = 'https://www.facebook.com/groups/fairyflossrealestate/';
+      document.getElementById('fb-post-url').value = 'https://www.facebook.com/marketplace/item/4819401829481920';
       document.getElementById('fb-post-text').value =
-        'LEASE TRANSFER — Camberwell / Hawthorn East border (3124)! Entire 2 bedroom, 1 bathroom furnished apartment with balcony and carpark. $545 per week (furnished). 3 mins walk to Riversdale Tram 70 & Camberwell train station (direct to Hawthorn in 5 mins). Move-in date flexible from December 14th, 2026. Not a sharehouse — whole apartment lease takeover until Sept 2027.';
+        'LEASE TRANSFER — Bayswater (3153)! Entire 2 bedroom, 1 bathroom unit with private garden and carpark. $520 per week (unfurnished). 400m from Bayswater Station (Belgrave line direct to Hawthorn, ~35 mins single-seat commute). Move-in date: December 15, 2026. Whole property lease transfer until October 2027.';
     });
   }
 
@@ -1573,17 +1660,51 @@ async function initApp() {
       const weeklyRent = mPrice ? parseInt(mPrice[1], 10) : 520;
 
       const mDec = lower.match(/\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?dec(?:ember)?|dec(?:ember)?\s+(\d{1,2}))\b/);
-      const avail = mDec ? `Dec ${mDec[1] || mDec[2]}, 2026` : 'Dec 2026 (Flexible)';
+      const avail = mDec ? `Dec ${mDec[1] || mDec[2]}, 2026` : 'Dec 15, 2026 (Flexible)';
 
       const isSharehouse = /\bshare\s*house\b|\bflat\s*share\b|\broom\s+for\s+rent\b|\bprivate\s+room\b|\bhousemates?\b/.test(lower) && !/\bentire\b|\bwhole\s+property\b/.test(lower);
       const isLeaseTransfer = /\blease\s+transfer\b|\blease\s+break\b|\bbreak\s+lease\b|\btake\s*over\b/.test(lower);
 
+      // Suburb alignment detection
+      const suburbInfo = detectSuburbFromText(rawText, postUrl);
+      const isAligned = suburbInfo.isAligned;
+
+      // Strict filter qualification
+      let passStrict = true;
+      let rejectionReason = null;
+
+      if (!isAligned) {
+        passStrict = false;
+        rejectionReason = `Suburb (${suburbInfo.name}) is outside your 27 Hawthorn direct train/tram corridors`;
+      } else if (isSharehouse) {
+        passStrict = false;
+        rejectionReason = 'Sharehouse / Room only (user requires entire property)';
+      } else if (weeklyRent > maxCap) {
+        passStrict = false;
+        rejectionReason = `Over budget ($${weeklyRent}/wk > $${maxCap}/wk cap for ${bedrooms}BHK ${isFurn ? 'furnished' : 'unfurnished'})`;
+      }
+
+      // 100-pt Explainable Score
+      let score = 50;
+      if (isAligned) score += 25;
+      if (!isSharehouse) score += 15;
+      if (weeklyRent <= maxCap) {
+        score += 20;
+        const diff = maxCap - weeklyRent;
+        if (diff >= 30) score += 10;
+      } else {
+        score -= 20;
+      }
+      if (isLeaseTransfer) score += 10;
+      score = Math.max(20, Math.min(100, score));
+
       const customItem = {
         id: 'fb-custom-' + Date.now(),
-        source: 'FB Marketplace / Group (Saved)',
-        title: `${isLeaseTransfer ? 'Lease Transfer: ' : ''}${bedrooms}BHK in Camberwell`,
-        subhead: `Saved from FB • ${isFurn ? 'Furnished' : 'Unfurnished'}`,
-        address: 'Camberwell, VIC 3124',
+        source: 'Facebook Marketplace',
+        source_key: 'facebook_marketplace',
+        title: `${isLeaseTransfer ? 'Lease Transfer: ' : ''}${bedrooms}BHK in ${suburbInfo.name}`,
+        subhead: `${suburbInfo.name} VIC ${suburbInfo.pc || ''} • ${isFurn ? 'Furnished' : 'Unfurnished'}`,
+        address: `${suburbInfo.name}, VIC ${suburbInfo.pc || ''}`,
         weekly_rent: weeklyRent,
         is_furnished: isFurn,
         bedrooms: bedrooms,
@@ -1591,44 +1712,48 @@ async function initApp() {
         parking: 1,
         is_lease_transfer: isLeaseTransfer,
         is_sharehouse: isSharehouse,
-        suburb: 'Camberwell',
-        postcode: '3124',
-        commute_mode: 'Train / Tram 70, 75',
-        commute_line: 'Belgrave/Lilydale Line (3 stops) + Tram 70/75',
-        commute_mins: 6,
-        station_distance_display: '~320m to Camberwell Station (~4 min walk)',
+        suburb: suburbInfo.name,
+        postcode: suburbInfo.pc || '',
+        commute_mode: suburbInfo.mode,
+        commute_line: suburbInfo.line,
+        commute_mins: suburbInfo.mins,
+        has_direct_hawthorn_transit: isAligned,
+        station_distance_display: `~400m to ${suburbInfo.name} Station (~5 min walk)`,
         station_is_explicit: true,
         availability_display: avail,
         availability_fit: 'ideal',
         description: rawText,
-        url: postUrl || 'https://www.facebook.com/groups/fairyflossrealestate/',
+        url: postUrl || 'https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom&exact=false',
         photo: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80',
-        match_score: isSharehouse ? 30 : Math.min(100, weeklyRent <= maxCap ? 92 : 75),
-        pass_strict_filter: !isSharehouse && weeklyRent <= maxCap,
-        rejection_reason: isSharehouse ? 'Sharehouse / Room only' : (weeklyRent > maxCap ? `Over budget ($${weeklyRent}/wk)` : null),
+        match_score: score,
+        pass_strict_filter: passStrict,
+        rejection_reason: rejectionReason,
         first_seen: new Date().toISOString(),
         last_verified: new Date().toISOString(),
         confidence: 'High'
       };
 
       saveCustomPost(customItem);
-      setSavedStatus(customItem.id, 'shortlist');
+      if (passStrict) {
+        setSavedStatus(customItem.id, 'shortlist');
+      }
 
       const out = document.getElementById('fb-analysis-output');
       out.innerHTML = `
-        <div style="padding: 0.9rem; border-radius: 8px; background: ${customItem.pass_strict_filter ? 'var(--brand-forest-soft)' : 'var(--danger-soft)'}; margin-bottom: 0.85rem;">
-          <strong style="color: ${customItem.pass_strict_filter ? 'var(--brand-forest)' : 'var(--danger-crimson)'}; font-size: 1rem;">
-            ${customItem.pass_strict_filter ? `✅ PASSED ALL CRITERIA (${customItem.match_score}% Match)` : `⚠️ FLAGGED: ${escapeHtml(customItem.rejection_reason)}`}
+        <div style="padding: 0.9rem; border-radius: 8px; background: ${passStrict ? 'var(--brand-forest-soft)' : 'var(--danger-soft)'}; margin-bottom: 0.85rem;">
+          <strong style="color: ${passStrict ? 'var(--brand-forest)' : 'var(--danger-crimson)'}; font-size: 1rem;">
+            ${passStrict ? `✅ PASSED ALL CRITERIA (${score}% Match)` : `⚠️ FLAGGED: ${escapeHtml(rejectionReason)}`}
           </strong>
         </div>
-        <ul style="list-style: none; display: grid; gap: 0.45rem;">
-          <li><strong>Detected Rent:</strong> $${customItem.weekly_rent}/wk (${customItem.is_furnished ? `Furnished ≤$${maxCap} cap` : `Unfurnished ≤$${maxCap} cap`})</li>
-          <li><strong>Property Type:</strong> ${customItem.bedrooms} BHK (${customItem.is_sharehouse ? 'Sharehouse' : 'Entire Property'})</li>
-          <li><strong>Commute:</strong> ~6m to Hawthorn (Belgrave Line / Tram 70)</li>
-          <li><strong>Move-In:</strong> ${escapeHtml(customItem.availability_display)}</li>
+        <ul style="list-style: none; display: grid; gap: 0.45rem; font-size: 0.9rem;">
+          <li><strong>Detected Suburb:</strong> ${escapeHtml(suburbInfo.name)} ${isAligned ? `✅ (Aligned corridor: ${escapeHtml(suburbInfo.line)})` : '❌ (Not on Hawthorn train/tram line)'}</li>
+          <li><strong>Detected Rent:</strong> $${weeklyRent}/wk (${isFurn ? `Furnished ≤$${maxCap} cap` : `Unfurnished ≤$${maxCap} cap`}) ${weeklyRent <= maxCap ? '✅' : '❌'}</li>
+          <li><strong>Property Type:</strong> ${bedrooms} BHK (${isSharehouse ? 'Sharehouse ❌' : 'Entire Property ✅'})</li>
+          <li><strong>Commute to Hawthorn:</strong> ~${suburbInfo.mins} mins (${escapeHtml(suburbInfo.mode)})</li>
+          <li><strong>Move-In Target:</strong> ${escapeHtml(avail)} (Ideal: Dec 5, 2026 – Jan 15, 2027)</li>
         </ul>
-        <p style="margin-top: 0.85rem; font-weight: 600; color: var(--brand-forest);">
-          Saved to "All Discoveries" and "⭐ Shortlist &amp; Inspections"!
+        <p style="margin-top: 0.85rem; font-weight: 600; color: ${passStrict ? 'var(--brand-forest)' : 'var(--text-muted)'};">
+          ${passStrict ? '🌟 Added to "⭐ Shortlist &amp; Inspections" and "All Discoveries"!' : 'Saved to "All Discoveries" for your review.'}
         </p>
       `;
 

@@ -446,6 +446,7 @@ class PropertyDatabase:
                 "two_bhk_matches": sum(1 for x in legacy_list if x.get("bedrooms") == 2 and x.get("is_under_600")),
                 "new_today": sum(1 for x in legacy_list if x.get("is_new")),
             },
+            "hawthorn_corridor_suburbs": HAWTHORN_DIRECT_SUBURBS,
             "portal_quick_links": portal_links or [],
             "listings": legacy_list,
         }
