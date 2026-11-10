@@ -33,6 +33,7 @@ let filterState = {
   budgetOnly: false,
   strictOnly: false,
   verifiedOnly: false,
+  directTransitOnly: false,
   activeMetric: 'all'
 };
 
@@ -43,7 +44,8 @@ let filterStateNormal = {
   furnished: 'all',
   maxRent: 600,
   newOnly: false,
-  excludeLeaseTransfers: false
+  excludeLeaseTransfers: false,
+  directTransitOnly: false
 };
 
 // --- Storage Utilities ---
@@ -151,7 +153,25 @@ function getUserDecisionLogs() {
   }
 }
 
-// --- Data Helpers & Normalization ---
+function getBudgetCap(bedrooms, isFurnished) {
+  if ((bedrooms || 1) >= 2) return isFurnished ? 625 : 560;
+  return isFurnished ? 500 : 400;
+}
+
+function isOutsideMelbourneListing(item) {
+  if (item.rejection_reason && item.rejection_reason.includes('Outside Greater Melbourne')) return true;
+  const text = `${item.suburb || ''} ${item.address || ''} ${item.title || ''}`.toLowerCase();
+  // Match interstate indicators: Canberra, Sydney, NSW, ACT, QLD, WA, SA, TAS
+  if (/\b(?:canberra|act\s*\d{4}|sydney|nsw\s*\d{4}|brisbane|gold coast|queensland|qld\s*\d{4}|adelaide|south australia|sa\s*\d{4}|perth|western australia|wa\s*\d{4}|hobart|tasmania|tas\s*\d{4}|wolli creek|barton|belconnen|kingston act|parramatta|chatswood|redfern)\b/i.test(text)) {
+    return true;
+  }
+  // Check explicit interstate postcodes
+  const pc = String(item.postcode || '').trim();
+  if (pc && (pc.startsWith('0') || pc.startsWith('2') || pc.startsWith('4') || pc.startsWith('5') || pc.startsWith('6') || pc.startsWith('7') || pc.startsWith('9'))) {
+    return true;
+  }
+  return false;
+}
 
 function getListingAgeDays(listedAt) {
   if (!listedAt) return 0;
@@ -201,6 +221,9 @@ function getAllMergedListings() {
   const statuses = getSavedStatuses();
 
   return merged.filter(item => {
+    // 0. Exclude outside Greater Melbourne (interstate e.g. ACT / NSW)
+    if (isOutsideMelbourneListing(item)) return false;
+
     // 1. Exclude Student Only Accommodation
     if (isStudentOnlyListing(item)) return false;
 
@@ -252,8 +275,8 @@ function computeExplainableBreakdown(item) {
   // Frontend calculation for custom FB posts or fallback
   const rent = item.weekly_rent || 0;
   const isFurn = !!item.is_furnished;
-  const maxCap = isFurn ? 560 : 525;
   const bedrooms = item.bedrooms || 1;
+  const maxCap = getBudgetCap(bedrooms, isFurn);
   const commuteMins = item.commute_mins || 35;
   const isLt = !!item.is_lease_transfer;
   const distM = item.station_distance_m || 500;
@@ -307,7 +330,7 @@ function computeExplainableBreakdown(item) {
   const concerns = [];
 
   if (rent <= maxCap) {
-    positive.push(`Within rental budget: $${rent}/wk (${isFurn ? 'Furnished ≤$560' : 'Unfurnished ≤$525'})`);
+    positive.push(`Within rental budget: $${rent}/wk (${isFurn ? 'Furnished' : 'Unfurnished'} ≤$${maxCap})`);
   } else {
     concerns.push(`Above target budget: $${rent}/wk ($${rent - maxCap} above cap)`);
   }
@@ -402,7 +425,8 @@ function createListingCardHTML(item) {
     breakdown.confidence === "High" ? "confidence-high" :
     breakdown.confidence === "Medium" ? "confidence-medium" : "confidence-low";
 
-  const furnLabel = item.is_furnished ? "Furnished (≤$560 cap)" : "Unfurnished (≤$525 cap)";
+  const maxCap = getBudgetCap(item.bedrooms, item.is_furnished);
+  const furnLabel = item.is_furnished ? `Furnished (≤$${maxCap} cap)` : `Unfurnished (≤$${maxCap} cap)`;
 
   // Fallback photo and graceful vector apartment fallback
   const fallbackSvg = "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22500%22%20viewBox%3D%220%200%20800%20500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e3a5f%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230f172a%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22url(%23g)%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224%22%20opacity%3D%220.6%22%3E%3Cpath%20d%3D%22M250%20420V160h160v260%22%2F%3E%3Cpath%20d%3D%22M410%20420V220h140v200%22%2F%3E%3Crect%20x%3D%22280%22%20y%3D%22190%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22345%22%20y%3D%22190%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22280%22%20y%3D%22265%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22345%22%20y%3D%22265%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22440%22%20y%3D%22250%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22495%22%20y%3D%22250%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22440%22%20y%3D%22320%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22495%22%20y%3D%22320%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3C%2Fg%3E%3Ctext%20x%3D%22400%22%20y%3D%22460%22%20fill%3D%22%2394a3b8%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%2216%22%20font-weight%3D%22600%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%222%22%3EMELBOURNE%20RENTAL%20FINDER%3C%2Ftext%3E%3C%2Fsvg%3E";
@@ -580,7 +604,7 @@ function renderListings() {
   const matchingFilter = all.filter(item => {
     // Metric Tile shortcuts
     if (filterState.activeMetric === 'strong' && (item.match_score || 0) < 80) return false;
-    if (filterState.activeMetric === 'budget' && (item.weekly_rent || 0) > (item.is_furnished ? 560 : 525)) return false;
+    if (filterState.activeMetric === 'budget' && (item.weekly_rent || 0) > getBudgetCap(item.bedrooms, item.is_furnished)) return false;
     if (filterState.activeMetric === 'new' && !isRecentNewListing(item)) return false;
     if (filterState.activeMetric === 'shortlist') {
       const st = statuses[item.id];
@@ -588,14 +612,17 @@ function renderListings() {
     }
     if (filterState.activeMetric === 'lt' && !item.is_lease_transfer) return false;
 
+    // Direct Hawthorn transit filter (chip or dropdown option)
+    if ((filterState.directTransitOnly || filterState.suburb === 'direct_hawthorn') && !item.has_direct_hawthorn_transit) return false;
+
     // Filters Bar
     if (filterState.strictOnly && !item.pass_strict_filter) return false;
     if (filterState.leaseTransferOnly && !item.is_lease_transfer) return false;
     if (filterState.newOnly && !isRecentNewListing(item)) return false;
-    if (filterState.budgetOnly && (item.weekly_rent || 0) > (item.is_furnished ? 560 : 525)) return false;
+    if (filterState.budgetOnly && (item.weekly_rent || 0) > getBudgetCap(item.bedrooms, item.is_furnished)) return false;
 
     // Suburb filter
-    if (filterState.suburb && filterState.suburb !== 'all') {
+    if (filterState.suburb && filterState.suburb !== 'all' && filterState.suburb !== 'direct_hawthorn') {
       const sub = (item.suburb || '').toLowerCase();
       const addr = (item.address || '').toLowerCase();
       const q = filterState.suburb.toLowerCase();
@@ -738,13 +765,16 @@ function renderNormalListings() {
     if (item.is_sharehouse) return false;
     if (isStudentOnlyListing(item)) return false;
 
+    // Direct Hawthorn transit filter (chip or dropdown option)
+    if ((filterStateNormal.directTransitOnly || filterStateNormal.suburb === 'direct_hawthorn') && !item.has_direct_hawthorn_transit) return false;
+
     const rent = item.weekly_rent;
     if (!rent || rent > filterStateNormal.maxRent || rent < 200) return false;
 
     if (filterStateNormal.excludeLeaseTransfers && item.is_lease_transfer) return false;
     if (filterStateNormal.newOnly && !isRecentNewListing(item)) return false;
 
-    if (filterStateNormal.suburb && filterStateNormal.suburb !== 'all') {
+    if (filterStateNormal.suburb && filterStateNormal.suburb !== 'all' && filterStateNormal.suburb !== 'direct_hawthorn') {
       const sub = (item.suburb || '').toLowerCase();
       const addr = (item.address || '').toLowerCase();
       const q = filterStateNormal.suburb.toLowerCase();
@@ -1063,12 +1093,16 @@ function renderInsightsAndAnalytics() {
   }
 
   // Budget stretch tolerance
-  const stretchShortlisted = shortlisted.filter(i => (i.weekly_rent || 0) > 525 && (i.weekly_rent || 0) <= 560).length;
+  const stretchShortlisted = shortlisted.filter(i => {
+    const cap = getBudgetCap(i.bedrooms, i.is_furnished);
+    const rent = i.weekly_rent || 0;
+    return rent > cap - 35 && rent <= cap;
+  }).length;
   if (stretchShortlisted >= 2) {
     preferences.push({
       type: 'budget',
-      title: 'Stretch Budget Tolerance ($525–$560/wk)',
-      desc: `You have shortlisted ${stretchShortlisted} properties in the upper $525–$560/wk range. They will continue to be shown without exceeding your $560 hard cap.`,
+      title: 'Upper-Bracket Budget Tolerance Detected',
+      desc: `You have shortlisted ${stretchShortlisted} properties near the upper limit of your budget rules. They will continue to be shown without exceeding your hard caps (≤$625 2BHK Furn / ≤$560 2BHK Unfurn / ≤$500 1BHK Furn / ≤$400 1BHK Unfurn).`,
       actionText: 'Within Stated Rules',
       actionFn: null
     });
@@ -1136,6 +1170,7 @@ function resetAllFilters() {
     budgetOnly: false,
     strictOnly: false,
     verifiedOnly: false,
+    directTransitOnly: false,
     activeMetric: 'all'
   };
 
@@ -1211,7 +1246,7 @@ function updateOverviewMetrics() {
 
   const total = all.length;
   const strongMatches = all.filter(i => (i.match_score || 0) >= 80).length;
-  const withinBudget = all.filter(i => (i.weekly_rent || 0) <= (i.is_furnished ? 560 : 525)).length;
+  const withinBudget = all.filter(i => (i.weekly_rent || 0) <= getBudgetCap(i.bedrooms, i.is_furnished)).length;
   const newToday = all.filter(isRecentNewListing).length;
   const shortlisted = all.filter(i => statuses[i.id] === 'shortlist' || statuses[i.id] === 'inspecting' || statuses[i.id] === 'applied').length;
   const leaseTransfers = all.filter(i => i.is_lease_transfer).length;
@@ -1365,6 +1400,7 @@ async function initApp() {
     }
   };
 
+  bindChip('chip-direct-transit', 'directTransitOnly');
   bindChip('chip-new-only', 'newOnly');
   bindChip('chip-lease-transfer', 'leaseTransferOnly');
   bindChip('chip-budget-only', 'budgetOnly');
@@ -1411,6 +1447,15 @@ async function initApp() {
   if (priceCapNorm) {
     priceCapNorm.addEventListener('change', e => {
       filterStateNormal.maxRent = parseInt(e.target.value, 10) || 600;
+      renderNormalListings();
+    });
+  }
+
+  const chipDirectNorm = document.getElementById('chip-direct-transit-normal');
+  if (chipDirectNorm) {
+    chipDirectNorm.addEventListener('click', () => {
+      filterStateNormal.directTransitOnly = !filterStateNormal.directTransitOnly;
+      chipDirectNorm.classList.toggle('active', filterStateNormal.directTransitOnly);
       renderNormalListings();
     });
   }
@@ -1519,10 +1564,9 @@ async function initApp() {
       const lower = rawText.toLowerCase();
       const isUnfurn = /\bunfurnished\b|\bnot\s+furnished\b/.test(lower);
       const isFurn = !isUnfurn && (/\bfully\s+furnished\b|\bfurnished\b|\bincludes\s+furniture\b/.test(lower));
-      const maxCap = isFurn ? 560 : 525;
-
       const mBed = lower.match(/\b(\d)\s*(?:bed|br|bhk|bedroom)/);
       const bedrooms = mBed ? parseInt(mBed[1], 10) : 2;
+      const maxCap = getBudgetCap(bedrooms, isFurn);
 
       // Extract price
       const mPrice = rawText.replace(/,/g, '').match(/\$\s*(\d{3,4})/);
@@ -1578,7 +1622,7 @@ async function initApp() {
           </strong>
         </div>
         <ul style="list-style: none; display: grid; gap: 0.45rem;">
-          <li><strong>Detected Rent:</strong> $${customItem.weekly_rent}/wk (${customItem.is_furnished ? 'Furnished ≤$560 cap' : 'Unfurnished ≤$525 cap'})</li>
+          <li><strong>Detected Rent:</strong> $${customItem.weekly_rent}/wk (${customItem.is_furnished ? `Furnished ≤$${maxCap} cap` : `Unfurnished ≤$${maxCap} cap`})</li>
           <li><strong>Property Type:</strong> ${customItem.bedrooms} BHK (${customItem.is_sharehouse ? 'Sharehouse' : 'Entire Property'})</li>
           <li><strong>Commute:</strong> ~6m to Hawthorn (Belgrave Line / Tram 70)</li>
           <li><strong>Move-In:</strong> ${escapeHtml(customItem.availability_display)}</li>

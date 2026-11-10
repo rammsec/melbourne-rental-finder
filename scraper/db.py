@@ -27,6 +27,7 @@ from typing import Dict, Any, List, Optional, Tuple
 
 from .models import Property, ListingSource, ListingSnapshot, PropertyScore, ScraperExecutionLog
 from .freshness import parse_iso_datetime
+from .config import HAWTHORN_DIRECT_SUBURBS
 
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "docs" / "data" / "database.sqlite"
@@ -89,6 +90,7 @@ class PropertyDatabase:
                 commute_line TEXT,
                 commute_mins INTEGER,
                 commute_tier INTEGER,
+                has_direct_hawthorn_transit INTEGER DEFAULT 0,
                 station_name TEXT,
                 station_distance_m INTEGER,
                 station_walking_mins INTEGER,
@@ -173,9 +175,13 @@ class PropertyDatabase:
             CREATE INDEX IF NOT EXISTS idx_sources_prop_id ON listing_sources(property_id);
             """)
 
-            # Schema migration: ensure photo column exists in older database files
+            # Schema migration: ensure photo and transit columns exist in older database files
             try:
                 conn.execute("ALTER TABLE properties ADD COLUMN photo TEXT;")
+            except Exception:
+                pass
+            try:
+                conn.execute("ALTER TABLE properties ADD COLUMN has_direct_hawthorn_transit INTEGER DEFAULT 0;")
             except Exception:
                 pass
 
@@ -217,7 +223,7 @@ class PropertyDatabase:
                     lease_transfer, available_date, lease_duration, description, photo, first_seen, last_seen, last_verified,
                     listing_status, verification_status, match_score, score_version, score_confidence,
                     score_breakdown_json, positive_factors_json, potential_concerns_json,
-                    commute_mode, commute_line, commute_mins, commute_tier,
+                    commute_mode, commute_line, commute_mins, commute_tier, has_direct_hawthorn_transit,
                     station_name, station_distance_m, station_walking_mins, station_distance_display, station_is_explicit,
                     availability_display, availability_fit, is_student_only, is_sharehouse, is_new,
                     pass_strict_filter, rejection_reason, raw_metadata_json, created_at, updated_at
@@ -227,7 +233,7 @@ class PropertyDatabase:
                     ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?,
-                    ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?
@@ -256,6 +262,7 @@ class PropertyDatabase:
                     score_breakdown_json = excluded.score_breakdown_json,
                     positive_factors_json = excluded.positive_factors_json,
                     potential_concerns_json = excluded.potential_concerns_json,
+                    has_direct_hawthorn_transit = excluded.has_direct_hawthorn_transit,
                     station_distance_m = excluded.station_distance_m,
                     station_distance_display = excluded.station_distance_display,
                     station_is_explicit = excluded.station_is_explicit,
@@ -275,6 +282,7 @@ class PropertyDatabase:
                     prop.score_version, prop.score_confidence, json.dumps(prop.score_breakdown),
                     json.dumps(prop.positive_factors), json.dumps(prop.potential_concerns),
                     prop.commute_mode, prop.commute_line, prop.commute_mins, prop.commute_tier,
+                    1 if prop.has_direct_hawthorn_transit else 0,
                     prop.station_name, prop.station_distance_m, prop.station_walking_mins, prop.station_distance_display,
                     1 if prop.station_is_explicit else 0, prop.availability_display, prop.availability_fit,
                     1 if prop.is_student_only else 0, 1 if prop.is_sharehouse else 0, 1 if prop.is_new else 0,
@@ -518,7 +526,7 @@ class PropertyDatabase:
             commute_line=row["commute_line"] or "Belgrave/Lilydale Line",
             commute_mins=int(row["commute_mins"] or 15),
             commute_tier=int(row["commute_tier"] or 2),
-            has_direct_hawthorn_transit=True,
+            has_direct_hawthorn_transit=bool(row["has_direct_hawthorn_transit"]) if ("has_direct_hawthorn_transit" in row.keys() and row["has_direct_hawthorn_transit"] is not None) else ((row["suburb"] or "").lower().strip() in HAWTHORN_DIRECT_SUBURBS),
             station_name=row["station_name"] or "",
             station_distance_m=int(row["station_distance_m"] or 500),
             station_walking_mins=int(row["station_walking_mins"] or 6),

@@ -20,7 +20,8 @@ Evaluates listings against the user's strict criteria:
 import re
 from datetime import datetime, date, timezone
 from typing import Dict, Any, Optional, Tuple, List
-from .config import HAWTHORN_DIRECT_SUBURBS, USER_CRITERIA
+from .config import HAWTHORN_DIRECT_SUBURBS, USER_CRITERIA, get_budget_cap
+from .sources import is_outside_melbourne
 
 
 SHAREHOUSE_KEYWORDS = [
@@ -595,23 +596,7 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     subhead = raw.get("subhead", "") or ""
     full_text = f"{title} {subhead} {address} {description}"
 
-    # 1. Price & Furnished status
-    weekly_rent = raw.get("weekly_rent")
-    if weekly_rent is None:
-        weekly_rent = parse_price_weekly(raw.get("price_text", ""), full_text)
-
-    is_furnished = raw.get("is_furnished")
-    if is_furnished is None:
-        is_furnished = detect_furnished(full_text)
-
-    max_allowed_rent = (
-        USER_CRITERIA["max_rent_furnished"]
-        if is_furnished
-        else USER_CRITERIA["max_rent_unfurnished"]
-    )
-    within_budget = weekly_rent is not None and 280 <= weekly_rent <= max_allowed_rent
-
-    # 2. Bedrooms & Property Type
+    # 1. Bedrooms & Property Type
     bedrooms = raw.get("bedrooms")
     if bedrooms is None:
         m_bed = re.search(r"\b(\d)\s*(?:bed|br|bhk|bedroom)", full_text.lower())
@@ -621,6 +606,21 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
             bedrooms = 1
         else:
             bedrooms = 1
+
+    # 2. Price & Furnished status with dynamic BHK-specific caps
+    weekly_rent = raw.get("weekly_rent")
+    if weekly_rent is None:
+        weekly_rent = parse_price_weekly(raw.get("price_text", ""), full_text)
+
+    is_furnished = raw.get("is_furnished")
+    if is_furnished is None:
+        is_furnished = detect_furnished(full_text)
+
+    # Dynamic Budget Caps:
+    # 2 BHK: Furnished <= 625, Unfurnished <= 560
+    # 1 BHK / Studio: Furnished <= 500, Unfurnished <= 400
+    max_allowed_rent = get_budget_cap(bedrooms, is_furnished)
+    within_budget = weekly_rent is not None and 200 <= weekly_rent <= max_allowed_rent
 
     is_student_only = detect_student_only(full_text)
     is_sharehouse = detect_sharehouse(full_text, raw.get("listing_kind", ""))
@@ -638,7 +638,10 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     # 3. Suburb & Direct Commute to Hawthorn
     suburb, commute_info = extract_suburb_info(address, title)
 
-    # 4. Availability Window (Dec 5 - Dec 30, 2026)
+    # Check if outside Greater Melbourne / Interstate (e.g. Canberra, Sydney, NSW, ACT)
+    is_interstate = is_outside_melbourne(address, title, description, raw.get("suburb", "") or suburb)
+
+    # 4. Availability Window (Dec 5 - Jan 15)
     avail_display, avail_fit = parse_availability(raw.get("date_available", ""), full_text)
 
     # 5. Compute Match Score (0 - 100) & Badges
@@ -646,17 +649,20 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     badges: List[str] = []
     rejection_reasons: List[str] = []
 
+    if is_interstate:
+        rejection_reasons.append("Outside Greater Melbourne (Interstate e.g. ACT / NSW)")
     if is_student_only:
         rejection_reasons.append("Student-only accommodation")
     if is_sharehouse:
         rejection_reasons.append("Sharehouse / Room only")
     if weekly_rent is None:
         rejection_reasons.append("Price unlisted")
-    elif weekly_rent < 220:
-        rejection_reasons.append("Likely room/carpark price (<$220/wk)")
+    elif weekly_rent < 200:
+        rejection_reasons.append("Likely room/carpark price (<$200/wk)")
     elif not within_budget:
-        furn_label = "furnished (max $560)" if is_furnished else "unfurnished (max $525)"
-        rejection_reasons.append(f"Over budget: ${weekly_rent}/wk {furn_label}")
+        bhk_lbl = f"{bedrooms}BHK" if bedrooms else "1BHK"
+        furn_lbl = f"furnished (max ${max_allowed_rent})" if is_furnished else f"unfurnished (max ${max_allowed_rent})"
+        rejection_reasons.append(f"Over budget: ${weekly_rent}/wk {bhk_lbl} {furn_lbl}")
 
     if avail_fit == "outside":
         rejection_reasons.append(f"Move-in outside window ({avail_display})")
@@ -668,10 +674,8 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     if within_budget and weekly_rent:
         headroom = max_allowed_rent - weekly_rent
         score += 22 + min(8, int(headroom / 8))
-        if is_furnished:
-            badges.append(f"Furnished ≤ $560 (${weekly_rent}/wk)")
-        else:
-            badges.append(f"Unfurnished ≤ $525 (${weekly_rent}/wk)")
+        furn_text = "Furnished" if is_furnished else "Unfurnished"
+        badges.append(f"{furn_text} ≤ ${max_allowed_rent} (${weekly_rent}/wk)")
     elif weekly_rent and weekly_rent <= max_allowed_rent + 25:
         # Slightly over budget (negotiable lease transfer)
         score += 10

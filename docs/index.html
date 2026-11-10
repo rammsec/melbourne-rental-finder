@@ -48,8 +48,8 @@
     <section class="criteria-strip" aria-label="Strict search criteria">
       <div class="criteria-card">
         <span class="criteria-label">Budget Cap (Weekly)</span>
-        <span class="criteria-value">≤ $525 Unfurn / ≤ $560 Furn</span>
-        <span class="criteria-note">Auto-adjusts cap based on furniture detection</span>
+        <span class="criteria-value">2BHK: ≤$560 Unfurn / ≤$625 Furn</span>
+        <span class="criteria-note">1BHK: ≤$400 Unfurn / ≤$500 Furn</span>
       </div>
       <div class="criteria-card">
         <span class="criteria-label">Property Configuration</span>
@@ -140,7 +140,8 @@
             aria-label="Search listings"
           >
           <select id="suburb-filter" class="filter-select" aria-label="Filter by suburb">
-            <option value="all">All Suburbs (All 27 Corridors)</option>
+            <option value="all">All Suburbs (All Melbourne Listings)</option>
+            <option value="direct_hawthorn">🚆 Direct Train / Tram to Hawthorn Only</option>
             <optgroup label="Inner East & City (Direct Train / Tram)">
               <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
               <option value="camberwell">Camberwell (3124)</option>
@@ -186,16 +187,16 @@
           </select>
           <select id="rent-filter" class="filter-select" aria-label="Filter by maximum rent">
             <option value="all">Max Rent: Any</option>
-            <option value="450">≤ $450 / week</option>
-            <option value="500">≤ $500 / week</option>
-            <option value="525">≤ $525 / wk (Unfurn Budget)</option>
-            <option value="560">≤ $560 / wk (Furn Budget)</option>
-            <option value="600">≤ $600 / week</option>
+            <option value="400">≤ $400 / wk (1BHK Unfurn Cap)</option>
+            <option value="500">≤ $500 / wk (1BHK Furn Cap)</option>
+            <option value="560">≤ $560 / wk (2BHK Unfurn Cap)</option>
+            <option value="625">≤ $625 / wk (2BHK Furn Cap)</option>
+            <option value="650">≤ $650 / week</option>
           </select>
           <select id="furn-filter" class="filter-select" aria-label="Filter by furnished status">
             <option value="all">Furnished &amp; Unfurnished (All)</option>
-            <option value="furnished">Furnished Only (≤$560/wk)</option>
-            <option value="unfurnished">Unfurnished Only (≤$525/wk)</option>
+            <option value="furnished">Furnished Only (≤$500 1BHK / ≤$625 2BHK)</option>
+            <option value="unfurnished">Unfurnished Only (≤$400 1BHK / ≤$560 2BHK)</option>
           </select>
           <select id="commute-filter" class="filter-select" aria-label="Filter by commute time">
             <option value="all">Commute: Any Distance</option>
@@ -211,6 +212,9 @@
         </div>
         <div class="filter-row-secondary">
           <div class="chips-wrapper">
+            <button type="button" class="toggle-chip" id="chip-direct-transit">
+              🚆 Direct to Hawthorn Only
+            </button>
             <button type="button" class="toggle-chip" id="chip-new-only">
               ✨ New Listings (24–48h)
             </button>
@@ -271,6 +275,7 @@
           >
           <select id="suburb-filter-normal" class="filter-select" aria-label="Filter by suburb">
             <option value="all">All Suburbs (All 27 Corridors)</option>
+            <option value="direct_hawthorn">🚆 Direct Train / Tram to Hawthorn Only</option>
             <optgroup label="Inner East & City (Direct Train / Tram)">
               <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
               <option value="camberwell">Camberwell (3124)</option>
@@ -328,6 +333,9 @@
           </select>
         </div>
         <div class="filter-group">
+          <button type="button" class="toggle-chip" id="chip-direct-transit-normal">
+            🚆 Direct to Hawthorn Only
+          </button>
           <button type="button" class="toggle-chip" id="chip-new-only-normal">
             ✨ New Listings (Last 1–2 Days)
           </button>

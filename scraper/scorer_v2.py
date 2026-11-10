@@ -21,9 +21,10 @@ import re
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 
-from .config import USER_CRITERIA, HAWTHORN_DIRECT_SUBURBS
+from .config import USER_CRITERIA, HAWTHORN_DIRECT_SUBURBS, get_budget_cap
 from .models import Property, PropertyScore
 from .freshness import parse_iso_datetime
+from .sources import is_outside_melbourne
 
 
 def evaluate_hard_eligibility(
@@ -33,6 +34,8 @@ def evaluate_hard_eligibility(
     is_student_only: bool,
     is_sharehouse: bool,
     max_budget_cap: float = 650.0,
+    is_interstate: bool = False,
+    bedrooms: Optional[int] = None,
 ) -> Tuple[bool, List[str]]:
     """
     Evaluate strict non-negotiable eligibility constraints.
@@ -40,18 +43,25 @@ def evaluate_hard_eligibility(
     """
     reasons: List[str] = []
 
+    if is_interstate:
+        reasons.append("Outside Greater Melbourne (Interstate e.g. ACT / NSW)")
+
     if is_student_only:
         reasons.append("Restricted to student-only accommodation")
 
     if is_sharehouse or not is_entire_property:
         reasons.append("Sharehouse or individual room (solo entire place required)")
 
+    effective_cap = get_budget_cap(bedrooms, is_furnished) if bedrooms is not None else max_budget_cap
+
     if weekly_rent is None:
         reasons.append("No rental price specified")
     elif weekly_rent < 200:
         reasons.append("Price below legitimate rental threshold (<$200/wk suggests storage/carpark/scam)")
-    elif weekly_rent > max_budget_cap:
-        reasons.append(f"Rental price (${int(weekly_rent)}/wk) exceeds absolute maximum threshold (${int(max_budget_cap)}/wk)")
+    elif weekly_rent > effective_cap:
+        bhk_txt = f" for {bedrooms}BHK" if bedrooms is not None else ""
+        furn_txt = "furnished" if is_furnished else "unfurnished"
+        reasons.append(f"Over budget: rental price (${int(weekly_rent)}/wk) exceeds cap (${int(effective_cap)}/wk{bhk_txt} {furn_txt})")
 
     return len(reasons) == 0, reasons
 
@@ -67,27 +77,37 @@ def score_property_v2(prop: Property) -> Property:
     is_furnished = bool(prop.furnished)
     is_entire = prop.property_entire and not prop.is_sharehouse
     suburb_clean = (prop.suburb or "").strip().lower()
+    bedrooms = prop.bedrooms or 1
 
-    # 1. Evaluate Hard Eligibility Criteria
-    budget_target = (
-        USER_CRITERIA.get("max_rent_furnished", 560)
-        if is_furnished
-        else USER_CRITERIA.get("max_rent_unfurnished", 525)
-    )
+    # Check for direct Hawthorn transit
+    prop.has_direct_hawthorn_transit = suburb_clean in HAWTHORN_DIRECT_SUBURBS
+
+    # Check if outside Greater Melbourne / Interstate
+    is_interstate = is_outside_melbourne(prop.address or "", prop.title, prop.description, prop.suburb)
+
+    # 1. Evaluate Hard Eligibility Criteria with dynamic BHK-specific caps
+    budget_target = get_budget_cap(bedrooms, is_furnished)
     is_eligible, disqualification_reasons = evaluate_hard_eligibility(
         weekly_rent=weekly_rent,
         is_furnished=is_furnished,
         is_entire_property=is_entire,
         is_student_only=prop.is_student_only,
         is_sharehouse=prop.is_sharehouse,
-        max_budget_cap=650.0,
+        max_budget_cap=budget_target,
+        is_interstate=is_interstate,
+        bedrooms=bedrooms,
     )
 
-    prop.pass_strict_filter = is_eligible and (weekly_rent is not None and weekly_rent <= budget_target)
+    prop.pass_strict_filter = is_eligible and (weekly_rent is not None and weekly_rent <= budget_target) and prop.has_direct_hawthorn_transit
+    prop.rejection_reasons = disqualification_reasons
     if not is_eligible:
         prop.rejection_reason = "; ".join(disqualification_reasons)
+    elif not prop.has_direct_hawthorn_transit:
+        prop.rejection_reason = "No direct train/tram to Hawthorn"
     elif not prop.pass_strict_filter:
-        prop.rejection_reason = f"Above target budget (${int(weekly_rent)}/wk > ${budget_target}/wk)"
+        bhk_lbl = f"{bedrooms}BHK"
+        furn_lbl = "furnished" if is_furnished else "unfurnished"
+        prop.rejection_reason = f"Above target budget (${int(weekly_rent)}/wk > ${budget_target}/wk {bhk_lbl} {furn_lbl})"
     else:
         prop.rejection_reason = None
 

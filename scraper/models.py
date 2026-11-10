@@ -19,6 +19,7 @@ import re
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
+from .config import HAWTHORN_DIRECT_SUBURBS
 
 
 def generate_property_id(source: str, source_listing_id: str, address: str = "", suburb: str = "") -> str:
@@ -188,6 +189,7 @@ class Property:
     is_new: bool = False
     pass_strict_filter: bool = True
     rejection_reason: Optional[str] = None
+    rejection_reasons: List[str] = field(default_factory=list)
 
     # Raw metadata preserved for rollback/extension
     raw_metadata: Dict[str, Any] = field(default_factory=dict)
@@ -203,6 +205,7 @@ class Property:
         d["is_lease_transfer"] = self.lease_transfer
         d["is_normal_listing"] = (not self.lease_transfer) and self.property_entire and (not self.is_student_only)
         d["is_under_600"] = self.weekly_rent is not None and 200 <= self.weekly_rent <= 600
+        d["has_direct_hawthorn_transit"] = self.has_direct_hawthorn_transit
         return d
 
     def to_legacy_dict(self) -> Dict[str, Any]:
@@ -365,7 +368,7 @@ class Property:
             commute_line=d.get("commute_line") or "Belgrave/Lilydale Line",
             commute_mins=int(d.get("commute_mins", 15)),
             commute_tier=int(d.get("commute_tier", 2)),
-            has_direct_hawthorn_transit=bool(d.get("has_direct_hawthorn_transit", True)),
+            has_direct_hawthorn_transit=bool(d.get("has_direct_hawthorn_transit")) if "has_direct_hawthorn_transit" in d else ((d.get("suburb", "") or "").lower().strip() in HAWTHORN_DIRECT_SUBURBS),
             station_name=d.get("station_name") or "",
             station_distance_m=int(d.get("station_distance_m", 500)),
             station_walking_mins=int(d.get("station_walking_mins", 6)),

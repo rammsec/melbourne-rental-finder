@@ -61,6 +61,37 @@ def parse_gumtree_age_to_iso(age_str: str) -> str:
     return now.isoformat()
 
 
+def is_outside_melbourne(address: str, title: str = "", description: str = "", suburb: str = "") -> bool:
+    """
+    Returns True if listing indicates an interstate / non-Melbourne location.
+    Rejects Canberra / ACT, Sydney / NSW, Brisbane / QLD, etc.
+    Correctly allows Melbourne's 'Surrey Hills' while rejecting Sydney's 'Surry Hills'.
+    """
+    addr_clean = f"{address} {title}".lower()
+
+    # Explicit ACT / Canberra check
+    if "australian capital territory" in addr_clean or re.search(r"\b(?:canberra|act)\b", addr_clean):
+        if re.search(r"\bcanberra\b|\bact\s*\d{4}\b|\bact\b", addr_clean):
+            return True
+
+    # Explicit NSW / Sydney check
+    if "new south wales" in addr_clean or re.search(r"\bnsw\b", addr_clean) or "wolli creek" in addr_clean:
+        return True
+    if re.search(r"\bsurry\s+hills\b", addr_clean) and not re.search(r"\bsurrey\s+hills\b", addr_clean):
+        return True
+
+    # Check explicit non-VIC state + postcode (e.g. ACT 2601, NSW 2010)
+    m_state_pc = re.search(r"\b(act|nsw|qld|wa|sa|tas|nt)\s+(\d{4})\b", f"{address} {title}", re.I)
+    if m_state_pc:
+        return True
+
+    # Suburb explicit interstate check
+    if suburb and suburb.lower() in ("canberra city", "barton", "wolli creek", "surry hills", "canberra"):
+        return True
+
+    return False
+
+
 def get_listing_age_days(listed_iso: str) -> float:
     """Return age of listing in days (float). Defaults to 0.0 if unparseable."""
     if not listed_iso:
@@ -161,6 +192,10 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
 
             l_m = re.search(r'class="user-ad-row-new-design__location">(.*?)<div>', inner, re.S)
             loc = html.unescape(l_m.group(1).strip()) if l_m else "Melbourne, VIC"
+
+            # Filter out non-Melbourne / interstate listings (e.g. Canberra, Sydney, NSW, ACT)
+            if is_outside_melbourne(loc, title, desc):
+                continue
 
             img_m = re.search(r'<img[^>]+src="([^"]+)"', inner)
             photo = img_m.group(1) if img_m else ""
@@ -277,6 +312,10 @@ def scrape_flatmates_whole_properties(max_pages: int = 2) -> List[Dict[str, Any]
                     activated_at = listing_meta.get("activated_at", datetime.now(timezone.utc).isoformat())
                     # Freshness filter: max 10 days for normal listings
                     if get_listing_age_days(activated_at) > 10.0:
+                        continue
+
+                    # Filter out non-Melbourne / interstate listings
+                    if is_outside_melbourne(address, subhead, desc):
                         continue
 
                     results.append({

@@ -14,8 +14,15 @@ User Criteria:
 from typing import Dict, Any, List
 
 USER_CRITERIA = {
-    "max_rent_unfurnished": 525,
-    "max_rent_furnished": 560,
+    # 2 BHK caps (Preferred)
+    "max_rent_2bhk_unfurnished": 560,
+    "max_rent_2bhk_furnished": 625,
+    # 1 BHK / Studio caps
+    "max_rent_1bhk_unfurnished": 400,
+    "max_rent_1bhk_furnished": 500,
+    # General / 2BHK default backward-compatibility
+    "max_rent_unfurnished": 560,
+    "max_rent_furnished": 625,
     "preferred_bedrooms": 2,
     "min_bedrooms": 1,
     "allow_sharehouse": False,
@@ -25,6 +32,18 @@ USER_CRITERIA = {
     "move_in_end": "2027-01-15",
     "target_hub": "Hawthorn, VIC 3122",
 }
+
+
+def get_budget_cap(bedrooms: int = 1, is_furnished: bool = False) -> int:
+    """
+    Granular user budget caps:
+    - 2 BHK (and 3+ BHK): Furnished <= 625, Unfurnished <= 560
+    - 1 BHK / Studio: Furnished <= 500, Unfurnished <= 400
+    """
+    if (bedrooms or 1) >= 2:
+        return 625 if is_furnished else 560
+    return 500 if is_furnished else 400
+
 
 # Suburbs with a DIRECT train (Belgrave / Lilydale / Alamein lines),
 # DIRECT tram (Route 70, Route 75, Route 16), or DIRECT bus (Route 609) to Hawthorn.
@@ -417,6 +436,13 @@ HAWTHORN_DIRECT_SUBURBS: Dict[str, Dict[str, Any]] = {
         "tier": 1,
     },
     "cbd": {
+        "postcode": "3000",
+        "mode": "Train / Tram 70, 75",
+        "line": "Flinders St / Parliament direct to Hawthorn (12 mins)",
+        "commute_mins": 12,
+        "tier": 1,
+    },
+    "melbourne cbd": {
         "postcode": "3000",
         "mode": "Train / Tram 70, 75",
         "line": "Flinders St / Parliament direct to Hawthorn (12 mins)",

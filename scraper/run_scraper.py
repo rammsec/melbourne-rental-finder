@@ -34,6 +34,7 @@ from .sources import (
     scrape_flatmates_whole_properties,
     scrape_reddit_lease_transfers,
     get_listing_age_days,
+    is_outside_melbourne,
 )
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -156,6 +157,10 @@ def main() -> None:
 
     for raw in raw_listings:
         enriched = score_and_classify_listing(raw)
+
+        # Exclude non-Melbourne / interstate listings (e.g. Canberra, Sydney, NSW, ACT)
+        if is_outside_melbourne(enriched.get("address", ""), enriched.get("title", ""), enriched.get("description", ""), enriched.get("suburb", "")):
+            continue
 
         # Exclude Student Only Accommodation & Rooming Houses
         if enriched.get("is_student_only"):

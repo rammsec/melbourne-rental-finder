@@ -16,7 +16,8 @@ import unittest
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from scraper.config import USER_CRITERIA, HAWTHORN_DIRECT_SUBURBS
+from scraper.config import USER_CRITERIA, HAWTHORN_DIRECT_SUBURBS, get_budget_cap
+from scraper.sources import is_outside_melbourne
 from scraper.models import Property, ListingSource, ListingSnapshot, PropertyScore, ScraperExecutionLog
 from scraper.dedup import (
     calculate_match_confidence,
@@ -411,6 +412,177 @@ class TestV1Regression(unittest.TestCase):
         self.assertEqual(enriched.get("score_version"), "2.0")
         self.assertIn("rent_affordability", enriched.get("score_breakdown", {}))
         self.assertGreater(len(enriched.get("positive_factors", [])), 0)
+
+
+class TestBHKBudgetRules(unittest.TestCase):
+    """Test granular BHK & furnishing budget rules:
+    - 2 BHK house: Furnished up to $625/wk, Unfurnished up to $560/wk
+    - 1 BHK: Furnished up to $500/wk, Unfurnished up to $400/wk
+    """
+
+    def test_budget_cap_helper(self):
+        # 2 BHK
+        self.assertEqual(get_budget_cap(2, is_furnished=True), 625)
+        self.assertEqual(get_budget_cap(2, is_furnished=False), 560)
+        self.assertEqual(get_budget_cap(3, is_furnished=True), 625)
+        self.assertEqual(get_budget_cap(3, is_furnished=False), 560)
+        # 1 BHK
+        self.assertEqual(get_budget_cap(1, is_furnished=True), 500)
+        self.assertEqual(get_budget_cap(1, is_furnished=False), 400)
+        self.assertEqual(get_budget_cap(0, is_furnished=True), 500)
+        self.assertEqual(get_budget_cap(0, is_furnished=False), 400)
+
+    def test_2bhk_furnished_budget_enforcement(self):
+        # $620 <= $625: passes
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=620.0, is_furnished=True, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=2
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(reasons), 0)
+
+        # $630 > $625: fails
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=630.0, is_furnished=True, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=2
+        )
+        self.assertFalse(ok)
+        self.assertTrue(any("Over budget" in r and "625" in r for r in reasons))
+
+    def test_2bhk_unfurnished_budget_enforcement(self):
+        # $550 <= $560: passes
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=550.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=2
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(reasons), 0)
+
+        # $575 > $560: fails
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=575.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=2
+        )
+        self.assertFalse(ok)
+        self.assertTrue(any("Over budget" in r and "560" in r for r in reasons))
+
+    def test_1bhk_furnished_budget_enforcement(self):
+        # $490 <= $500: passes
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=490.0, is_furnished=True, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=1
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(reasons), 0)
+
+        # $510 > $500: fails
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=510.0, is_furnished=True, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=1
+        )
+        self.assertFalse(ok)
+        self.assertTrue(any("Over budget" in r and "500" in r for r in reasons))
+
+    def test_1bhk_unfurnished_budget_enforcement(self):
+        # $395 <= $400: passes
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=395.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=1
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(reasons), 0)
+
+        # $430 > $400: fails
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=430.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=1
+        )
+        self.assertFalse(ok)
+        self.assertTrue(any("Over budget" in r and "400" in r for r in reasons))
+
+
+class TestInterstateListingExclusion(unittest.TestCase):
+    """Test detection and exclusion of listings outside Greater Melbourne (ACT, NSW, QLD, etc.)."""
+
+    def test_interstate_detection_rules(self):
+        # Canberra / ACT
+        self.assertTrue(is_outside_melbourne(suburb="Canberra City", address="Canberra City, ACT 2601"))
+        self.assertTrue(is_outside_melbourne(suburb="Barton", address="Barton, ACT 2600"))
+
+        # Sydney / NSW
+        self.assertTrue(is_outside_melbourne(suburb="Wolli Creek", address="Wolli Creek, NSW 2205"))
+        self.assertTrue(is_outside_melbourne(suburb="Surry Hills", address="Surry Hills, NSW 2010"))
+        self.assertTrue(is_outside_melbourne(suburb="Parramatta", address="Parramatta NSW"))
+
+        # Melbourne Surrey Hills (VIC 3127) must NOT be excluded
+        self.assertFalse(is_outside_melbourne(suburb="Surrey Hills", address="Surrey Hills, VIC 3127"))
+        self.assertFalse(is_outside_melbourne(suburb="Hawthorn", address="Hawthorn, VIC 3122"))
+        self.assertFalse(is_outside_melbourne(suburb="Boronia", address="Boronia VIC 3155"))
+
+    def test_scoring_rejects_interstate(self):
+        # Canberra listing scored via score_property_v2
+        p_act = Property(
+            property_id="p_act_1",
+            source="gumtree",
+            source_listing_id="1345474789",
+            source_url="https://gumtree.com.au/1345474789",
+            title="Apartment in Canberra City",
+            suburb="Canberra City",
+            address="Canberra City, ACT 2601",
+            bedrooms=2,
+            weekly_rent=550.0,
+        )
+        scored = score_property_v2(p_act)
+        self.assertFalse(scored.pass_strict_filter)
+        self.assertTrue(any("outside greater melbourne" in r.lower() for r in scored.rejection_reasons))
+
+        # Legacy score_and_classify_listing rejects interstate
+        raw_nsw = {
+            "id": "raw_nsw_1",
+            "title": "Apartment in Wolli Creek",
+            "address": "Wolli Creek, NSW 2205",
+            "suburb": "Wolli Creek",
+            "price_text": "$520 pw",
+        }
+        res = score_and_classify_listing(raw_nsw)
+        self.assertFalse(res["pass_strict_filter"])
+        self.assertIn("Outside Greater Melbourne", res.get("rejection_reason", ""))
+
+
+class TestHawthornTransitFilter(unittest.TestCase):
+    """Test direct train or tram line to Hawthorn classification."""
+
+    def test_direct_suburbs_flagged(self):
+        direct_examples = ["Hawthorn", "Camberwell", "Box Hill", "Bayswater", "Boronia", "Clayton", "Richmond", "Belgrave"]
+        for sub in direct_examples:
+            p = Property(
+                property_id=f"p_{sub.lower()}",
+                source="domain",
+                source_listing_id="1",
+                source_url="https://domain.com/1",
+                title=f"2BR in {sub}",
+                suburb=sub,
+                bedrooms=2,
+                weekly_rent=520.0,
+            )
+            scored = score_property_v2(p)
+            self.assertTrue(scored.has_direct_hawthorn_transit, f"{sub} should have direct Hawthorn transit")
+
+    def test_indirect_or_distant_suburbs_flagged_false(self):
+        indirect_examples = ["Tarneit", "Geelong", "Ballarat", "Craigieburn", "Werribee"]
+        for sub in indirect_examples:
+            p = Property(
+                property_id=f"p_{sub.lower()}",
+                source="domain",
+                source_listing_id="1",
+                source_url="https://domain.com/1",
+                title=f"2BR in {sub}",
+                suburb=sub,
+                bedrooms=2,
+                weekly_rent=400.0,
+            )
+            scored = score_property_v2(p)
+            self.assertFalse(scored.has_direct_hawthorn_transit, f"{sub} should NOT have direct Hawthorn transit")
 
 
 if __name__ == "__main__":
