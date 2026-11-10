@@ -771,4 +771,22 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
         "pass_strict_filter": pass_strict,
         "rejection_reason": "; ".join(rejection_reasons) if rejection_reasons else None,
     })
+
+    # Attach V2 100-point explainable scoring engine outputs
+    try:
+        from .models import Property
+        from .scorer_v2 import score_property_v2
+        p_obj = Property.from_legacy(enriched)
+        p_obj = score_property_v2(p_obj)
+        v2_dict = p_obj.to_legacy_dict()
+        enriched.update({
+            "score_version": "2.0",
+            "score_confidence": v2_dict.get("score_confidence", "medium"),
+            "score_breakdown": v2_dict.get("score_breakdown", {}),
+            "positive_factors": v2_dict.get("positive_factors", []),
+            "potential_concerns": v2_dict.get("potential_concerns", []),
+        })
+    except Exception:
+        pass
+
     return enriched
