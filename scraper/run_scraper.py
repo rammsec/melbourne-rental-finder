@@ -150,8 +150,10 @@ def main() -> None:
         "stats": {
             "total_scanned": len(all_listings),
             "strict_matches": len(strict_matches),
-            "lease_transfers": sum(1 for x in strict_matches if x.get("is_lease_transfer")),
-            "two_bhk_matches": sum(1 for x in strict_matches if x.get("bedrooms") == 2),
+            "normal_under_600": sum(1 for x in all_listings if x.get("is_normal_listing") and x.get("is_under_600")),
+            "total_under_600": sum(1 for x in all_listings if x.get("is_under_600")),
+            "lease_transfers": sum(1 for x in all_listings if x.get("is_lease_transfer")),
+            "two_bhk_matches": sum(1 for x in all_listings if x.get("bedrooms") == 2 and x.get("is_under_600")),
             "new_today": new_matches_count,
         },
         "portal_quick_links": build_portal_quick_links(),

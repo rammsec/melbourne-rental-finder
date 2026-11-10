@@ -457,28 +457,63 @@ def extract_suburb_info(address: str, title: str = "") -> Tuple[str, Optional[Di
     return fallback_name, None
 
 
-def parse_price_weekly(price_text: str) -> Optional[int]:
+def parse_price_weekly(price_text: str, full_text: str = "") -> Optional[int]:
     """
-    Parse weekly rent in AUD from strings like '$510', '$520/wk', '$2,200 pcm', etc.
+    Parse weekly rent in AUD accurately from strings like:
+      - '$1450 per week', '$1,450/wk', '$550 pw', '$1,050 pw / $4,563 pcm'
+      - '$2,200 pcm', '$2400 per month'
+      - '$550', '$1200', '$2,433'
     """
-    if not price_text:
+    if not price_text and not full_text:
         return None
-    clean = price_text.replace(",", "").lower()
 
-    # Check if per calendar month (pcm / per month) -> convert to weekly
-    m_pcm = re.search(r"\$\s*(\d{4})\s*(?:pcm|p\.c\.m|per\s+month|/month|/mth)", clean)
+    clean_p = (price_text or "").replace(",", "").lower()
+    clean_all = f"{price_text or ''} {full_text or ''}".replace(",", "").lower()
+
+    # 1. Dual quote in price_text: e.g. '$1,050 pw / $4,563 pcm' -> explicitly pick weekly portion
+    m_dual = re.search(r"\$\s*(\d{3,4})\s*(?:pw|p/w|p\.w|/wk|/week|per\s+week)", clean_p)
+    if m_dual:
+        return int(m_dual.group(1))
+
+    # 2. Explicit monthly in price_text: e.g. '$2,200 pcm', '$2400 per month', '$2200/month'
+    m_pcm = re.search(r"\$\s*(\d{3,5})\s*(?:pcm|p\.c\.m|per\s+month|/month|/mth|pm\b|\bmonthly\b)", clean_p)
     if m_pcm:
         monthly = int(m_pcm.group(1))
         return round(monthly * 12 / 52)
 
-    # Standard weekly price ($250 - $1200)
-    m_wk = re.search(r"\$\s*(\d{3,4})", clean)
+    # 3. Explicit weekly in price_text: e.g. '$1450 per week', '$2,500 Per Week', '$550 pw'
+    m_wk = re.search(r"\$\s*(\d{3,5})\s*(?:pw|p/w|p\.w|/wk|/week|per\s+week|\bweekly\b)", clean_p)
     if m_wk:
-        val = int(m_wk.group(1))
-        if val > 1400:
-            # Likely monthly figure cited without 'pcm'
+        return int(m_wk.group(1))
+
+    # 4. Standalone dollar figure in price_text: e.g. '$550', '$620', '$1200', '$2,433'
+    m_std = re.search(r"\$\s*(\d{3,5})", clean_p)
+    if m_std:
+        val = int(m_std.group(1))
+        # If full_text explicitly specifies per month / pcm for this rent figure
+        if re.search(r"\b(?:pcm|p\.c\.m|per\s+month|/month|/mth)\b", clean_all):
             return round(val * 12 / 52)
+        # If figure is >= 1900, does not have 'per week', and is an amateur lease takeover in full_text
+        if val >= 1900 and not re.search(r"\b(?:per\s+week|pw|p/w|/wk|/week)\b", clean_all):
+            if val <= 4000:
+                return round(val * 12 / 52)
         return val
+
+    # 5. Check description/full_text if price_text had no dollar amount
+    m_full_wk = re.search(r"\$\s*(\d{3,4})\s*(?:pw|p/w|p\.w|/wk|/week|per\s+week)", clean_all)
+    if m_full_wk:
+        return int(m_full_wk.group(1))
+
+    m_full_pcm = re.search(r"\$\s*(\d{3,5})\s*(?:pcm|p\.c\.m|per\s+month|/month|/mth)", clean_all)
+    if m_full_pcm:
+        return round(int(m_full_pcm.group(1)) * 12 / 52)
+
+    m_full_std = re.search(r"\$\s*(\d{3,4})", clean_all)
+    if m_full_std:
+        val = int(m_full_std.group(1))
+        if 200 <= val <= 2000:
+            return val
+
     return None
 
 
@@ -554,7 +589,7 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     # 1. Price & Furnished status
     weekly_rent = raw.get("weekly_rent")
     if weekly_rent is None:
-        weekly_rent = parse_price_weekly(raw.get("price_text", "") or full_text)
+        weekly_rent = parse_price_weekly(raw.get("price_text", ""), full_text)
 
     is_furnished = raw.get("is_furnished")
     if is_furnished is None:
@@ -703,6 +738,8 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
         "within_budget": within_budget,
         "bedrooms": bedrooms,
         "is_lease_transfer": is_lease_transfer,
+        "is_normal_listing": (not is_lease_transfer) and (not is_sharehouse) and (not is_student_only),
+        "is_under_600": weekly_rent is not None and 200 <= weekly_rent <= 600,
         "is_sharehouse": is_sharehouse,
         "is_student_only": is_student_only,
         "is_new": is_recent,

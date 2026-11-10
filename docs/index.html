@@ -71,10 +71,13 @@
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" aria-label="Dashboard Sections">
       <button class="tab-btn active" data-tab="panel-matches" id="tab-matches" type="button">
-        All Active Listings <span class="tab-count" id="count-strict">0</span>
+        Strict Matches &amp; All Listings <span class="tab-count" id="count-strict">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-normal" id="tab-normal" type="button">
+        🏠 Normal Listings (Below $600) <span class="tab-count" id="count-normal">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-shortlist" id="tab-shortlist" type="button">
-        My Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
+        ⭐ My Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-fb-analyzer" id="tab-fb-analyzer" type="button">
         FB Marketplace &amp; Post Analyzer
@@ -153,6 +156,86 @@
           </div>
         </div>
         <div class="listings-grid skipped-grid" id="skipped-container"></div>
+      </div>
+    </section>
+
+    <!-- PANEL: NORMAL LISTINGS (BELOW $600) -->
+    <section class="panel-section" id="panel-normal">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>🏠 Normal Property Rentals (Below $600 / week)</h2>
+        <p class="helper-text">
+          Standard residential leases (whole properties: 1 BHK, 2 BHK &amp; 3 BHK, zero sharehouses, no student-only housing) asking <strong>≤ $600/wk</strong> across Hawthorn, Clayton, Bayswater, Boronia, Box Hill, Camberwell, Richmond, and direct transit lines.
+        </p>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-group">
+          <input
+            type="search"
+            id="search-input-normal"
+            class="filter-input"
+            placeholder="Search suburb, station, street..."
+            aria-label="Search normal listings"
+          >
+          <select id="suburb-filter-normal" class="filter-select" aria-label="Filter by suburb">
+            <option value="all">All Suburbs (All Corridors)</option>
+            <option value="clayton">Clayton (3168)</option>
+            <option value="bayswater">Bayswater (3153)</option>
+            <option value="boronia">Boronia (3155)</option>
+            <option value="hawthorn">Hawthorn / Hawthorn East</option>
+            <option value="box hill">Box Hill (3128)</option>
+            <option value="camberwell">Camberwell (3124)</option>
+            <option value="richmond">Richmond / Burnley</option>
+            <option value="burwood">Burwood (3125)</option>
+            <option value="surrey hills">Surrey Hills (3127)</option>
+            <option value="blackburn">Blackburn (3130)</option>
+            <option value="nunawading">Nunawading (3131)</option>
+            <option value="kew">Kew (3101)</option>
+          </select>
+          <select id="bedroom-filter-normal" class="filter-select" aria-label="Filter by BHK">
+            <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
+            <option value="1">1 BHK / Studio</option>
+            <option value="2">2 BHK (Preferred)</option>
+            <option value="3">3 BHK</option>
+          </select>
+          <select id="furn-filter-normal" class="filter-select" aria-label="Filter by furnished status">
+            <option value="all">Furnished &amp; Unfurnished (All)</option>
+            <option value="furnished">Furnished Only</option>
+            <option value="unfurnished">Unfurnished Only</option>
+          </select>
+          <select id="price-cap-normal" class="filter-select" aria-label="Max weekly rent">
+            <option value="600">Max Rent: ≤ $600/wk</option>
+            <option value="550">Max Rent: ≤ $550/wk</option>
+            <option value="525">Max Rent: ≤ $525/wk</option>
+            <option value="500">Max Rent: ≤ $500/wk</option>
+            <option value="450">Max Rent: ≤ $450/wk</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <button type="button" class="toggle-chip" id="chip-new-only-normal">
+            ✨ New Listings (Last 1–2 Days)
+          </button>
+          <button type="button" class="toggle-chip" id="chip-exclude-lt-normal">
+            🏠 Normal Rentals Only (Exclude Lease Transfers)
+          </button>
+        </div>
+      </div>
+
+      <div class="listings-grid" id="normal-listings-container">
+        <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Bottom Section for Red-Starred (Skipped / Not Interested) Listings on Normal tab -->
+      <div id="normal-skipped-section" class="skipped-section" style="display: none; margin-top: 2.5rem;">
+        <div class="panel-card skipped-header-card">
+          <div>
+            <h3>🔴 Not Interested / Skipped Properties (<span id="count-normal-skipped">0</span>)</h3>
+            <p class="helper-text">
+              Properties you clicked twice (<strong>Red Star ★</strong>) are moved here so you can skip them next time. Click the red star once more to reset back to normal.
+            </p>
+          </div>
+        </div>
+        <div class="listings-grid skipped-grid" id="normal-skipped-container"></div>
       </div>
     </section>
 

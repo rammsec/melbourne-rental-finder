@@ -78,27 +78,30 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
     seen_ids = set()
 
-    urls = [
-        "https://www.gumtree.com.au/s-feed-search/melbourne/lease+transfer/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/lease+break/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/takeover/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/clayton/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/bayswater/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/boronia/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/box-hill/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/hawthorn/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/camberwell/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/richmond/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/burwood/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/surrey-hills/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/blackburn/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/kew/k0c18364l3001317.rss",
-        "https://www.gumtree.com.au/s-feed-search/melbourne/2+bedroom+apartment/k0c18364l3001317.rss",
+    feeds = [
+        # Explicit lease transfer / lease break feeds
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/lease+transfer/k0c18364l3001317.rss", True),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/lease+break/k0c18364l3001317.rss", True),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/takeover/k0c18364l3001317.rss", True),
+        # Normal rental feeds capped at $600/wk across priority transit suburbs
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/clayton/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/bayswater/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/boronia/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/hawthorn/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/box-hill/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/camberwell/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/richmond/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/burwood/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/surrey-hills/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/blackburn/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/kew/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/2+bedroom+apartment/k0c18364l3001317.rss?price=0.00__600.00", False),
     ]
 
-    for url in urls:
+    for url, is_lt_feed in feeds:
         try:
-            time.sleep(0.4)
+            time.sleep(0.35)
             raw = fetch_url(url, timeout=12)
         except Exception as exc:
             print(f"[Gumtree] Skipped {url}: {exc}")
@@ -113,7 +116,7 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
             seen_ids.add(ad_id)
 
             t_m = re.search(r'class="user-ad-row-new-design__title-span">(.*?)</span>', inner, re.S)
-            title = html.unescape(t_m.group(1).strip()) if t_m else "Lease Transfer Listing"
+            title = html.unescape(t_m.group(1).strip()) if t_m else "Lease Listing"
 
             p_m = re.search(r'class="user-ad-price-new-design__price">(.*?)</span>', inner, re.S)
             price_text = html.unescape(p_m.group(1).strip()) if p_m else ""
@@ -139,6 +142,14 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
             bath_m = re.search(r'(\d+)\s*Bathrooms?', inner, re.I)
             bathrooms = int(bath_m.group(1)) if bath_m else 1
 
+            # Detect if explicitly a lease transfer vs a normal standard rental
+            combined_text = f"{title} {desc}".lower()
+            is_explicit_lt = bool(re.search(
+                r"\blease\s+(?:transfer|break|takeover|take\s*over)\b|\bbreak\s+lease\b|\btake\s+over\s+(?:my|the|our)\s+lease\b|\btransferring\s+lease\b",
+                combined_text,
+            ))
+            is_lt = is_lt_feed or is_explicit_lt
+
             results.append({
                 "id": f"gumtree-{ad_id}",
                 "source": "Gumtree Melbourne",
@@ -155,10 +166,10 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
                 "photo": photo,
                 "listed_at": listed_iso,
                 "listing_kind": "property",
-                "is_lease_transfer": True,
+                "is_lease_transfer": is_lt,
             })
 
-    print(f"[Gumtree] Collected {len(results)} live lease transfer ads with direct URLs.")
+    print(f"[Gumtree] Collected {len(results)} live ads with direct URLs.")
     return results
 
 

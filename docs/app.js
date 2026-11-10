@@ -27,6 +27,16 @@ let filterState = {
   strictOnly: false
 };
 
+let filterStateNormal = {
+  search: '',
+  suburb: 'all',
+  bedrooms: 'all',
+  furnished: 'all',
+  maxRent: 600,
+  newOnly: false,
+  excludeLeaseTransfers: false
+};
+
 function getSavedStatuses() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_STATUS_KEY) || '{}');
@@ -165,7 +175,7 @@ function createListingCardHTML(item) {
           <div class="media-left-badges">
             <span class="score-pill ${scoreClass}">${item.match_score}% Match</span>
             ${isNew ? `<span class="new-listing-badge">✨ NEW LISTING</span>` : ''}
-            ${item.is_lease_transfer ? `<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>` : ''}
+            ${item.is_lease_transfer ? `<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>` : `<span class="lease-transfer-ribbon normal-ribbon">🏠 Normal Rental</span>`}
           </div>
           <button
             type="button"
@@ -343,6 +353,159 @@ function renderListings() {
   });
 }
 
+function renderNormalListings() {
+  const container = document.getElementById('normal-listings-container');
+  if (!container) return;
+  const skippedSection = document.getElementById('normal-skipped-section');
+  const skippedContainer = document.getElementById('normal-skipped-container');
+  const countSkippedEl = document.getElementById('count-normal-skipped');
+  const countNormalEl = document.getElementById('count-normal');
+  const statuses = getSavedStatuses();
+  const all = getAllMergedListings();
+
+  const matchingNormal = all.filter(item => {
+    // Whole properties only
+    if (item.is_sharehouse) return false;
+    if (isStudentOnlyListing(item)) return false;
+
+    // Price cap (default <= $600/wk)
+    const rent = item.weekly_rent;
+    if (!rent || rent > filterStateNormal.maxRent || rent < 200) return false;
+
+    // Option to exclude lease transfers
+    if (filterStateNormal.excludeLeaseTransfers && item.is_lease_transfer) return false;
+
+    // New only
+    if (filterStateNormal.newOnly && !isRecentNewListing(item)) return false;
+
+    // Suburb filter
+    if (filterStateNormal.suburb && filterStateNormal.suburb !== 'all') {
+      const sub = (item.suburb || '').toLowerCase();
+      const addr = (item.address || '').toLowerCase();
+      const q = filterStateNormal.suburb.toLowerCase();
+      if (!sub.includes(q) && !addr.includes(q)) return false;
+    }
+
+    // BHK filter
+    if (filterStateNormal.bedrooms === '1' && item.bedrooms !== 1) return false;
+    if (filterStateNormal.bedrooms === '2' && item.bedrooms !== 2) return false;
+    if (filterStateNormal.bedrooms === '3' && item.bedrooms < 3) return false;
+
+    // Furnished filter
+    if (filterStateNormal.furnished === 'unfurnished' && item.is_furnished) return false;
+    if (filterStateNormal.furnished === 'furnished' && !item.is_furnished) return false;
+
+    // Search query
+    if (filterStateNormal.search) {
+      const q = filterStateNormal.search.toLowerCase();
+      const hay = `${item.title} ${item.suburb} ${item.address} ${item.commute_line} ${item.station_distance_display || ''} ${item.description}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+
+    return true;
+  });
+
+  const activeNormal = [];
+  const skippedNormal = [];
+  for (const item of matchingNormal) {
+    const st = statuses[item.id] || 'none';
+    if (st === 'skipped' || st === 'hidden') {
+      skippedNormal.push(item);
+    } else {
+      activeNormal.push(item);
+    }
+  }
+
+  // Sort: shortlisted first, then lowest rent first
+  activeNormal.sort((a, b) => {
+    const stA = statuses[a.id] === 'shortlist' ? 1 : 0;
+    const stB = statuses[b.id] === 'shortlist' ? 1 : 0;
+    if (stA !== stB) return stB - stA;
+    return (a.weekly_rent || 9999) - (b.weekly_rent || 9999);
+  });
+
+  if (countNormalEl) countNormalEl.textContent = activeNormal.length;
+
+  if (activeNormal.length === 0) {
+    container.innerHTML = `
+      <div class="panel-card" style="grid-column: 1 / -1; text-align: center; padding: 2.5rem;">
+        <h3>No normal listings match the current filter combination</h3>
+        <p class="helper-text" style="margin-top: 0.4rem;">Try adjusting the Max Rent filter or clearing a filter chip.</p>
+      </div>
+    `;
+  } else {
+    container.innerHTML = activeNormal.map(createListingCardHTML).join('');
+  }
+
+  // Render bottom skipped section
+  if (skippedSection && skippedContainer) {
+    if (skippedNormal.length > 0) {
+      skippedSection.style.display = 'block';
+      if (countSkippedEl) countSkippedEl.textContent = skippedNormal.length;
+      skippedContainer.innerHTML = skippedNormal.map(createListingCardHTML).join('');
+    } else {
+      skippedSection.style.display = 'none';
+      skippedContainer.innerHTML = '';
+    }
+  }
+
+  // Re-bind star and status buttons in the newly rendered normal grid
+  container.querySelectorAll('.star-btn').forEach(btnEl => {
+    btnEl.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      cycleStarStatus(btnEl.getAttribute('data-star-id'));
+    });
+  });
+
+  container.querySelectorAll('.status-select').forEach(selectEl => {
+    selectEl.addEventListener('change', e => {
+      setSavedStatus(e.target.getAttribute('data-listing-id'), e.target.value);
+    });
+  });
+
+  if (skippedContainer) {
+    skippedContainer.querySelectorAll('.star-btn').forEach(btnEl => {
+      btnEl.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        cycleStarStatus(btnEl.getAttribute('data-star-id'));
+      });
+    });
+  }
+}
+
+function parseWeeklyRentJS(rawText) {
+  if (!rawText) return null;
+  const clean = rawText.replace(/,/g, '').toLowerCase();
+
+  // Dual quote or explicit weekly: $1050 pw / $4563 pcm -> 1050
+  const mDual = clean.match(/\$\s*(\d{3,4})\s*(?:pw|p\/w|p\.w|\/wk|\/week|per\s+week)/);
+  if (mDual) return parseInt(mDual[1], 10);
+
+  // Explicit monthly: $2200 pcm, $2400 per month
+  const mPcm = clean.match(/\$\s*(\d{3,5})\s*(?:pcm|p\.c\.m|per\s+month|\/month|\/mth|pm\b|\bmonthly\b)/);
+  if (mPcm) return Math.round(parseInt(mPcm[1], 10) * 12 / 52);
+
+  // Explicit weekly: $1450 per week, $2500 per week
+  const mWk = clean.match(/\$\s*(\d{3,5})\s*(?:pw|p\/w|p\.w|\/wk|\/week|per\s+week|\bweekly\b)/);
+  if (mWk) return parseInt(mWk[1], 10);
+
+  // Standalone dollar
+  const mStd = clean.match(/\$\s*(\d{3,5})/);
+  if (mStd) {
+    const val = parseInt(mStd[1], 10);
+    if (/\b(?:pcm|p\.c\.m|per\s+month|\/month|\/mth)\b/.test(clean)) {
+      return Math.round(val * 12 / 52);
+    }
+    if (val >= 1900 && !/\b(?:per\s+week|pw|p\/w|\/wk|\/week)\b/.test(clean) && val <= 4000) {
+      return Math.round(val * 12 / 52);
+    }
+    return val;
+  }
+  return null;
+}
+
 function renderPortalsAndCorridor() {
   const portalContainer = document.getElementById('portal-links-container');
   const links = appData.portal_quick_links || [];
@@ -385,12 +548,8 @@ function analyzeFacebookPostText(rawText, postUrl) {
   const isFurn = !isUnfurn && (/\bfully\s+furnished\b|\bfurnished\b|\bincludes\s+furniture\b/.test(lower));
   const maxCap = isFurn ? 560 : 525;
 
-  // 2. Price detection
-  const mPrice = rawText.replace(/,/g, '').match(/\$\s*(\d{3,4})/);
-  let weeklyRent = mPrice ? parseInt(mPrice[1], 10) : null;
-  if (weeklyRent && weeklyRent > 1400) {
-    weeklyRent = Math.round((weeklyRent * 12) / 52);
-  }
+  // 2. Price detection (accurate Australian rental parsing)
+  const weeklyRent = parseWeeklyRentJS(rawText);
   const withinBudget = weeklyRent !== null && weeklyRent >= 260 && weeklyRent <= maxCap;
 
   // 3. Bedrooms & Sharehouse check
@@ -478,12 +637,13 @@ function escapeHtml(str) {
 function renderAll() {
   const all = getAllMergedListings();
   const strictCount = all.filter(i => i.pass_strict_filter).length;
-  const ltCount = all.filter(i => i.pass_strict_filter && i.is_lease_transfer).length;
-  const twoBhkCount = all.filter(i => i.pass_strict_filter && i.bedrooms === 2).length;
+  const ltCount = all.filter(i => i.is_lease_transfer).length;
+  const normalUnder600 = all.filter(i => !i.is_sharehouse && (i.weekly_rent || 9999) <= 600 && (i.weekly_rent || 0) >= 200).length;
+  const twoBhkUnder600 = all.filter(i => !i.is_sharehouse && i.bedrooms === 2 && (i.weekly_rent || 9999) <= 600).length;
 
   document.getElementById('stat-strict-matches').textContent = `${strictCount} Strict Matches`;
   document.getElementById('stat-sub-summary').textContent =
-    `${twoBhkCount} are 2BHK • ${ltCount} Lease Transfers • ${all.length} total scanned`;
+    `${normalUnder600} Whole Properties ≤$600 • ${twoBhkUnder600} are 2BHK • ${ltCount} Lease Transfers`;
 
   if (appData.last_updated) {
     const dt = new Date(appData.last_updated);
@@ -492,6 +652,7 @@ function renderAll() {
   }
 
   renderListings();
+  renderNormalListings();
   renderPortalsAndCorridor();
 }
 
@@ -515,7 +676,7 @@ async function initApp() {
     document.getElementById('fb-post-text').focus();
   });
 
-  // Filters
+  // Main Listings Filters
   document.getElementById('search-input').addEventListener('input', e => {
     filterState.search = e.target.value.trim();
     renderListings();
@@ -561,6 +722,65 @@ async function initApp() {
     chipStrict.classList.toggle('active', filterState.strictOnly);
     renderListings();
   });
+
+  // Normal Listings (Below $600) Filters
+  const searchNorm = document.getElementById('search-input-normal');
+  if (searchNorm) {
+    searchNorm.addEventListener('input', e => {
+      filterStateNormal.search = e.target.value.trim();
+      renderNormalListings();
+    });
+  }
+
+  const suburbNorm = document.getElementById('suburb-filter-normal');
+  if (suburbNorm) {
+    suburbNorm.addEventListener('change', e => {
+      filterStateNormal.suburb = e.target.value;
+      renderNormalListings();
+    });
+  }
+
+  const bedNorm = document.getElementById('bedroom-filter-normal');
+  if (bedNorm) {
+    bedNorm.addEventListener('change', e => {
+      filterStateNormal.bedrooms = e.target.value;
+      renderNormalListings();
+    });
+  }
+
+  const furnNorm = document.getElementById('furn-filter-normal');
+  if (furnNorm) {
+    furnNorm.addEventListener('change', e => {
+      filterStateNormal.furnished = e.target.value;
+      renderNormalListings();
+    });
+  }
+
+  const priceCapNorm = document.getElementById('price-cap-normal');
+  if (priceCapNorm) {
+    priceCapNorm.addEventListener('change', e => {
+      filterStateNormal.maxRent = parseInt(e.target.value, 10) || 600;
+      renderNormalListings();
+    });
+  }
+
+  const chipNewNorm = document.getElementById('chip-new-only-normal');
+  if (chipNewNorm) {
+    chipNewNorm.addEventListener('click', () => {
+      filterStateNormal.newOnly = !filterStateNormal.newOnly;
+      chipNewNorm.classList.toggle('active', filterStateNormal.newOnly);
+      renderNormalListings();
+    });
+  }
+
+  const chipExcludeLtNorm = document.getElementById('chip-exclude-lt-normal');
+  if (chipExcludeLtNorm) {
+    chipExcludeLtNorm.addEventListener('click', () => {
+      filterStateNormal.excludeLeaseTransfers = !filterStateNormal.excludeLeaseTransfers;
+      chipExcludeLtNorm.classList.toggle('active', filterStateNormal.excludeLeaseTransfers);
+      renderNormalListings();
+    });
+  }
 
   // FB Post Analyzer
   document.getElementById('btn-load-sample-fb').addEventListener('click', () => {
