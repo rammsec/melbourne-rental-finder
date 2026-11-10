@@ -16,7 +16,7 @@
     <div class="deadline-bar-inner">
       <div class="timeline-steps">
         <span class="timeline-pill urgent" id="countdown-pill">⏳ 27 Days to Dec 3 Decision Goal</span>
-        <span class="timeline-pill">🎯 Move-In Window: Dec 5 – Dec 30, 2026</span>
+        <span class="timeline-pill">🎯 Move-In Window: Dec 5, 2026 – Jan 15, 2027</span>
         <span class="timeline-pill">🏠 Current Contract Ends: Jan 10, 2027</span>
       </div>
       <div class="timeline-steps">
@@ -31,7 +31,7 @@
       <div class="app-title-group">
         <h1>Melbourne Lease Transfer &amp; Hawthorn Commute Finder</h1>
         <p class="app-subtitle">
-          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong>, including <strong>Clayton, Bayswater, Boronia</strong>, Box Hill, and inner-east corridors.
+          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong> across all 27 Belgrave, Lilydale &amp; Inner-East line suburbs plus <strong>Clayton, Bayswater, Boronia</strong>.
         </p>
       </div>
       <div class="header-actions">
@@ -58,7 +58,7 @@
       </div>
       <div class="criteria-card">
         <span class="criteria-label">Commute Requirement</span>
-        <span class="criteria-value">Hawthorn, Clayton, Bayswater, Boronia+</span>
+        <span class="criteria-value">27 Corridors to Hawthorn</span>
         <span class="criteria-note">Belgrave, Lilydale, Pakenham Lines • Tram 70, 75, 16</span>
       </div>
       <div class="criteria-card">
@@ -102,19 +102,43 @@
             aria-label="Search listings"
           >
           <select id="suburb-filter" class="filter-select" aria-label="Filter by suburb">
-            <option value="all">All Suburbs (All Corridors)</option>
-            <option value="clayton">Clayton (3168)</option>
-            <option value="bayswater">Bayswater (3153)</option>
-            <option value="boronia">Boronia (3155)</option>
-            <option value="hawthorn">Hawthorn / Hawthorn East</option>
-            <option value="box hill">Box Hill (3128)</option>
-            <option value="camberwell">Camberwell (3124)</option>
-            <option value="richmond">Richmond / Burnley</option>
-            <option value="burwood">Burwood (3125)</option>
-            <option value="surrey hills">Surrey Hills (3127)</option>
-            <option value="blackburn">Blackburn (3130)</option>
-            <option value="nunawading">Nunawading (3131)</option>
-            <option value="ringwood">Ringwood (3134)</option>
+            <option value="all">All Suburbs (All 27 Corridors)</option>
+            <optgroup label="Inner East & City (Direct Train / Tram)">
+              <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
+              <option value="camberwell">Camberwell (3124)</option>
+              <option value="canterbury">Canterbury (3126)</option>
+              <option value="surrey hills">Surrey Hills (3127)</option>
+              <option value="mont albert">Mont Albert (3127)</option>
+              <option value="richmond">Richmond / Burnley (3121)</option>
+              <option value="east melbourne">East Melbourne (3002)</option>
+              <option value="melbourne">Melbourne CBD (3000)</option>
+            </optgroup>
+            <optgroup label="Belgrave Line Corridor">
+              <option value="box hill">Box Hill (3128)</option>
+              <option value="blackburn">Blackburn (3130)</option>
+              <option value="nunawading">Nunawading (3131)</option>
+              <option value="mitcham">Mitcham (3132)</option>
+              <option value="ringwood">Ringwood (3134)</option>
+              <option value="heathmont">Heathmont (3135)</option>
+              <option value="bayswater">Bayswater (3153)</option>
+              <option value="boronia">Boronia (3155)</option>
+              <option value="ferntree gully">Ferntree Gully (3156)</option>
+              <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
+              <option value="upwey">Upwey (3158)</option>
+              <option value="tecoma">Tecoma (3160)</option>
+              <option value="belgrave">Belgrave (3160)</option>
+            </optgroup>
+            <optgroup label="Lilydale Line Corridor">
+              <option value="ringwood east">Ringwood East (3135)</option>
+              <option value="croydon">Croydon (3136)</option>
+              <option value="mooroolbark">Mooroolbark (3138)</option>
+              <option value="lilydale">Lilydale (3140)</option>
+            </optgroup>
+            <optgroup label="South-East & Tram Corridors">
+              <option value="clayton">Clayton (3168)</option>
+              <option value="burwood">Burwood (3125)</option>
+              <option value="kew">Kew (3101)</option>
+            </optgroup>
           </select>
           <select id="bedroom-filter" class="filter-select" aria-label="Filter by BHK">
             <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
@@ -178,19 +202,43 @@
             aria-label="Search normal listings"
           >
           <select id="suburb-filter-normal" class="filter-select" aria-label="Filter by suburb">
-            <option value="all">All Suburbs (All Corridors)</option>
-            <option value="clayton">Clayton (3168)</option>
-            <option value="bayswater">Bayswater (3153)</option>
-            <option value="boronia">Boronia (3155)</option>
-            <option value="hawthorn">Hawthorn / Hawthorn East</option>
-            <option value="box hill">Box Hill (3128)</option>
-            <option value="camberwell">Camberwell (3124)</option>
-            <option value="richmond">Richmond / Burnley</option>
-            <option value="burwood">Burwood (3125)</option>
-            <option value="surrey hills">Surrey Hills (3127)</option>
-            <option value="blackburn">Blackburn (3130)</option>
-            <option value="nunawading">Nunawading (3131)</option>
-            <option value="kew">Kew (3101)</option>
+            <option value="all">All Suburbs (All 27 Corridors)</option>
+            <optgroup label="Inner East & City (Direct Train / Tram)">
+              <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
+              <option value="camberwell">Camberwell (3124)</option>
+              <option value="canterbury">Canterbury (3126)</option>
+              <option value="surrey hills">Surrey Hills (3127)</option>
+              <option value="mont albert">Mont Albert (3127)</option>
+              <option value="richmond">Richmond / Burnley (3121)</option>
+              <option value="east melbourne">East Melbourne (3002)</option>
+              <option value="melbourne">Melbourne CBD (3000)</option>
+            </optgroup>
+            <optgroup label="Belgrave Line Corridor">
+              <option value="box hill">Box Hill (3128)</option>
+              <option value="blackburn">Blackburn (3130)</option>
+              <option value="nunawading">Nunawading (3131)</option>
+              <option value="mitcham">Mitcham (3132)</option>
+              <option value="ringwood">Ringwood (3134)</option>
+              <option value="heathmont">Heathmont (3135)</option>
+              <option value="bayswater">Bayswater (3153)</option>
+              <option value="boronia">Boronia (3155)</option>
+              <option value="ferntree gully">Ferntree Gully (3156)</option>
+              <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
+              <option value="upwey">Upwey (3158)</option>
+              <option value="tecoma">Tecoma (3160)</option>
+              <option value="belgrave">Belgrave (3160)</option>
+            </optgroup>
+            <optgroup label="Lilydale Line Corridor">
+              <option value="ringwood east">Ringwood East (3135)</option>
+              <option value="croydon">Croydon (3136)</option>
+              <option value="mooroolbark">Mooroolbark (3138)</option>
+              <option value="lilydale">Lilydale (3140)</option>
+            </optgroup>
+            <optgroup label="South-East & Tram Corridors">
+              <option value="clayton">Clayton (3168)</option>
+              <option value="burwood">Burwood (3125)</option>
+              <option value="kew">Kew (3101)</option>
+            </optgroup>
           </select>
           <select id="bedroom-filter-normal" class="filter-select" aria-label="Filter by BHK">
             <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
@@ -256,7 +304,7 @@
         <div class="panel-card">
           <h2>Instant FB Marketplace / Fairy Floss Lease Transfer Scorer</h2>
           <p class="helper-text">
-            Since Facebook blocks automated bots from reading private groups (like <em>Fairy Floss Real Estate</em> or <em>Melbourne Lease Transfers</em>), paste any FB post or listing text below. It will immediately check the <strong>$525/$560 budget rule</strong>, verify <strong>direct train/tram commute to Hawthorn</strong>, confirm <strong>Dec 5–30 move-in</strong>, and save it to your dashboard.
+            Since Facebook blocks automated bots from reading private groups (like <em>Fairy Floss Real Estate</em> or <em>Melbourne Lease Transfers</em>), paste any FB post or listing text below. It will immediately check the <strong>$525/$560 budget rule</strong>, verify <strong>direct train/tram commute to Hawthorn</strong>, confirm <strong>Dec 5, 2026 – Jan 15, 2027 move-in</strong>, and save it to your dashboard.
           </p>
           <input
             type="text"
@@ -288,7 +336,7 @@
               <li>✔ <strong>Budget Check:</strong> Unfurnished ≤ $525/wk | Furnished ≤ $560/wk</li>
               <li>✔ <strong>Solo Entire Property:</strong> 2BHK preferred (auto-flags sharehouses)</li>
               <li>✔ <strong>Hawthorn Transit:</strong> Checks Belgrave/Lilydale/Alamein train &amp; Tram 70/75/16</li>
-              <li>✔ <strong>Move-in Window:</strong> Dec 5 – Dec 30, 2026 (prior to Jan 10 contract end)</li>
+              <li>✔ <strong>Move-in Window:</strong> Dec 5, 2026 – Jan 15, 2027 (extended availability)</li>
             </ul>
           </div>
         </div>

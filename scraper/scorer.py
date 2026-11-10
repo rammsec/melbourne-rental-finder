@@ -175,7 +175,13 @@ SUBURB_STATIONS: Dict[str, str] = {
     "bayswater": "Bayswater Station",
     "boronia": "Boronia Station",
     "ferntree gully": "Ferntree Gully Station",
+    "upper ferntree gully": "Upper Ferntree Gully Station",
+    "upwey": "Upwey Station",
+    "tecoma": "Tecoma Station",
+    "belgrave": "Belgrave Station",
     "croydon": "Croydon Station",
+    "mooroolbark": "Mooroolbark Station",
+    "lilydale": "Lilydale Station",
     "clayton": "Clayton Station",
     "clayton south": "Clayton Station",
     "oakleigh": "Oakleigh Station",
@@ -559,16 +565,19 @@ def parse_availability(avail_text: str, full_text: str = "") -> Tuple[str, str]:
         day = int(m_nov.group(1) or m_nov.group(2))
         return (f"Nov {day}, 2026", "early_flex")
 
-    # Look for early January
+    # Look for January dates (target window now extended till Jan 15th)
     m_jan = re.search(
         r"\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?jan(?:uary)?|jan(?:uary)?\s+(\d{1,2})(?:st|nd|rd|th)?)\b",
         avail_lower,
     )
     if m_jan:
         day = int(m_jan.group(1) or m_jan.group(2))
-        if day <= 9:
-            return (f"Jan {day}, 2027", "jan_tight")
+        if day <= 15:
+            return (f"Jan {day}, 2027", "ideal")
         return (f"Jan {day}, 2027", "outside")
+
+    if re.search(r"\b(?:early|mid)\s+jan(?:uary)?\b|\bjan(?:uary)?\s+2027\b", combined):
+        return (avail_text or "Early Jan 2027", "ideal")
 
     if "now" in avail_lower or "immediate" in combined or "flexible" in combined:
         return (avail_text or "Available Now (Flexible)", "early_flex")
@@ -693,7 +702,7 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     # Move-in date & Lease Transfer bonus (up to 20 pts)
     if avail_fit == "ideal":
         score += 12
-        badges.append(f"Dec 5–30 Move-In ({avail_display})")
+        badges.append(f"Dec 5–Jan 15 Move-In ({avail_display})")
     elif avail_fit == "early_flex":
         score += 8
     elif avail_fit == "jan_tight":

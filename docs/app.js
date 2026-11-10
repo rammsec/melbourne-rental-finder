@@ -113,11 +113,44 @@ function updateCountdownBanner() {
   }
 }
 
+function getListingAgeDays(listedAt) {
+  if (!listedAt) return 0;
+  const dt = new Date(listedAt);
+  if (isNaN(dt.getTime())) return 0;
+  return Math.max(0, (Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 function getAllMergedListings() {
   const custom = getCustomPosts();
   const base = appData.listings || [];
   const seen = new Set(custom.map(i => i.id));
-  return [...custom, ...base.filter(i => !seen.has(i.id))].filter(i => !isStudentOnlyListing(i));
+  const merged = [...custom, ...base.filter(i => !seen.has(i.id))];
+  const statuses = getSavedStatuses();
+
+  return merged.filter(item => {
+    // 1. Exclude Student Only Accommodation
+    if (isStudentOnlyListing(item)) return false;
+
+    // 2. Exclude if user marked as leased / gone
+    if (statuses[item.id] === 'leased') return false;
+
+    // 3. Exclude missing price or invalid dummy listings
+    const rent = item.weekly_rent;
+    if (!rent || rent < 200) return false;
+    if ((item.title || '').trim().toLowerCase() === 'lease listing') return false;
+
+    // 4. Enforce strict freshness cutoffs:
+    // - Lease transfers: within last 15 days
+    // - Normal listings: within last 10 days
+    const ageDays = getListingAgeDays(item.listed_at);
+    if (item.is_lease_transfer) {
+      if (ageDays > 15.5) return false;
+    } else {
+      if (ageDays > 10.5) return false;
+    }
+
+    return true;
+  });
 }
 
 function createListingCardHTML(item) {
@@ -224,6 +257,7 @@ function createListingCardHTML(item) {
             <option value="inspecting" ${userStatus === 'inspecting' ? 'selected' : ''}>🗓️ Booked Inspection</option>
             <option value="applied" ${userStatus === 'applied' ? 'selected' : ''}>✅ Applied for Lease</option>
             <option value="skipped" ${(userStatus === 'skipped' || userStatus === 'hidden') ? 'selected' : ''}>🔴 Red Star (Skip to Bottom)</option>
+            <option value="leased" ${userStatus === 'leased' ? 'selected' : ''}>🔴 Mark as Leased / Gone</option>
           </select>
 
           <a href="${escapeHtml(item.url || '#')}" target="_blank" rel="noopener" class="btn btn-primary">
@@ -573,14 +607,19 @@ function analyzeFacebookPostText(rawText, postUrl) {
     }
   }
 
-  // 5. Move-in date detection
+  // 5. Move-in date detection (Dec 5, 2026 – Jan 15, 2027)
   const mDec = lower.match(/\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?dec(?:ember)?|dec(?:ember)?\s+(\d{1,2}))\b/);
+  const mJan = lower.match(/\b(?:(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?jan(?:uary)?|jan(?:uary)?\s+(\d{1,2}))\b/);
   let availDisplay = 'Dec 2026 (Flexible)';
-  let isDecWindow = true;
+  let isWindow = true;
   if (mDec) {
     const day = parseInt(mDec[1] || mDec[2], 10);
     availDisplay = `Dec ${day}, 2026`;
-    isDecWindow = day >= 5 && day <= 30;
+    isWindow = day >= 5 && day <= 31;
+  } else if (mJan) {
+    const day = parseInt(mJan[1] || mJan[2], 10);
+    availDisplay = `Jan ${day}, 2027`;
+    isWindow = day <= 15;
   }
 
   // Calculate score
@@ -596,7 +635,7 @@ function analyzeFacebookPostText(rawText, postUrl) {
   else if (bedrooms === 1) score += 15;
   if (commuteInfo) score += (commuteInfo.tier === 1 ? 25 : 19);
   if (isLeaseTransfer) score += 10;
-  if (isDecWindow) score += 10;
+  if (isWindow) score += 10;
 
   const passStrict = reasons.length === 0;
 

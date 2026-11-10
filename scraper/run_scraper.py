@@ -25,6 +25,7 @@ from .sources import (
     scrape_gumtree_lease_transfers,
     scrape_flatmates_whole_properties,
     scrape_reddit_lease_transfers,
+    get_listing_age_days,
 )
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -48,6 +49,12 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
     Direct pre-filtered search portals tailored for Hawthorn & direct transit corridors.
     """
     return [
+        {
+            "name": "Domain: Full Belgrave & Lilydale Line Corridor (≤$600/wk)",
+            "category": "Domain.com.au (Live)",
+            "url": "https://www.domain.com.au/rent/?suburb=melbourne-vic-3000,east-melbourne-vic-3002,richmond-vic-3121,burnley-vic-3121,hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,canterbury-vic-3126,surrey-hills-vic-3127,mont-albert-vic-3127,box-hill-vic-3128,blackburn-vic-3130,nunawading-vic-3131,mitcham-vic-3132,ringwood-vic-3134,heathmont-vic-3135,bayswater-vic-3153,boronia-vic-3155,ferntree-gully-vic-3156,upper-ferntree-gully-vic-3156,upwey-vic-3158,tecoma-vic-3160,belgrave-vic-3160,ringwood-east-vic-3135,croydon-vic-3136,mooroolbark-vic-3138,lilydale-vic-3140,clayton-vic-3168&bedrooms=1-3&price=0-600&excludedeposittaken=1&sort=dateupdated-desc",
+            "note": "Complete 27-suburb search across the entire Belgrave and Lilydale lines plus Inner East and Clayton under $600/wk.",
+        },
         {
             "name": "Domain: Hawthorn, Box Hill, Clayton, Bayswater, Boronia (≤$525/wk)",
             "category": "Domain.com.au (Live)",
@@ -119,9 +126,28 @@ def main() -> None:
 
     for raw in raw_listings:
         enriched = score_and_classify_listing(raw)
-        # Completely exclude Student Only Accommodation & Rooming Houses
+        # 1. Completely exclude Student Only Accommodation & Rooming Houses
         if enriched.get("is_student_only"):
             continue
+
+        # 2. Exclude missing prices, dummy titles, or sub-$200 listings (storage, carparks, scams)
+        weekly_rent = enriched.get("weekly_rent")
+        if weekly_rent is None or weekly_rent < 200:
+            continue
+        if (enriched.get("title") or "").strip().lower() in ("lease listing", "wanted:"):
+            continue
+
+        # 3. Enforce strict freshness cutoffs:
+        #    - Lease Transfers: posted within last 15 days
+        #    - Normal Listings: posted within last 10 days
+        age_days = get_listing_age_days(enriched.get("listed_at", ""))
+        if enriched.get("is_lease_transfer"):
+            if age_days > 15.0:
+                continue
+        else:
+            if age_days > 10.0:
+                continue
+
         lid = enriched["id"]
         if lid not in existing_map:
             enriched["is_new"] = True
@@ -168,7 +194,7 @@ def main() -> None:
         f"# Melbourne Rental & Lease Transfer Digest ({now_iso[:10]})",
         "",
         f"- **Decision Goal**: `Dec 3, 2026` (Current contract ends `Jan 10, 2027`)",
-        f"- **Move-In Window**: `Dec 5 – Dec 30, 2026`",
+        f"- **Move-In Window**: `Dec 5, 2026 – Jan 15, 2027`",
         f"- **Budget Cap**: `≤ $525/wk` Unfurnished | `≤ $560/wk` Furnished",
         f"- **Scanned Live Ads**: `{len(all_listings)}` | **Strict Hawthorn Matches**: `{len(strict_matches)}`",
         "",

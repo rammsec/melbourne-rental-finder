@@ -7,7 +7,7 @@ User Criteria:
 - Budget:
   - Unfurnished: max $525/week
   - Furnished: max $560/week
-- Move-in window: Dec 5, 2026 to Dec 30, 2026 (must find before Dec 3, 2026; current lease ends Jan 10, 2027)
+- Move-in window: Dec 5, 2026 to Jan 15, 2027 (must find before Dec 3, 2026; current lease ends Jan 10, 2027)
 - Direct train or tram commute to Hawthorn (Station / Burwood Rd / Riversdale Rd / Glenferrie Rd)
 """
 
@@ -22,7 +22,7 @@ USER_CRITERIA = {
     "decision_deadline": "2026-12-03",
     "current_lease_end": "2027-01-10",
     "move_in_start": "2026-12-05",
-    "move_in_end": "2026-12-30",
+    "move_in_end": "2027-01-15",
     "target_hub": "Hawthorn, VIC 3122",
 }
 
@@ -200,6 +200,20 @@ HAWTHORN_DIRECT_SUBURBS: Dict[str, Dict[str, Any]] = {
         "commute_mins": 35,
         "tier": 3,
     },
+    "mooroolbark": {
+        "postcode": "3138",
+        "mode": "Train",
+        "line": "Lilydale Line (direct to Hawthorn)",
+        "commute_mins": 38,
+        "tier": 3,
+    },
+    "lilydale": {
+        "postcode": "3140",
+        "mode": "Train",
+        "line": "Lilydale Line (direct to Hawthorn)",
+        "commute_mins": 44,
+        "tier": 3,
+    },
     "heathmont": {
         "postcode": "3135",
         "mode": "Train",
@@ -226,6 +240,34 @@ HAWTHORN_DIRECT_SUBURBS: Dict[str, Dict[str, Any]] = {
         "mode": "Train",
         "line": "Belgrave Line (direct to Hawthorn)",
         "commute_mins": 41,
+        "tier": 3,
+    },
+    "upper ferntree gully": {
+        "postcode": "3156",
+        "mode": "Train",
+        "line": "Belgrave Line (direct to Hawthorn)",
+        "commute_mins": 43,
+        "tier": 3,
+    },
+    "upwey": {
+        "postcode": "3158",
+        "mode": "Train",
+        "line": "Belgrave Line (direct to Hawthorn)",
+        "commute_mins": 46,
+        "tier": 3,
+    },
+    "tecoma": {
+        "postcode": "3160",
+        "mode": "Train",
+        "line": "Belgrave Line (direct to Hawthorn)",
+        "commute_mins": 48,
+        "tier": 3,
+    },
+    "belgrave": {
+        "postcode": "3160",
+        "mode": "Train",
+        "line": "Belgrave Line (direct to Hawthorn)",
+        "commute_mins": 52,
         "tier": 3,
     },
 
@@ -477,8 +519,19 @@ PRIORITY_SUBURB_SLUGS: List[str] = [
     "nunawading-vic-3131",
     "mitcham-vic-3132",
     "ringwood-vic-3134",
+    "ringwood-east-vic-3135",
+    "heathmont-vic-3135",
     "bayswater-vic-3153",
     "boronia-vic-3155",
+    "ferntree-gully-vic-3156",
+    "upper-ferntree-gully-vic-3156",
+    "upwey-vic-3158",
+    "tecoma-vic-3160",
+    "belgrave-vic-3160",
+    "croydon-vic-3136",
+    "mooroolbark-vic-3138",
+    "lilydale-vic-3140",
+    "mont-albert-vic-3127",
     "clayton-vic-3168",
     "caulfield-north-vic-3161",
     "st-kilda-east-vic-3183",

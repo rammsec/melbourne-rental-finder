@@ -61,6 +61,17 @@ def parse_gumtree_age_to_iso(age_str: str) -> str:
     return now.isoformat()
 
 
+def get_listing_age_days(listed_iso: str) -> float:
+    """Return age of listing in days (float). Defaults to 0.0 if unparseable."""
+    if not listed_iso:
+        return 0.0
+    try:
+        dt = datetime.fromisoformat(listed_iso.replace("Z", "+00:00"))
+        return max(0.0, (datetime.now(timezone.utc) - dt).total_seconds() / 86400.0)
+    except Exception:
+        return 0.0
+
+
 def fetch_url(url: str, headers: Dict[str, str] = None, timeout: int = 12) -> str:
     req_headers = dict(DEFAULT_HEADERS)
     if headers:
@@ -74,34 +85,54 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
     """
     Scrape real, live lease transfer & rental listings from Gumtree Melbourne.
     Extracts individual ad IDs and links directly to each ad's unique URL.
+    Enforces strict freshness:
+      - Lease Transfers: posted within last 15 days
+      - Normal Listings: posted within last 10 days
     """
     results: List[Dict[str, Any]] = []
     seen_ids = set()
 
     feeds = [
-        # Explicit lease transfer / lease break feeds
+        # Explicit lease transfer / lease break feeds (checked for last 15 days)
         ("https://www.gumtree.com.au/s-feed-search/melbourne/lease+transfer/k0c18364l3001317.rss", True),
         ("https://www.gumtree.com.au/s-feed-search/melbourne/lease+break/k0c18364l3001317.rss", True),
         ("https://www.gumtree.com.au/s-feed-search/melbourne/takeover/k0c18364l3001317.rss", True),
-        # Normal rental feeds capped at $600/wk across priority transit suburbs
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/clayton/k0c18364l3001317.rss?price=0.00__600.00", False),
+        # All 27 corridor suburbs along Belgrave & Lilydale lines + Inner East + Clayton (capped at $600/wk)
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/melbourne/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/east-melbourne/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/richmond/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/burnley/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/hawthorn/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/hawthorn-east/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/camberwell/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/canterbury/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/surrey-hills/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/mont-albert/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/box-hill/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/blackburn/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/nunawading/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/mitcham/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/ringwood/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/heathmont/k0c18364l3001317.rss?price=0.00__600.00", False),
         ("https://www.gumtree.com.au/s-feed-search/melbourne/bayswater/k0c18364l3001317.rss?price=0.00__600.00", False),
         ("https://www.gumtree.com.au/s-feed-search/melbourne/boronia/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/hawthorn/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/box-hill/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/camberwell/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/richmond/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/ferntree-gully/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/upper-ferntree-gully/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/upwey/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/tecoma/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/belgrave/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/ringwood-east/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/croydon/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/mooroolbark/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/lilydale/k0c18364l3001317.rss?price=0.00__600.00", False),
+        ("https://www.gumtree.com.au/s-feed-search/melbourne/clayton/k0c18364l3001317.rss?price=0.00__600.00", False),
         ("https://www.gumtree.com.au/s-feed-search/melbourne/burwood/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/surrey-hills/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/blackburn/k0c18364l3001317.rss?price=0.00__600.00", False),
         ("https://www.gumtree.com.au/s-feed-search/melbourne/kew/k0c18364l3001317.rss?price=0.00__600.00", False),
-        ("https://www.gumtree.com.au/s-feed-search/melbourne/2+bedroom+apartment/k0c18364l3001317.rss?price=0.00__600.00", False),
     ]
 
     for url, is_lt_feed in feeds:
         try:
-            time.sleep(0.35)
+            time.sleep(0.3)
             raw = fetch_url(url, timeout=12)
         except Exception as exc:
             print(f"[Gumtree] Skipped {url}: {exc}")
@@ -116,10 +147,14 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
             seen_ids.add(ad_id)
 
             t_m = re.search(r'class="user-ad-row-new-design__title-span">(.*?)</span>', inner, re.S)
-            title = html.unescape(t_m.group(1).strip()) if t_m else "Lease Listing"
-
             p_m = re.search(r'class="user-ad-price-new-design__price">(.*?)</span>', inner, re.S)
-            price_text = html.unescape(p_m.group(1).strip()) if p_m else ""
+            if not t_m or not p_m:
+                continue
+
+            title = html.unescape(t_m.group(1).strip())
+            price_text = html.unescape(p_m.group(1).strip())
+            if not title or title.lower() in ("lease listing", "wanted:") or not price_text:
+                continue
 
             d_m = re.search(r'class="user-ad-row-new-design__description-text">(.*?)</p>', inner, re.S)
             desc = html.unescape(d_m.group(1).strip()) if d_m else ""
@@ -134,14 +169,6 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
             age = age_m.group(1).strip() if age_m else "Recent"
             listed_iso = parse_gumtree_age_to_iso(age)
 
-            # Check bedrooms
-            bed_m = re.search(r'(\d+)\s*Bedrooms?', inner, re.I)
-            bedrooms = int(bed_m.group(1)) if bed_m else None
-
-            # Check bathrooms
-            bath_m = re.search(r'(\d+)\s*Bathrooms?', inner, re.I)
-            bathrooms = int(bath_m.group(1)) if bath_m else 1
-
             # Detect if explicitly a lease transfer vs a normal standard rental
             combined_text = f"{title} {desc}".lower()
             is_explicit_lt = bool(re.search(
@@ -149,6 +176,25 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
                 combined_text,
             ))
             is_lt = is_lt_feed or is_explicit_lt
+
+            # Enforce freshness filter:
+            # - Lease transfers: within last 15 days
+            # - Normal listings: within last 10 days
+            age_days = get_listing_age_days(listed_iso)
+            if is_lt:
+                if age_days > 15.0:
+                    continue
+            else:
+                if age_days > 10.0:
+                    continue
+
+            # Check bedrooms
+            bed_m = re.search(r'(\d+)\s*Bedrooms?', inner, re.I)
+            bedrooms = int(bed_m.group(1)) if bed_m else None
+
+            # Check bathrooms
+            bath_m = re.search(r'(\d+)\s*Bathrooms?', inner, re.I)
+            bathrooms = int(bath_m.group(1)) if bath_m else 1
 
             results.append({
                 "id": f"gumtree-{ad_id}",
@@ -169,7 +215,7 @@ def scrape_gumtree_lease_transfers() -> List[Dict[str, Any]]:
                 "is_lease_transfer": is_lt,
             })
 
-    print(f"[Gumtree] Collected {len(results)} live ads with direct URLs.")
+    print(f"[Gumtree] Collected {len(results)} fresh, live ads (<=10/15 days) with direct URLs.")
     return results
 
 
@@ -229,6 +275,9 @@ def scrape_flatmates_whole_properties(max_pages: int = 2) -> List[Dict[str, Any]
                     bathrooms = listing_meta.get("number_bathrooms") or 1
                     photo = item.get("photo", "")
                     activated_at = listing_meta.get("activated_at", datetime.now(timezone.utc).isoformat())
+                    # Freshness filter: max 10 days for normal listings
+                    if get_listing_age_days(activated_at) > 10.0:
+                        continue
 
                     results.append({
                         "id": f"flatmates-{lid}",
@@ -273,6 +322,12 @@ def scrape_reddit_lease_transfers() -> List[Dict[str, Any]]:
             selftext = post.get("selftext", "")
             if not pid or not title:
                 continue
+            listed_iso = datetime.fromtimestamp(
+                post.get("created_utc", time.time()), tz=timezone.utc
+            ).isoformat()
+            # Freshness filter: max 15 days for lease transfers
+            if get_listing_age_days(listed_iso) > 15.0:
+                continue
             results.append({
                 "id": f"reddit-{pid}",
                 "source": "Reddit (r/melbourne)",
@@ -285,9 +340,7 @@ def scrape_reddit_lease_transfers() -> List[Dict[str, Any]]:
                 "description": selftext[:600],
                 "url": f"https://www.reddit.com{post.get('permalink', '')}",
                 "photo": "",
-                "listed_at": datetime.fromtimestamp(
-                    post.get("created_utc", time.time()), tz=timezone.utc
-                ).isoformat(),
+                "listed_at": listed_iso,
                 "listing_kind": "property",
                 "is_lease_transfer": True,
             })
