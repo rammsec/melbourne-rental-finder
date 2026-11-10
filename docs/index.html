@@ -44,46 +44,67 @@
       </div>
     </section>
 
-    <!-- User Criteria Strip -->
-    <section class="criteria-strip" aria-label="Active Search Criteria">
-      <div class="criteria-card">
-        <span class="criteria-label">Budget Cap (Weekly)</span>
-        <span class="criteria-value">≤ $525 Unfurn / ≤ $560 Furn</span>
-        <span class="criteria-note">Auto-adjusts cap based on furniture detection</span>
+    <!-- Section A: Interactive Rental Search Overview Tiles -->
+    <section class="overview-grid" aria-label="Interactive Rental Search Overview">
+      <div class="overview-tile active" id="tile-all" data-metric="all" title="Click to view all discovered properties">
+        <span class="overview-tile-label">📍 Total Discovered</span>
+        <span class="overview-tile-value" id="stat-total-scanned">--</span>
+        <span class="overview-tile-sub">All active corridor listings</span>
       </div>
-      <div class="criteria-card">
-        <span class="criteria-label">Property Configuration</span>
-        <span class="criteria-value">2 BHK Preferred (Solo)</span>
-        <span class="criteria-note">Entire place only • Rejects sharehouses &amp; rooms</span>
+      <div class="overview-tile" id="tile-strong" data-metric="strong" title="Click to filter strong matches (Score ≥ 80%)">
+        <span class="overview-tile-label">⭐ Strong Matches</span>
+        <span class="overview-tile-value" id="stat-strict-matches">--</span>
+        <span class="overview-tile-sub">Score ≥ 80% &amp; Hawthorn direct</span>
       </div>
-      <div class="criteria-card">
-        <span class="criteria-label">Commute Requirement</span>
-        <span class="criteria-value">27 Corridors to Hawthorn</span>
-        <span class="criteria-note">Belgrave, Lilydale, Pakenham Lines • Tram 70, 75, 16</span>
+      <div class="overview-tile" id="tile-budget" data-metric="budget" title="Click to filter properties within budget">
+        <span class="overview-tile-label">💰 Within Budget</span>
+        <span class="overview-tile-value" id="stat-under-budget">--</span>
+        <span class="overview-tile-sub">≤ $525 unfurn / ≤ $560 furn</span>
       </div>
-      <div class="criteria-card">
-        <span class="criteria-label">Matches Found</span>
-        <span class="criteria-value" id="stat-strict-matches">-- Listings</span>
-        <span class="criteria-note" id="stat-sub-summary">Scanning lease transfers &amp; whole properties</span>
+      <div class="overview-tile" id="tile-new" data-metric="new" title="Click to view new listings discovered in last 24–48h">
+        <span class="overview-tile-label">✨ New (24–48h)</span>
+        <span class="overview-tile-value" id="stat-new-today">--</span>
+        <span class="overview-tile-sub">Freshly discovered</span>
+      </div>
+      <div class="overview-tile" id="tile-shortlist" data-metric="shortlist" title="Click to view your shortlisted properties">
+        <span class="overview-tile-label">🟢 Shortlisted</span>
+        <span class="overview-tile-value" id="stat-shortlisted-top">0</span>
+        <span class="overview-tile-sub">Saved for inspection</span>
+      </div>
+      <div class="overview-tile" id="tile-lt" data-metric="lt" title="Click to filter lease transfers">
+        <span class="overview-tile-label">🔄 Lease Transfers</span>
+        <span class="overview-tile-value" id="stat-lease-transfers">--</span>
+        <span class="overview-tile-sub">Direct lease breaks / takeovers</span>
+      </div>
+      <div class="overview-tile" id="tile-refresh" data-metric="refresh" style="cursor: default;" title="Last successful scraper data refresh">
+        <span class="overview-tile-label">🕒 Last Refresh</span>
+        <span class="overview-tile-value" id="stat-last-refresh" style="font-size: 1.05rem;">Loading...</span>
+        <span class="overview-tile-sub">Automated daily at 6 PM</span>
       </div>
     </section>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" aria-label="Dashboard Sections">
       <button class="tab-btn active" data-tab="panel-matches" id="tab-matches" type="button">
-        Strict Matches &amp; All Listings <span class="tab-count" id="count-strict">0</span>
+        All Discoveries &amp; Strong Matches <span class="tab-count" id="count-strict">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-normal" id="tab-normal" type="button">
         🏠 Normal Listings (Below $600) <span class="tab-count" id="count-normal">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-shortlist" id="tab-shortlist" type="button">
-        ⭐ My Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
+        ⭐ Shortlist &amp; Inspections <span class="tab-count" id="count-shortlist">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-compare" id="tab-compare" type="button">
+        ⚖️ Compare Properties <span class="tab-count" id="count-compare">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-insights" id="tab-insights" type="button">
+        📊 Property Intelligence &amp; Insights
       </button>
       <button class="tab-btn" data-tab="panel-fb-analyzer" id="tab-fb-analyzer" type="button">
         FB Marketplace &amp; Post Analyzer
       </button>
       <button class="tab-btn" data-tab="panel-portals" id="tab-portals" type="button">
-        Pre-Filtered Live Search Portals <span class="tab-count" id="count-portals">8</span>
+        Pre-Filtered Search Portals <span class="tab-count" id="count-portals">8</span>
       </button>
       <button class="tab-btn" data-tab="panel-corridor" id="tab-corridor" type="button">
         Hawthorn Direct Train/Tram Map
@@ -92,13 +113,14 @@
 
     <!-- PANEL 1: STRICT MATCHES & ALL SCRAPED LISTINGS -->
     <section class="panel-section active" id="panel-matches">
-      <div class="filters-bar">
-        <div class="filter-group">
+      <div class="filters-bar-v2">
+        <div class="filter-row-primary">
           <input
             type="search"
             id="search-input"
             class="filter-input"
-            placeholder="Search suburb, station, street..."
+            style="min-width: 220px; flex: 1;"
+            placeholder="Search suburb, station, street, keywords..."
             aria-label="Search listings"
           >
           <select id="suburb-filter" class="filter-select" aria-label="Filter by suburb">
@@ -146,21 +168,51 @@
             <option value="2">2 BHK (Preferred)</option>
             <option value="3">3 BHK</option>
           </select>
+          <select id="rent-filter" class="filter-select" aria-label="Filter by maximum rent">
+            <option value="all">Max Rent: Any</option>
+            <option value="450">≤ $450 / week</option>
+            <option value="500">≤ $500 / week</option>
+            <option value="525">≤ $525 / wk (Unfurn Budget)</option>
+            <option value="560">≤ $560 / wk (Furn Budget)</option>
+            <option value="600">≤ $600 / week</option>
+          </select>
           <select id="furn-filter" class="filter-select" aria-label="Filter by furnished status">
             <option value="all">Furnished &amp; Unfurnished (All)</option>
             <option value="furnished">Furnished Only (≤$560/wk)</option>
             <option value="unfurnished">Unfurnished Only (≤$525/wk)</option>
           </select>
+          <select id="commute-filter" class="filter-select" aria-label="Filter by commute time">
+            <option value="all">Commute: Any Distance</option>
+            <option value="15">≤ 15 mins to Hawthorn</option>
+            <option value="30">≤ 30 mins to Hawthorn</option>
+            <option value="45">≤ 45 mins to Hawthorn</option>
+          </select>
+          <select id="score-filter" class="filter-select" aria-label="Filter by match score">
+            <option value="all">Match Score: Any</option>
+            <option value="80">Strong Matches (≥ 80%)</option>
+            <option value="70">Good Matches (≥ 70%)</option>
+          </select>
         </div>
-        <div class="filter-group">
-          <button type="button" class="toggle-chip" id="chip-new-only">
-            ✨ New Listings (Last 1–2 Days)
-          </button>
-          <button type="button" class="toggle-chip" id="chip-lease-transfer">
-            🔄 Lease Transfers Only
-          </button>
-          <button type="button" class="toggle-chip" id="chip-strict-only">
-            ✅ Strict 100% Matches Only
+        <div class="filter-row-secondary">
+          <div class="chips-wrapper">
+            <button type="button" class="toggle-chip" id="chip-new-only">
+              ✨ New Listings (24–48h)
+            </button>
+            <button type="button" class="toggle-chip" id="chip-lease-transfer">
+              🔄 Lease Transfers Only
+            </button>
+            <button type="button" class="toggle-chip" id="chip-budget-only">
+              💰 Within Budget Cap
+            </button>
+            <button type="button" class="toggle-chip" id="chip-strict-only">
+              ✅ Strict 100% Matches
+            </button>
+            <button type="button" class="toggle-chip" id="chip-verified-only">
+              🔒 Verified Available
+            </button>
+          </div>
+          <button type="button" class="btn-reset-filters" id="btn-reset-filters">
+            ↺ Reset Filters
           </button>
         </div>
       </div>
@@ -292,10 +344,75 @@
       <div class="panel-card" style="margin-bottom: 1.25rem;">
         <h2>Your Inspection &amp; Lease Transfer Shortlist</h2>
         <p class="helper-text">
-          Mark any listing as <strong>Interested / Inspecting</strong> or <strong>Applied</strong> using the dropdown on each card. Your statuses are saved locally in your browser so you can track applications before giving your notice on <strong>December 3, 2026</strong>.
+          Mark any listing as <strong>Interested / Inspecting</strong> or <strong>Applied</strong> using the action buttons on each card. Record inspection dates and personal notes directly. Everything is saved locally.
         </p>
       </div>
       <div class="listings-grid" id="shortlist-container"></div>
+    </section>
+
+    <!-- PANEL: PROPERTY COMPARISON MATRIX -->
+    <section class="panel-section" id="panel-compare">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h2>⚖️ Side-by-Side Property Comparison</h2>
+            <p class="helper-text">
+              Compare 2 to 4 properties across rent, commute convenience, suitability, station distance, and overall match score. Differences are highlighted automatically.
+            </p>
+          </div>
+          <button type="button" class="btn btn-secondary" id="btn-clear-compare">
+            Clear Comparison Selection
+          </button>
+        </div>
+      </div>
+      <div id="compare-matrix-view" class="panel-card" style="padding: 1.5rem; overflow-x: auto;">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- PANEL: INTELLIGENCE & INSIGHTS -->
+    <section class="panel-section" id="panel-insights">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>📊 Personal Property Intelligence &amp; Insights</h2>
+        <p class="helper-text">
+          Transparent preference learning, scoring performance analytics, and scraper pipeline health. The platform analyzes your interactions to refine recommendations with your explicit approval.
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+        <!-- Preference Learning Card -->
+        <div class="panel-card">
+          <h3>🧠 Learned User Preferences</h3>
+          <p class="helper-text" style="margin-bottom: 0.85rem;">
+            Observed decision patterns from your shortlists and skips. Never auto-applied without your review.
+          </p>
+          <div id="insights-preferences-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Outcome Analytics Card -->
+        <div class="panel-card">
+          <h3>📈 Recommendation Performance</h3>
+          <p class="helper-text" style="margin-bottom: 0.85rem;">
+            Correlation between match scores and your inspection decisions.
+          </p>
+          <div id="insights-metrics-list" style="display: flex; flex-direction: column; gap: 0.65rem; font-size: 0.85rem;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Pipeline Health Card -->
+        <div class="panel-card">
+          <h3>🛠️ Scraper &amp; Data Pipeline Health</h3>
+          <p class="helper-text" style="margin-bottom: 0.85rem;">
+            Multi-source execution tracking, duplicate resolution, and freshness verification.
+          </p>
+          <div id="insights-pipeline-health" style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.85rem;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- PANEL 3: FB MARKETPLACE & FAIRY FLOSS INSTANT ANALYZER -->
@@ -378,6 +495,71 @@
       </div>
     </section>
   </main>
+
+  <!-- Floating Comparison Dock -->
+  <aside id="comparison-dock" class="comparison-dock" aria-label="Selected properties comparison dock">
+    <div>
+      <span style="font-weight: 700; font-size: 0.95rem;">⚖️ <span id="dock-compare-count">0</span> Properties Selected</span>
+      <span style="font-size: 0.78rem; color: #94a3b8; display: block;">Select 2 to 4 properties to compare</span>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="button" class="btn btn-primary" id="btn-dock-open-compare" style="padding: 0.45rem 0.85rem; font-size: 0.82rem;">
+        Compare Now ↗
+      </button>
+      <button type="button" class="btn btn-secondary" id="btn-dock-clear" style="padding: 0.45rem 0.65rem; font-size: 0.82rem; background: #334155; color: #fff; border-color: #475569;">
+        ✕ Clear
+      </button>
+    </div>
+  </aside>
+
+  <!-- Modal 1: Inspection & Notes Booking Dialog -->
+  <div id="modal-inspection" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-inspection-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-inspection-title" style="font-size: 1.1rem; margin: 0;">🗓️ Schedule Inspection &amp; Add Notes</h3>
+        <button type="button" id="btn-close-inspection-modal" class="btn-action-sm" style="border:none; font-size: 1.1rem;">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modal-listing-id">
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.25rem;">Property</label>
+          <div id="modal-property-name" style="font-weight: 600; color: var(--text-primary); font-size: 0.95rem;"></div>
+        </div>
+        <div>
+          <label for="inspection-date" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.25rem;">Inspection Date &amp; Time</label>
+          <input type="datetime-local" id="inspection-date" class="filter-input" style="width: 100%;">
+        </div>
+        <div>
+          <label for="inspection-agent" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.25rem;">Agent / Contact Info (Optional)</label>
+          <input type="text" id="inspection-agent" class="filter-input" style="width: 100%;" placeholder="e.g. Ray White Hawthorn, Sarah 0412 345 678">
+        </div>
+        <div>
+          <label for="inspection-notes" style="font-size: 0.82rem; font-weight: 700; display: block; margin-bottom: 0.25rem;">Personal Inspection Notes</label>
+          <textarea id="inspection-notes" class="fb-textarea" style="min-height: 80px;" placeholder="Things to verify: water pressure, natural light, parking spot location, noise from street..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-inspection">Cancel</button>
+        <button type="button" class="btn btn-primary" id="btn-save-inspection">Save Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Side-by-Side Property Comparison Dialog -->
+  <div id="modal-comparison" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-comparison-title">
+    <div class="modal-card modal-card-wide">
+      <div class="modal-header">
+        <h3 id="modal-comparison-title" style="font-size: 1.15rem; margin: 0;">⚖️ Side-by-Side Property Comparison</h3>
+        <button type="button" id="btn-close-comparison-modal" class="btn-action-sm" style="border:none; font-size: 1.1rem;">✕</button>
+      </div>
+      <div class="modal-body comparison-table-wrapper" id="modal-comparison-body">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-comparison">Close</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
