@@ -73,6 +73,7 @@ class PropertyDatabase:
                 available_date TEXT,
                 lease_duration TEXT,
                 description TEXT,
+                photo TEXT,
                 first_seen TEXT NOT NULL,
                 last_seen TEXT NOT NULL,
                 last_verified TEXT,
@@ -172,6 +173,12 @@ class PropertyDatabase:
             CREATE INDEX IF NOT EXISTS idx_sources_prop_id ON listing_sources(property_id);
             """)
 
+            # Schema migration: ensure photo column exists in older database files
+            try:
+                conn.execute("ALTER TABLE properties ADD COLUMN photo TEXT;")
+            except Exception:
+                pass
+
     def upsert_property(self, prop: Property) -> bool:
         """
         Insert or update a property record.
@@ -207,7 +214,7 @@ class PropertyDatabase:
                 INSERT INTO properties (
                     property_id, source, source_listing_id, source_url, title, address, suburb, postcode, state,
                     property_type, bedrooms, bathrooms, parking, weekly_rent, furnished, property_entire,
-                    lease_transfer, available_date, lease_duration, description, first_seen, last_seen, last_verified,
+                    lease_transfer, available_date, lease_duration, description, photo, first_seen, last_seen, last_verified,
                     listing_status, verification_status, match_score, score_version, score_confidence,
                     score_breakdown_json, positive_factors_json, potential_concerns_json,
                     commute_mode, commute_line, commute_mins, commute_tier,
@@ -217,7 +224,7 @@ class PropertyDatabase:
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?,
                     ?, ?, ?, ?,
@@ -238,6 +245,7 @@ class PropertyDatabase:
                     lease_transfer = excluded.lease_transfer,
                     available_date = coalesce(excluded.available_date, properties.available_date),
                     description = excluded.description,
+                    photo = coalesce(excluded.photo, properties.photo),
                     last_seen = excluded.last_seen,
                     last_verified = coalesce(excluded.last_verified, properties.last_verified),
                     listing_status = excluded.listing_status,
@@ -262,7 +270,7 @@ class PropertyDatabase:
                     prop.suburb, prop.postcode, prop.state, prop.property_type, prop.bedrooms, prop.bathrooms, prop.parking,
                     prop.weekly_rent, 1 if prop.furnished else (0 if prop.furnished is not None else None),
                     1 if prop.property_entire else 0, 1 if prop.lease_transfer else 0,
-                    prop.available_date, prop.lease_duration, prop.description, prop.first_seen, prop.last_seen,
+                    prop.available_date, prop.lease_duration, prop.description, prop.photo, prop.first_seen, prop.last_seen,
                     prop.last_verified, prop.listing_status, prop.verification_status, prop.match_score,
                     prop.score_version, prop.score_confidence, json.dumps(prop.score_breakdown),
                     json.dumps(prop.positive_factors), json.dumps(prop.potential_concerns),
@@ -493,6 +501,7 @@ class PropertyDatabase:
             available_date=row["available_date"],
             lease_duration=row["lease_duration"],
             description=row["description"] or "",
+            photo=row["photo"] if ("photo" in row.keys() and row["photo"]) else "",
             first_seen=row["first_seen"],
             last_seen=row["last_seen"],
             last_verified=row["last_verified"],

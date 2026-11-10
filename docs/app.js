@@ -367,7 +367,7 @@ function computeExplainableBreakdown(item) {
 
 function createListingCardHTML(item) {
   const statuses = getSavedStatuses();
-  const userStatus = statuses[item.id] || 'none';
+  const userStatus = statuses[item.id] || "none";
   const isNew = isRecentNewListing(item);
   const inspections = getSavedInspections();
   const inspectionInfo = inspections[item.id];
@@ -376,39 +376,46 @@ function createListingCardHTML(item) {
 
   const breakdown = computeExplainableBreakdown(item);
 
-  const isGreenStar = userStatus === 'shortlist' || userStatus === 'inspecting' || userStatus === 'applied';
-  const isRedStar = userStatus === 'skipped' || userStatus === 'hidden';
+  const isGreenStar = userStatus === "shortlist" || userStatus === "inspecting" || userStatus === "applied";
+  const isRedStar = userStatus === "skipped" || userStatus === "hidden";
 
-  let starBtnClass = 'btn-action-sm';
-  let starLabel = '☆ Star';
+  let starBtnClass = "star-btn";
+  let starIcon = "☆";
+  let starLabel = "Star";
+  let starTitle = "Click once for Green Star (Interested), twice for Red Star (Skip to bottom)";
   if (isGreenStar) {
-    starBtnClass = 'btn-action-sm star-green';
-    starLabel = '★ Shortlisted';
+    starBtnClass = "star-btn star-green";
+    starIcon = "★";
+    starLabel = "Interested";
+    starTitle = "Green Star (Interested) — Click again for Red Star (Skip to bottom)";
   } else if (isRedStar) {
-    starBtnClass = 'btn-action-sm star-red';
-    starLabel = '★ Skipped';
+    starBtnClass = "star-btn star-red";
+    starIcon = "★";
+    starLabel = "Skipped";
+    starTitle = "Red Star (Skipped) — Click again to reset star";
   }
 
   const scoreVal = item.match_score || 70;
-  const scoreClass = scoreVal >= 80 ? '' : scoreVal >= 70 ? 'medium' : 'low';
+  const scoreClass = scoreVal >= 80 ? "" : scoreVal >= 70 ? "medium" : "low";
 
   const confClass =
-    breakdown.confidence === 'High' ? 'confidence-high' :
-    breakdown.confidence === 'Medium' ? 'confidence-medium' : 'confidence-low';
+    breakdown.confidence === "High" ? "confidence-high" :
+    breakdown.confidence === "Medium" ? "confidence-medium" : "confidence-low";
 
-  const furnLabel = item.is_furnished ? 'Furnished (≤$560 cap)' : 'Unfurnished (≤$525 cap)';
+  const furnLabel = item.is_furnished ? "Furnished (≤$560 cap)" : "Unfurnished (≤$525 cap)";
 
-  // Fallback photo
-  const photoUrl = (item.photo && item.photo.startsWith('http'))
+  // Fallback photo and graceful vector apartment fallback
+  const fallbackSvg = "data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22500%22%20viewBox%3D%220%200%20800%20500%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%231e3a5f%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230f172a%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22url(%23g)%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224%22%20opacity%3D%220.6%22%3E%3Cpath%20d%3D%22M250%20420V160h160v260%22%2F%3E%3Cpath%20d%3D%22M410%20420V220h140v200%22%2F%3E%3Crect%20x%3D%22280%22%20y%3D%22190%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22345%22%20y%3D%22190%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22280%22%20y%3D%22265%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22345%22%20y%3D%22265%22%20width%3D%2235%22%20height%3D%2245%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22440%22%20y%3D%22250%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22495%22%20y%3D%22250%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22440%22%20y%3D%22320%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3Crect%20x%3D%22495%22%20y%3D%22320%22%20width%3D%2235%22%20height%3D%2240%22%20rx%3D%224%22%2F%3E%3C%2Fg%3E%3Ctext%20x%3D%22400%22%20y%3D%22460%22%20fill%3D%22%2394a3b8%22%20font-family%3D%22system-ui%2C%20sans-serif%22%20font-size%3D%2216%22%20font-weight%3D%22600%22%20text-anchor%3D%22middle%22%20letter-spacing%3D%222%22%3EMELBOURNE%20RENTAL%20FINDER%3C%2Ftext%3E%3C%2Fsvg%3E";
+  const photoUrl = (item.photo && item.photo.startsWith("http"))
     ? item.photo
-    : 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80';
+    : "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80";
 
   const cardClasses = [
-    'listing-card-v2',
-    isNew ? 'is-new-listing' : '',
-    isGreenStar ? 'is-shortlisted' : '',
-    isRedStar ? 'is-skipped' : ''
-  ].filter(Boolean).join(' ');
+    "listing-card",
+    isNew ? "is-new-listing" : "",
+    isGreenStar ? "is-shortlisted-card" : "",
+    isRedStar ? "is-skipped" : ""
+  ].filter(Boolean).join(" ");
 
   // Positive Factors (Show top 2 by default)
   const topPositives = breakdown.positiveFactors.slice(0, 2);
@@ -416,85 +423,94 @@ function createListingCardHTML(item) {
 
   const positiveHTML = topPositives.map(p => `
     <div class="factor-positive"><span>✔</span> <span>${escapeHtml(p)}</span></div>
-  `).join('');
+  `).join("");
 
   const concernHTML = topConcerns.map(c => `
     <div class="factor-concern"><span>⚠️</span> <span>${escapeHtml(c)}</span></div>
-  `).join('');
+  `).join("");
 
   const cat = breakdown.categoryScores;
 
+  const badgePills = [];
+  if (item.bedrooms === 2) {
+    badgePills.push(`<span class="spec-badge highlight-2bhk">★ 2 BHK (Preferred)</span>`);
+  } else {
+    badgePills.push(`<span class="spec-badge">${item.bedrooms || 1} BHK Entire Place</span>`);
+  }
+  badgePills.push(`<span class="spec-badge highlight-dec">📅 ${escapeHtml(item.availability_display || item.date_available || "Dec 2026")}</span>`);
+
   return `
     <article class="${cardClasses}" data-id="${escapeHtml(item.id)}">
-      <!-- Card Header -->
-      <div class="card-header-bar">
-        <div class="card-title-block">
-          <span class="card-suburb-tag">
-            📍 ${escapeHtml(item.suburb || 'Melbourne')} ${escapeHtml(item.postcode || '')}
-            ${item.is_lease_transfer ? '<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>' : ''}
-          </span>
-          <h3 class="card-title-text">${escapeHtml(item.title)}</h3>
+      <!-- Visual Card Image with Badges & Top Star -->
+      <div class="listing-media">
+        <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="if(this.dataset.fallback!=='1'){this.dataset.fallback='1';this.src='${fallbackSvg}';}">
+        <div class="media-top-badges">
+          <div class="media-left-badges">
+            <span class="score-pill ${scoreClass}">${scoreVal}% Match</span>
+            <span class="confidence-badge ${confClass}">● ${escapeHtml(breakdown.confidence)} Conf</span>
+            ${isNew ? `<span class="new-listing-badge">✨ NEW LISTING</span>` : ""}
+            ${item.is_lease_transfer ? `<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>` : `<span class="lease-transfer-ribbon normal-ribbon">🏠 Normal Rental</span>`}
+          </div>
+          <button
+            type="button"
+            class="${starBtnClass}"
+            data-star-id="${escapeHtml(item.id)}"
+            title="${escapeHtml(starTitle)}"
+            aria-label="${escapeHtml(starTitle)}"
+          >
+            <span class="star-icon">${starIcon}</span>
+            <span>${starLabel}</span>
+          </button>
         </div>
-        <div class="card-price-block">
-          <div class="card-price-val">$${item.weekly_rent || '—'}<span style="font-size: 0.85rem; font-weight: 500;">/wk</span></div>
-          <div class="card-furn-pill">${escapeHtml(furnLabel)}</div>
+        <div class="price-overlay">
+          $${item.weekly_rent || "—"}/wk
+          <span class="furn-tag">${escapeHtml(furnLabel)}</span>
         </div>
       </div>
 
-      <!-- Score & Confidence Strip -->
-      <div class="card-score-strip">
-        <div class="score-badge-group">
-          <span class="score-num-badge ${scoreClass}">${scoreVal}/100 Match</span>
-          <span class="confidence-tag ${confClass}">● ${breakdown.confidence} Confidence</span>
-          ${isNew ? '<span class="new-listing-badge">✨ NEW</span>' : ''}
-        </div>
-        <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">
-          ${escapeHtml(item.source || 'Verified Source')}
-        </div>
-      </div>
-
-      <!-- Specs Bar -->
-      <div class="card-specs-bar">
-        <span class="spec-item">🛏️ ${item.bedrooms || 1} Bed</span>
-        <span class="spec-item">🚿 ${item.bathrooms || 1} Bath</span>
-        <span class="spec-item">🚗 ${item.parking !== undefined && item.parking !== null ? item.parking : (item.has_parking ? '1' : 'Check')} Parking</span>
-        <span class="spec-item" style="color: var(--accent-amber);">📅 ${escapeHtml(item.availability_display || item.date_available || 'Dec 2026')}</span>
-      </div>
-
-      <!-- Highlights & Commute Body -->
-      <div class="card-content-body">
-        <div class="card-transit-row">
-          <strong>🚆 Direct to Hawthorn: ~${item.commute_mins || 15} mins (${escapeHtml(item.commute_mode || 'Train')})</strong>
-          <span>${escapeHtml(item.commute_line || 'Corridor transit')}</span>
+      <!-- Card Body -->
+      <div class="listing-body">
+        <div class="listing-meta-row">
+          <span class="suburb-pill">📍 ${escapeHtml(item.suburb || "Melbourne")} ${escapeHtml(item.postcode || "")}</span>
+          <span>${escapeHtml(item.source || "Verified Source")}</span>
         </div>
 
-        <div style="font-size: 0.82rem; color: #1e3a8a; background: hsla(208, 90%, 95%, 0.7); padding: 0.4rem 0.65rem; border-radius: 6px;">
-          🚉 <strong>Station Proximity:</strong> ${escapeHtml(item.station_distance_display || 'Near local station')}
+        <h3 class="listing-title">${escapeHtml(item.title)}</h3>
+
+        <div class="transit-box">
+          <strong>🚆 Direct to Hawthorn: ${escapeHtml(item.commute_mode || "Train")} (~${item.commute_mins || 15} mins)</strong>
+          <span>${escapeHtml(item.commute_line || "Corridor transit")}</span>
         </div>
 
-        <!-- Explainable Factors List -->
-        <div class="factor-list-box">
+        <div class="station-box">
+          <span>🚉 <strong>Train Station:</strong> ${escapeHtml(item.station_distance_display || "Near local station")}</span>
+        </div>
+
+        <div class="specs-row">
+          ${badgePills.join("")}
+        </div>
+
+        <!-- Highlight Factors -->
+        <div class="factor-list-box" style="margin-top: 0.2rem;">
           ${positiveHTML}
           ${concernHTML}
         </div>
 
         ${inspectionInfo ? `
-          <div style="background: #ecfdf5; border-left: 3px solid #10b981; padding: 0.45rem 0.7rem; border-radius: 4px; font-size: 0.8rem; color: #065f46;">
-            <strong>🗓️ Inspection Scheduled:</strong> ${escapeHtml(new Date(inspectionInfo.datetime).toLocaleString('en-AU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}
-            ${inspectionInfo.notes ? `<div style="margin-top: 0.2rem; font-style: italic;">"${escapeHtml(inspectionInfo.notes)}"</div>` : ''}
+          <div style="background: #ecfdf5; border-left: 3px solid #10b981; padding: 0.45rem 0.7rem; border-radius: 4px; font-size: 0.8rem; color: #065f46; margin-top: 0.2rem;">
+            <strong>🗓️ Inspection Scheduled:</strong> ${escapeHtml(new Date(inspectionInfo.datetime).toLocaleString("en-AU", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }))}
+            ${inspectionInfo.notes ? `<div style="margin-top: 0.2rem; font-style: italic;">"${escapeHtml(inspectionInfo.notes)}"</div>` : ""}
           </div>
-        ` : ''}
+        ` : ""}
 
-        <!-- Progressive Disclosure Toggle -->
-        <button type="button" class="drawer-toggle-btn" data-drawer-id="${escapeHtml(item.id)}">
-          Show Detailed Scoring Breakdown &amp; Description ▼
+        <!-- Progressive Disclosure Accordion -->
+        <button type="button" class="drawer-toggle-btn" data-drawer-id="${escapeHtml(item.id)}" style="margin-top: 0.35rem; width: 100%; padding: 0.45rem 0.65rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--brand-forest); cursor: pointer; font-weight: 600;">
+          Show 100-Point Breakdown &amp; Description ▼
         </button>
 
-        <!-- Expandable Drawer Content -->
-        <div class="card-drawer-content" id="drawer-${escapeHtml(item.id)}">
-          <!-- 6-Category Scoring Breakdown -->
-          <div style="font-weight: 700; font-size: 0.8rem; color: var(--text-primary); margin-bottom: 0.25rem;">
-            100-Point Match Score Analysis (Version: ${escapeHtml(item.score_version || '2.0')})
+        <div class="card-drawer-content" id="drawer-${escapeHtml(item.id)}" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 6px; padding: 0.75rem; margin-top: 0.35rem;">
+          <div style="font-weight: 700; font-size: 0.8rem; color: var(--text-primary); margin-bottom: 0.4rem;">
+            100-Point Match Score Analysis (Version: ${escapeHtml(item.score_version || "2.0")})
           </div>
           <div class="score-categories-grid">
             <div class="cat-bar-item">
@@ -523,52 +539,27 @@ function createListingCardHTML(item) {
             </div>
           </div>
 
-          <!-- Description -->
-          <div style="margin-top: 0.35rem;">
+          <div style="margin-top: 0.5rem;">
             <strong style="display: block; font-size: 0.78rem; margin-bottom: 0.2rem; color: var(--text-primary);">Original Listing Summary:</strong>
-            <p style="font-size: 0.8rem; line-height: 1.45; color: var(--text-secondary);">${escapeHtml(item.description || item.subhead || 'No detailed description provided.')}</p>
-          </div>
-
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">
-            <span>First Discovered: ${escapeHtml(item.first_seen ? new Date(item.first_seen).toLocaleDateString('en-AU') : (item.listed_at ? new Date(item.listed_at).toLocaleDateString('en-AU') : 'Recent'))}</span>
-            <span>Last Verified: ${escapeHtml(item.last_verified ? new Date(item.last_verified).toLocaleDateString('en-AU') : 'Today (Active)')}</span>
-            <span>Source ID: ${escapeHtml(item.source_listing_id || item.id)}</span>
+            <p style="font-size: 0.8rem; line-height: 1.45; color: var(--text-secondary);">${escapeHtml(item.description || item.subhead || "No detailed description provided.")}</p>
           </div>
         </div>
-      </div>
 
-      <!-- Action Toolbar -->
-      <div class="card-action-bar">
-        <div class="card-action-group">
-          <!-- Shortlist Star Button -->
-          <button type="button" class="${starBtnClass}" data-star-id="${escapeHtml(item.id)}" title="Click once for Green Star (Shortlisted), twice for Red Star (Skip)">
-            <span>${starLabel}</span>
-          </button>
+        <!-- Action Footer -->
+        <div class="card-action-bar" style="margin-top: 0.5rem; padding-top: 0.65rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="btn-action-sm" data-inspect-id="${escapeHtml(item.id)}" title="Add inspection date and personal notes">
+              <span>🗓️ Inspection</span>
+            </button>
+            <button type="button" class="btn-action-sm ${isCompared ? "is-active-compare" : ""}" data-compare-id="${escapeHtml(item.id)}" title="Select to compare side by side">
+              <span>${isCompared ? "✓ Comparing" : "⚖ Compare"}</span>
+            </button>
+          </div>
 
-          <!-- Add Inspection Button -->
-          <button type="button" class="btn-action-sm" data-inspect-id="${escapeHtml(item.id)}" title="Add inspection date and personal notes">
-            <span>🗓️ Inspection</span>
-          </button>
-
-          <!-- Compare Button -->
-          <button type="button" class="btn-action-sm ${isCompared ? 'is-active-compare' : ''}" data-compare-id="${escapeHtml(item.id)}" title="Select to compare side by side">
-            <span>${isCompared ? '✓ Comparing' : '⚖ Compare'}</span>
-          </button>
-
-          <!-- Status Dropdown (Fallback & Extra Options) -->
-          <select class="status-select" data-listing-id="${escapeHtml(item.id)}" aria-label="Application status" style="font-size: 0.75rem; padding: 0.3rem 0.45rem;">
-            <option value="none" ${userStatus === 'none' ? 'selected' : ''}>Status: None</option>
-            <option value="shortlist" ${userStatus === 'shortlist' ? 'selected' : ''}>🟢 Shortlisted</option>
-            <option value="inspecting" ${userStatus === 'inspecting' ? 'selected' : ''}>🗓️ Inspecting</option>
-            <option value="applied" ${userStatus === 'applied' ? 'selected' : ''}>✅ Applied</option>
-            <option value="skipped" ${userStatus === 'skipped' ? 'selected' : ''}>🔴 Skipped</option>
-            <option value="leased" ${userStatus === 'leased' ? 'selected' : ''}>🚫 Leased / Gone</option>
-          </select>
+          <a href="${escapeHtml(item.url || item.source_url || "#")}" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 0.38rem 0.85rem; font-size: 0.82rem;">
+            Open Listing ↗
+          </a>
         </div>
-
-        <a href="${escapeHtml(item.url || item.source_url || '#')}" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">
-          Open Listing ↗
-        </a>
       </div>
     </article>
   `;
@@ -827,7 +818,7 @@ function renderNormalListings() {
 
 function bindCardInteractions(rootElement) {
   // 1. Star / Shortlist toggle
-  rootElement.querySelectorAll('.card-action-bar button[data-star-id]').forEach(btn => {
+  rootElement.querySelectorAll('button[data-star-id]').forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
@@ -868,9 +859,10 @@ function bindCardInteractions(rootElement) {
       const drawer = document.getElementById(`drawer-${lid}`);
       if (drawer) {
         const isOpen = drawer.classList.toggle('is-open');
+        drawer.style.display = isOpen ? 'block' : 'none';
         btn.textContent = isOpen
-          ? 'Hide Detailed Scoring Breakdown ▲'
-          : 'Show Detailed Scoring Breakdown & Description ▼';
+          ? 'Hide 100-Point Breakdown ▲'
+          : 'Show 100-Point Breakdown & Description ▼';
       }
     });
   });
@@ -1230,7 +1222,8 @@ function updateOverviewMetrics() {
   };
 
   setTxt('stat-total-scanned', total);
-  setTxt('stat-strict-matches', strongMatches);
+  setTxt('stat-strict-matches', `${strongMatches} Strict (${total} Total)`);
+  setTxt('stat-strong-matches-pill', strongMatches);
   setTxt('stat-under-budget', withinBudget);
   setTxt('stat-new-today', newToday);
   setTxt('stat-shortlisted-top', shortlisted);
@@ -1282,13 +1275,13 @@ async function initApp() {
     });
   });
 
-  // Section A: Interactive Overview Tiles
-  document.querySelectorAll('.overview-tile[data-metric]').forEach(tile => {
+  // Section A: Interactive Overview Tiles & Metric Pills
+  document.querySelectorAll('.overview-tile[data-metric], .metric-pill[data-metric]').forEach(tile => {
     tile.addEventListener('click', () => {
       const metric = tile.getAttribute('data-metric');
       if (metric === 'refresh') return;
 
-      document.querySelectorAll('.overview-tile').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.overview-tile, .metric-pill').forEach(t => t.classList.remove('active'));
       tile.classList.add('active');
 
       filterState.activeMetric = metric;

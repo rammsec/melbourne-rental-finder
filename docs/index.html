@@ -44,70 +44,86 @@
       </div>
     </section>
 
-    <!-- Section A: Interactive Rental Search Overview Tiles -->
-    <section class="overview-grid" aria-label="Interactive Rental Search Overview">
-      <div class="overview-tile active" id="tile-all" data-metric="all" title="Click to view all discovered properties">
-        <span class="overview-tile-label">📍 Total Discovered</span>
-        <span class="overview-tile-value" id="stat-total-scanned">--</span>
-        <span class="overview-tile-sub">All active corridor listings</span>
+    <!-- Search Criteria Summary Strip -->
+    <section class="criteria-strip" aria-label="Strict search criteria">
+      <div class="criteria-card">
+        <span class="criteria-label">Budget Cap (Weekly)</span>
+        <span class="criteria-value">≤ $525 Unfurn / ≤ $560 Furn</span>
+        <span class="criteria-note">Auto-adjusts cap based on furniture detection</span>
       </div>
-      <div class="overview-tile" id="tile-strong" data-metric="strong" title="Click to filter strong matches (Score ≥ 80%)">
-        <span class="overview-tile-label">⭐ Strong Matches</span>
-        <span class="overview-tile-value" id="stat-strict-matches">--</span>
-        <span class="overview-tile-sub">Score ≥ 80% &amp; Hawthorn direct</span>
+      <div class="criteria-card">
+        <span class="criteria-label">Property Configuration</span>
+        <span class="criteria-value">2 BHK Preferred (Solo)</span>
+        <span class="criteria-note">Entire place only • Rejects sharehouses &amp; rooms</span>
       </div>
-      <div class="overview-tile" id="tile-budget" data-metric="budget" title="Click to filter properties within budget">
-        <span class="overview-tile-label">💰 Within Budget</span>
-        <span class="overview-tile-value" id="stat-under-budget">--</span>
-        <span class="overview-tile-sub">≤ $525 unfurn / ≤ $560 furn</span>
+      <div class="criteria-card">
+        <span class="criteria-label">Commute Requirement</span>
+        <span class="criteria-value">27 Corridors to Hawthorn</span>
+        <span class="criteria-note">Belgrave, Lilydale Lines • Tram 70, 75, 16</span>
       </div>
-      <div class="overview-tile" id="tile-new" data-metric="new" title="Click to view new listings discovered in last 24–48h">
-        <span class="overview-tile-label">✨ New (24–48h)</span>
-        <span class="overview-tile-value" id="stat-new-today">--</span>
-        <span class="overview-tile-sub">Freshly discovered</span>
+      <div class="criteria-card">
+        <span class="criteria-label">Matches Found</span>
+        <span class="criteria-value" id="stat-strict-matches">-- Listings</span>
+        <span class="criteria-note" id="stat-sub-summary">Scanning live verified properties</span>
       </div>
-      <div class="overview-tile" id="tile-shortlist" data-metric="shortlist" title="Click to view your shortlisted properties">
-        <span class="overview-tile-label">🟢 Shortlisted</span>
-        <span class="overview-tile-value" id="stat-shortlisted-top">0</span>
-        <span class="overview-tile-sub">Saved for inspection</span>
-      </div>
-      <div class="overview-tile" id="tile-lt" data-metric="lt" title="Click to filter lease transfers">
-        <span class="overview-tile-label">🔄 Lease Transfers</span>
-        <span class="overview-tile-value" id="stat-lease-transfers">--</span>
-        <span class="overview-tile-sub">Direct lease breaks / takeovers</span>
-      </div>
-      <div class="overview-tile" id="tile-refresh" data-metric="refresh" style="cursor: default;" title="Last successful scraper data refresh">
-        <span class="overview-tile-label">🕒 Last Refresh</span>
-        <span class="overview-tile-value" id="stat-last-refresh" style="font-size: 1.05rem;">Loading...</span>
-        <span class="overview-tile-sub">Automated daily at 6 PM</span>
+    </section>
+
+    <!-- Quick Metric Filter Tiles Strip -->
+    <section class="metrics-filter-strip" aria-label="Interactive Quick Filter Tiles">
+      <button class="metric-pill active" id="tile-all" data-metric="all" type="button" title="View all discovered properties">
+        <span class="metric-pill-num" id="stat-total-scanned">89</span>
+        <span class="metric-pill-label">All Discoveries</span>
+      </button>
+      <button class="metric-pill" id="tile-strong" data-metric="strong" type="button" title="Filter strong matches (Score ≥ 80%)">
+        <span class="metric-pill-num" id="stat-strong-matches-pill">35</span>
+        <span class="metric-pill-label">⭐ Strong Matches</span>
+      </button>
+      <button class="metric-pill" id="tile-budget" data-metric="budget" type="button" title="Filter properties within budget cap">
+        <span class="metric-pill-num" id="stat-under-budget">78</span>
+        <span class="metric-pill-label">💰 Under Budget</span>
+      </button>
+      <button class="metric-pill" id="tile-new" data-metric="new" type="button" title="Filter listings discovered in last 24–48h">
+        <span class="metric-pill-num" id="stat-new-today">52</span>
+        <span class="metric-pill-label">✨ New (≤48h)</span>
+      </button>
+      <button class="metric-pill" id="tile-lt" data-metric="lt" type="button" title="Filter lease transfers and breaks">
+        <span class="metric-pill-num" id="stat-lease-transfers">22</span>
+        <span class="metric-pill-label">🔄 Lease Transfers</span>
+      </button>
+      <button class="metric-pill" id="tile-shortlist" data-metric="shortlist" type="button" title="Filter your shortlisted properties">
+        <span class="metric-pill-num" id="stat-shortlisted-top">0</span>
+        <span class="metric-pill-label">🟢 Shortlisted</span>
+      </button>
+      <div class="metric-pill-refresh" title="Scraper automation refresh status">
+        🕒 Refreshed: <span id="stat-last-refresh">Today 6:00 PM</span>
       </div>
     </section>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" aria-label="Dashboard Sections">
       <button class="tab-btn active" data-tab="panel-matches" id="tab-matches" type="button">
-        All Discoveries &amp; Strong Matches <span class="tab-count" id="count-strict">0</span>
+        Strict Matches &amp; All Listings <span class="tab-count" id="count-strict">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-normal" id="tab-normal" type="button">
-        🏠 Normal Listings (Below $600) <span class="tab-count" id="count-normal">0</span>
+        🏠 Normal Rentals (&lt;$600) <span class="tab-count" id="count-normal">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-shortlist" id="tab-shortlist" type="button">
-        ⭐ Shortlist &amp; Inspections <span class="tab-count" id="count-shortlist">0</span>
+        ⭐ Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-compare" id="tab-compare" type="button">
-        ⚖️ Compare Properties <span class="tab-count" id="count-compare">0</span>
+        ⚖️ Compare <span class="tab-count" id="count-compare">0</span>
       </button>
       <button class="tab-btn" data-tab="panel-insights" id="tab-insights" type="button">
-        📊 Property Intelligence &amp; Insights
+        📊 Intelligence
       </button>
       <button class="tab-btn" data-tab="panel-fb-analyzer" id="tab-fb-analyzer" type="button">
-        FB Marketplace &amp; Post Analyzer
+        FB Post Analyzer
       </button>
       <button class="tab-btn" data-tab="panel-portals" id="tab-portals" type="button">
-        Pre-Filtered Search Portals <span class="tab-count" id="count-portals">8</span>
+        Search Portals <span class="tab-count" id="count-portals">9</span>
       </button>
       <button class="tab-btn" data-tab="panel-corridor" id="tab-corridor" type="button">
-        Hawthorn Direct Train/Tram Map
+        Hawthorn Transit Map
       </button>
     </nav>
 

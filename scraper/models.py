@@ -149,6 +149,7 @@ class Property:
     available_date: Optional[str] = None
     lease_duration: Optional[str] = None
     description: str = ""
+    photo: str = ""
 
     first_seen: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     last_seen: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -197,6 +198,7 @@ class Property:
         # Ensure id alias is present for frontend compatibility
         d["id"] = self.property_id
         d["url"] = self.source_url
+        d["photo"] = self.photo
         d["is_furnished"] = self.furnished
         d["is_lease_transfer"] = self.lease_transfer
         d["is_normal_listing"] = (not self.lease_transfer) and self.property_entire and (not self.is_student_only)
@@ -213,6 +215,7 @@ class Property:
         d.update({
             "id": self.property_id,
             "url": self.source_url,
+            "photo": self.photo,
             "title": self.title,
             "address": self.address or f"{self.suburb}, VIC {self.postcode}".strip(),
             "suburb": self.suburb,
@@ -345,6 +348,7 @@ class Property:
             available_date=d.get("available_date") or d.get("date_available"),
             lease_duration=d.get("lease_duration"),
             description=d.get("description") or d.get("subhead") or "",
+            photo=d.get("photo") or "",
             first_seen=first_seen,
             last_seen=last_seen,
             last_verified=d.get("last_verified"),
