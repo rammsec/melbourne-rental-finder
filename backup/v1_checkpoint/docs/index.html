@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Melbourne Lease Transfer & 2BHK Rental Finder — Direct to Hawthorn</title>
+  <meta name="description" content="Daily automated Melbourne rental and lease transfer tracker filtered for entire 1–2BHK properties under $525/$560 per week with direct train or tram commute to Hawthorn.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Critical Lease Timeline Bar -->
+  <header class="deadline-bar" role="banner">
+    <div class="deadline-bar-inner">
+      <div class="timeline-steps">
+        <span class="timeline-pill urgent" id="countdown-pill">⏳ 27 Days to Dec 3 Decision Goal</span>
+        <span class="timeline-pill">🎯 Move-In Window: Dec 5, 2026 – Jan 15, 2027</span>
+        <span class="timeline-pill">🏠 Current Contract Ends: Jan 10, 2027</span>
+      </div>
+      <div class="timeline-steps">
+        <span class="timeline-pill" id="last-updated-pill">Updated: Loading...</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Title & Quick Actions -->
+    <section class="app-header">
+      <div class="app-title-group">
+        <h1>Melbourne Lease Transfer &amp; Hawthorn Commute Finder</h1>
+        <p class="app-subtitle">
+          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong> across all 27 Belgrave, Lilydale &amp; Inner-East line suburbs plus <strong>Clayton, Bayswater, Boronia</strong>.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="btn-open-fb-analyzer" type="button">
+          + Paste FB / Fairy Floss Post
+        </button>
+        <a class="btn btn-primary" href="melbourne-rental-finder.zip" download="melbourne-rental-finder.zip">
+          ⬇ Download Project (.zip)
+        </a>
+      </div>
+    </section>
+
+    <!-- User Criteria Strip -->
+    <section class="criteria-strip" aria-label="Active Search Criteria">
+      <div class="criteria-card">
+        <span class="criteria-label">Budget Cap (Weekly)</span>
+        <span class="criteria-value">≤ $525 Unfurn / ≤ $560 Furn</span>
+        <span class="criteria-note">Auto-adjusts cap based on furniture detection</span>
+      </div>
+      <div class="criteria-card">
+        <span class="criteria-label">Property Configuration</span>
+        <span class="criteria-value">2 BHK Preferred (Solo)</span>
+        <span class="criteria-note">Entire place only • Rejects sharehouses &amp; rooms</span>
+      </div>
+      <div class="criteria-card">
+        <span class="criteria-label">Commute Requirement</span>
+        <span class="criteria-value">27 Corridors to Hawthorn</span>
+        <span class="criteria-note">Belgrave, Lilydale, Pakenham Lines • Tram 70, 75, 16</span>
+      </div>
+      <div class="criteria-card">
+        <span class="criteria-label">Matches Found</span>
+        <span class="criteria-value" id="stat-strict-matches">-- Listings</span>
+        <span class="criteria-note" id="stat-sub-summary">Scanning lease transfers &amp; whole properties</span>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" aria-label="Dashboard Sections">
+      <button class="tab-btn active" data-tab="panel-matches" id="tab-matches" type="button">
+        Strict Matches &amp; All Listings <span class="tab-count" id="count-strict">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-normal" id="tab-normal" type="button">
+        🏠 Normal Listings (Below $600) <span class="tab-count" id="count-normal">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-shortlist" id="tab-shortlist" type="button">
+        ⭐ My Shortlist &amp; Applied <span class="tab-count" id="count-shortlist">0</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-fb-analyzer" id="tab-fb-analyzer" type="button">
+        FB Marketplace &amp; Post Analyzer
+      </button>
+      <button class="tab-btn" data-tab="panel-portals" id="tab-portals" type="button">
+        Pre-Filtered Live Search Portals <span class="tab-count" id="count-portals">8</span>
+      </button>
+      <button class="tab-btn" data-tab="panel-corridor" id="tab-corridor" type="button">
+        Hawthorn Direct Train/Tram Map
+      </button>
+    </nav>
+
+    <!-- PANEL 1: STRICT MATCHES & ALL SCRAPED LISTINGS -->
+    <section class="panel-section active" id="panel-matches">
+      <div class="filters-bar">
+        <div class="filter-group">
+          <input
+            type="search"
+            id="search-input"
+            class="filter-input"
+            placeholder="Search suburb, station, street..."
+            aria-label="Search listings"
+          >
+          <select id="suburb-filter" class="filter-select" aria-label="Filter by suburb">
+            <option value="all">All Suburbs (All 27 Corridors)</option>
+            <optgroup label="Inner East & City (Direct Train / Tram)">
+              <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
+              <option value="camberwell">Camberwell (3124)</option>
+              <option value="canterbury">Canterbury (3126)</option>
+              <option value="surrey hills">Surrey Hills (3127)</option>
+              <option value="mont albert">Mont Albert (3127)</option>
+              <option value="richmond">Richmond / Burnley (3121)</option>
+              <option value="east melbourne">East Melbourne (3002)</option>
+              <option value="melbourne">Melbourne CBD (3000)</option>
+            </optgroup>
+            <optgroup label="Belgrave Line Corridor">
+              <option value="box hill">Box Hill (3128)</option>
+              <option value="blackburn">Blackburn (3130)</option>
+              <option value="nunawading">Nunawading (3131)</option>
+              <option value="mitcham">Mitcham (3132)</option>
+              <option value="ringwood">Ringwood (3134)</option>
+              <option value="heathmont">Heathmont (3135)</option>
+              <option value="bayswater">Bayswater (3153)</option>
+              <option value="boronia">Boronia (3155)</option>
+              <option value="ferntree gully">Ferntree Gully (3156)</option>
+              <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
+              <option value="upwey">Upwey (3158)</option>
+              <option value="tecoma">Tecoma (3160)</option>
+              <option value="belgrave">Belgrave (3160)</option>
+            </optgroup>
+            <optgroup label="Lilydale Line Corridor">
+              <option value="ringwood east">Ringwood East (3135)</option>
+              <option value="croydon">Croydon (3136)</option>
+              <option value="mooroolbark">Mooroolbark (3138)</option>
+              <option value="lilydale">Lilydale (3140)</option>
+            </optgroup>
+            <optgroup label="South-East & Tram Corridors">
+              <option value="clayton">Clayton (3168)</option>
+              <option value="burwood">Burwood (3125)</option>
+              <option value="kew">Kew (3101)</option>
+            </optgroup>
+          </select>
+          <select id="bedroom-filter" class="filter-select" aria-label="Filter by BHK">
+            <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
+            <option value="1">1 BHK / Studio</option>
+            <option value="2">2 BHK (Preferred)</option>
+            <option value="3">3 BHK</option>
+          </select>
+          <select id="furn-filter" class="filter-select" aria-label="Filter by furnished status">
+            <option value="all">Furnished &amp; Unfurnished (All)</option>
+            <option value="furnished">Furnished Only (≤$560/wk)</option>
+            <option value="unfurnished">Unfurnished Only (≤$525/wk)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <button type="button" class="toggle-chip" id="chip-new-only">
+            ✨ New Listings (Last 1–2 Days)
+          </button>
+          <button type="button" class="toggle-chip" id="chip-lease-transfer">
+            🔄 Lease Transfers Only
+          </button>
+          <button type="button" class="toggle-chip" id="chip-strict-only">
+            ✅ Strict 100% Matches Only
+          </button>
+        </div>
+      </div>
+
+      <div class="listings-grid" id="listings-container">
+        <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Bottom Section for Red-Starred (Skipped / Not Interested) Listings -->
+      <div id="skipped-section" class="skipped-section" style="display: none; margin-top: 2.5rem;">
+        <div class="panel-card skipped-header-card">
+          <div>
+            <h3>🔴 Not Interested / Skipped Properties (<span id="count-skipped">0</span>)</h3>
+            <p class="helper-text">
+              Properties you clicked twice (<strong>Red Star ★</strong>) are moved here so you can skip them next time. Click the red star once more to reset back to normal.
+            </p>
+          </div>
+        </div>
+        <div class="listings-grid skipped-grid" id="skipped-container"></div>
+      </div>
+    </section>
+
+    <!-- PANEL: NORMAL LISTINGS (BELOW $600) -->
+    <section class="panel-section" id="panel-normal">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>🏠 Normal Property Rentals (Below $600 / week)</h2>
+        <p class="helper-text">
+          Standard residential leases (whole properties: 1 BHK, 2 BHK &amp; 3 BHK, zero sharehouses, no student-only housing) asking <strong>≤ $600/wk</strong> across Hawthorn, Clayton, Bayswater, Boronia, Box Hill, Camberwell, Richmond, and direct transit lines.
+        </p>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-group">
+          <input
+            type="search"
+            id="search-input-normal"
+            class="filter-input"
+            placeholder="Search suburb, station, street..."
+            aria-label="Search normal listings"
+          >
+          <select id="suburb-filter-normal" class="filter-select" aria-label="Filter by suburb">
+            <option value="all">All Suburbs (All 27 Corridors)</option>
+            <optgroup label="Inner East & City (Direct Train / Tram)">
+              <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
+              <option value="camberwell">Camberwell (3124)</option>
+              <option value="canterbury">Canterbury (3126)</option>
+              <option value="surrey hills">Surrey Hills (3127)</option>
+              <option value="mont albert">Mont Albert (3127)</option>
+              <option value="richmond">Richmond / Burnley (3121)</option>
+              <option value="east melbourne">East Melbourne (3002)</option>
+              <option value="melbourne">Melbourne CBD (3000)</option>
+            </optgroup>
+            <optgroup label="Belgrave Line Corridor">
+              <option value="box hill">Box Hill (3128)</option>
+              <option value="blackburn">Blackburn (3130)</option>
+              <option value="nunawading">Nunawading (3131)</option>
+              <option value="mitcham">Mitcham (3132)</option>
+              <option value="ringwood">Ringwood (3134)</option>
+              <option value="heathmont">Heathmont (3135)</option>
+              <option value="bayswater">Bayswater (3153)</option>
+              <option value="boronia">Boronia (3155)</option>
+              <option value="ferntree gully">Ferntree Gully (3156)</option>
+              <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
+              <option value="upwey">Upwey (3158)</option>
+              <option value="tecoma">Tecoma (3160)</option>
+              <option value="belgrave">Belgrave (3160)</option>
+            </optgroup>
+            <optgroup label="Lilydale Line Corridor">
+              <option value="ringwood east">Ringwood East (3135)</option>
+              <option value="croydon">Croydon (3136)</option>
+              <option value="mooroolbark">Mooroolbark (3138)</option>
+              <option value="lilydale">Lilydale (3140)</option>
+            </optgroup>
+            <optgroup label="South-East & Tram Corridors">
+              <option value="clayton">Clayton (3168)</option>
+              <option value="burwood">Burwood (3125)</option>
+              <option value="kew">Kew (3101)</option>
+            </optgroup>
+          </select>
+          <select id="bedroom-filter-normal" class="filter-select" aria-label="Filter by BHK">
+            <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
+            <option value="1">1 BHK / Studio</option>
+            <option value="2">2 BHK (Preferred)</option>
+            <option value="3">3 BHK</option>
+          </select>
+          <select id="furn-filter-normal" class="filter-select" aria-label="Filter by furnished status">
+            <option value="all">Furnished &amp; Unfurnished (All)</option>
+            <option value="furnished">Furnished Only</option>
+            <option value="unfurnished">Unfurnished Only</option>
+          </select>
+          <select id="price-cap-normal" class="filter-select" aria-label="Max weekly rent">
+            <option value="600">Max Rent: ≤ $600/wk</option>
+            <option value="550">Max Rent: ≤ $550/wk</option>
+            <option value="525">Max Rent: ≤ $525/wk</option>
+            <option value="500">Max Rent: ≤ $500/wk</option>
+            <option value="450">Max Rent: ≤ $450/wk</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <button type="button" class="toggle-chip" id="chip-new-only-normal">
+            ✨ New Listings (Last 1–2 Days)
+          </button>
+          <button type="button" class="toggle-chip" id="chip-exclude-lt-normal">
+            🏠 Normal Rentals Only (Exclude Lease Transfers)
+          </button>
+        </div>
+      </div>
+
+      <div class="listings-grid" id="normal-listings-container">
+        <!-- Populated dynamically by app.js -->
+      </div>
+
+      <!-- Bottom Section for Red-Starred (Skipped / Not Interested) Listings on Normal tab -->
+      <div id="normal-skipped-section" class="skipped-section" style="display: none; margin-top: 2.5rem;">
+        <div class="panel-card skipped-header-card">
+          <div>
+            <h3>🔴 Not Interested / Skipped Properties (<span id="count-normal-skipped">0</span>)</h3>
+            <p class="helper-text">
+              Properties you clicked twice (<strong>Red Star ★</strong>) are moved here so you can skip them next time. Click the red star once more to reset back to normal.
+            </p>
+          </div>
+        </div>
+        <div class="listings-grid skipped-grid" id="normal-skipped-container"></div>
+      </div>
+    </section>
+
+    <!-- PANEL 2: SHORTLIST & TRACKER -->
+    <section class="panel-section" id="panel-shortlist">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>Your Inspection &amp; Lease Transfer Shortlist</h2>
+        <p class="helper-text">
+          Mark any listing as <strong>Interested / Inspecting</strong> or <strong>Applied</strong> using the dropdown on each card. Your statuses are saved locally in your browser so you can track applications before giving your notice on <strong>December 3, 2026</strong>.
+        </p>
+      </div>
+      <div class="listings-grid" id="shortlist-container"></div>
+    </section>
+
+    <!-- PANEL 3: FB MARKETPLACE & FAIRY FLOSS INSTANT ANALYZER -->
+    <section class="panel-section" id="panel-fb-analyzer">
+      <div class="analyzer-grid">
+        <div class="panel-card">
+          <h2>Instant FB Marketplace / Fairy Floss Lease Transfer Scorer</h2>
+          <p class="helper-text">
+            Since Facebook blocks automated bots from reading private groups (like <em>Fairy Floss Real Estate</em> or <em>Melbourne Lease Transfers</em>), paste any FB post or listing text below. It will immediately check the <strong>$525/$560 budget rule</strong>, verify <strong>direct train/tram commute to Hawthorn</strong>, confirm <strong>Dec 5, 2026 – Jan 15, 2027 move-in</strong>, and save it to your dashboard.
+          </p>
+          <input
+            type="text"
+            id="fb-post-url"
+            class="filter-input"
+            style="width: 100%; margin-bottom: 0.65rem;"
+            placeholder="Optional: Paste Facebook Marketplace or Group post URL..."
+          >
+          <textarea
+            id="fb-post-text"
+            class="fb-textarea"
+            placeholder="Example: LEASE BREAK in Camberwell 3124! Entire 2 bedroom apartment on Riversdale Rd right near Tram 70 and Camberwell Station. $515 per week unfurnished. Available from December 14th..."
+          ></textarea>
+          <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" id="btn-score-fb-post">
+              Analyze &amp; Save to My Listings
+            </button>
+            <button type="button" class="btn btn-secondary" id="btn-load-sample-fb">
+              Load Example FB Lease Transfer Post
+            </button>
+          </div>
+        </div>
+
+        <div class="panel-card" id="fb-analysis-result-card">
+          <h2>Live Criteria Breakdown</h2>
+          <p class="helper-text">Paste a post on the left and click <strong>Analyze</strong> to see how it scores against your rules.</p>
+          <div id="fb-analysis-output" style="font-size: 0.9rem; color: var(--text-secondary);">
+            <ul style="list-style: none; display: grid; gap: 0.6rem; margin-top: 0.75rem;">
+              <li>✔ <strong>Budget Check:</strong> Unfurnished ≤ $525/wk | Furnished ≤ $560/wk</li>
+              <li>✔ <strong>Solo Entire Property:</strong> 2BHK preferred (auto-flags sharehouses)</li>
+              <li>✔ <strong>Hawthorn Transit:</strong> Checks Belgrave/Lilydale/Alamein train &amp; Tram 70/75/16</li>
+              <li>✔ <strong>Move-in Window:</strong> Dec 5, 2026 – Jan 15, 2027 (extended availability)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 4: PRE-FILTERED PORTAL DEEP LINKS -->
+    <section class="panel-section" id="panel-portals">
+      <div class="panel-card" style="margin-bottom: 1.25rem;">
+        <h2>One-Click Pre-Filtered Search Portals (Hawthorn Corridor)</h2>
+        <p class="helper-text">
+          These links open Facebook Marketplace, Domain, Realestate.com.au, Flatmates (Whole Properties), and Gumtree with your exact filters (<strong>2BHK, ≤$525/$560, Hawthorn + direct transit suburbs, newest first</strong>) already applied.
+        </p>
+      </div>
+      <div class="quick-links-grid" id="portal-links-container"></div>
+    </section>
+
+    <!-- PANEL 5: HAWTHORN DIRECT TRAIN & TRAM SUBURB REFERENCE -->
+    <section class="panel-section" id="panel-corridor">
+      <div class="panel-card">
+        <h2>Direct Train &amp; Tram Suburbs to Hawthorn (Zero Transfers)</h2>
+        <p class="helper-text">
+          Every suburb below has a single-seat train or tram ride straight into Hawthorn (Hawthorn Station, Glenferrie Station, Auburn Station, Burwood Rd, Riversdale Rd, or Glenferrie Rd).
+        </p>
+        <div style="overflow-x: auto;">
+          <table class="corridor-table" id="corridor-table">
+            <thead>
+              <tr>
+                <th>Suburb</th>
+                <th>Postcode</th>
+                <th>Direct Mode</th>
+                <th>Line / Route to Hawthorn</th>
+                <th>Est. Commute</th>
+              </tr>
+            </thead>
+            <tbody id="corridor-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
