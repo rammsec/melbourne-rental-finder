@@ -47,6 +47,18 @@ def parse_iso_datetime(dt_str: Optional[str]) -> datetime:
         return datetime.now(timezone.utc)
 
 
+def get_listing_age_days(listed_iso: str) -> float:
+    """Calculate age in days from an ISO timestamp string."""
+    if not listed_iso:
+        return 0.0
+    try:
+        dt = parse_iso_datetime(listed_iso)
+        diff_sec = (datetime.now(timezone.utc) - dt).total_seconds()
+        return max(0.0, diff_sec / 86400.0)
+    except Exception:
+        return 0.0
+
+
 def compute_freshness_status(
     first_seen_iso: str,
     last_seen_iso: str,

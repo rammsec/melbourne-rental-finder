@@ -34,14 +34,41 @@ cp -r backup/v1_checkpoint/docs .
 cp backup/v1_checkpoint/README.md .
 ```
 
-### C. Database Rollback
-- V2 maintains dual-mode operation: the normalized database layer writes to `docs/data/listings.json` and `docs/data/database.sqlite` (or Supabase via adapter).
-- The frontend always includes a fallback mechanism: if V2 database endpoints fail or are unavailable, it seamlessly falls back to reading `docs/data/listings.json`.
-- To discard SQLite/database changes without losing raw scraped data:
-  ```bash
-  rm -f docs/data/database.sqlite docs/data/database.sqlite-journal
-  cp backup/v1_checkpoint/docs/data/listings.json docs/data/listings.json
-  ```
+### C. Database Migration & Rollback Procedure
+- **Relational Tables**:
+  - `properties`: Canonical property records and attributes.
+  - `listing_sources`: Multiple source tracking for deduplicated properties.
+  - `listing_snapshots`: Immutable historical records of price, availability, and status changes.
+  - `property_scores`: 100-point explainable score logs with versions and confidence.
+  - `user_interactions`: User actions (shortlist, interested, skip, inspection scheduling, notes).
+  - `scraper_executions`: Scraper telemetry, error logging, and execution durations.
+- **Backward Compatibility Guarantee**:
+  - V2 maintains dual-mode operation: the database layer writes to `docs/data/database.sqlite` and exports normalized, backward-compatible JSON to `docs/data/listings.json`.
+  - The static frontend hosted on GitHub Pages reads `docs/data/listings.json` and persists user interactions in browser `localStorage`.
+- **Database Rollback Steps**:
+  1. To discard SQLite/database changes without losing raw scraped data:
+     ```bash
+     rm -f docs/data/database.sqlite docs/data/database.sqlite-journal
+     cp backup/v1_checkpoint/docs/data/listings.json docs/data/listings.json
+     ```
+  2. To re-seed the SQLite database from existing listings JSON:
+     ```bash
+     python3 -c "
+     import json
+     from scraper.db import PropertyDatabase
+     from scraper.models import Property
+     db = PropertyDatabase('docs/data/database.sqlite')
+     with open('docs/data/listings.json') as f:
+         data = json.load(f)
+     for item in data.get('listings', []):
+         db.upsert_property(Property.from_legacy(item))
+     print('Database re-seeded successfully')
+     "
+     ```
+  3. **Cloud Adapter (Supabase) Rollback**:
+     - Supabase integration is non-intrusive and strictly driven by `SUPABASE_URL` and `SUPABASE_KEY` environment variables.
+     - To disable Supabase sync and run in pure local SQLite mode, simply unset or remove those environment variables.
+     - No credentials or secrets are ever committed to git.
 
 ---
 

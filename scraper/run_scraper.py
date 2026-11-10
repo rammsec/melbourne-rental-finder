@@ -1,26 +1,34 @@
 #!/usr/bin/env python3
 """
-Main CLI & GitHub Actions Runner for Melbourne Lease Transfer & Rental Finder.
+Main CLI & GitHub Actions Runner for Melbourne Lease Transfer & Rental Finder V2.
 
-Only scrapes and publishes 100% genuine, active listings with direct property URLs:
-- Live Gumtree Lease Transfers & Rentals (Direct /web/listing/property-for-rent/<ad_id> links)
-- Live Flatmates Whole Properties (Direct /whole-property-melbourne-...-P<id> links)
-- Live Reddit Lease Transfer posts (Direct reddit.com/r/melbourne/comments/... links)
-
-Every listing is strictly scored against:
-- Solo occupancy (2BHK preferred, entire place only, zero sharehouses)
-- Unfurnished <= $525/wk | Furnished <= $560/wk
-- Direct train or tram commute to Hawthorn (Belgrave/Lilydale/Alamein line, Tram 70/75/16)
-- Move-in window Dec 5 – Dec 30, 2026
+Features:
+- Scrapes live Gumtree Lease Transfers & Rentals
+- Scrapes live Flatmates Whole Properties
+- Scrapes live Reddit Lease Transfer posts
+- Normalizes into unified Property models
+- Multi-criteria cross-source deduplication with confidence scoring
+- 100-point explainable scoring engine V2
+- Lifecycle and freshness tracking
+- Persistent relational SQLite storage (docs/data/database.sqlite)
+- Optional Supabase PostgreSQL cloud sync (when credentials configured)
+- Exports backward-compatible JSON to docs/data/listings.json
+- Generates daily Markdown digest to docs/data/digest.md
 """
 
 import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List
 
 from .config import USER_CRITERIA, HAWTHORN_DIRECT_SUBURBS
+from .models import Property, ScraperExecutionLog
 from .scorer import score_and_classify_listing
+from .scorer_v2 import score_property_v2
+from .dedup import deduplicate_properties
+from .freshness import update_property_freshness, update_catalog_freshness
+from .db import PropertyDatabase
 from .sources import (
     scrape_gumtree_lease_transfers,
     scrape_flatmates_whole_properties,
@@ -32,6 +40,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT_DIR / "docs" / "data"
 LISTINGS_FILE = DATA_DIR / "listings.json"
 DIGEST_FILE = DATA_DIR / "digest.md"
+DATABASE_FILE = DATA_DIR / "database.sqlite"
 
 
 def load_existing_listings() -> Dict[str, Dict[str, Any]]:
@@ -107,39 +116,59 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
 
 
 def main() -> None:
+    start_time = time.time()
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    db = PropertyDatabase(DATABASE_FILE)
     existing_map = load_existing_listings()
 
     raw_listings: List[Dict[str, Any]] = []
+    errors_logged = 0
 
-    # 1. Scrape live Gumtree lease transfers (100% real ads with direct URLs)
-    raw_listings.extend(scrape_gumtree_lease_transfers())
+    # 1. Scrape live Gumtree lease transfers
+    try:
+        raw_listings.extend(scrape_gumtree_lease_transfers())
+    except Exception as e:
+        print(f"[Warn] Gumtree scraper error: {e}")
+        errors_logged += 1
 
-    # 2. Scrape live Flatmates Whole Properties (100% real ads with direct URLs)
-    raw_listings.extend(scrape_flatmates_whole_properties(max_pages=3))
+    # 2. Scrape live Flatmates Whole Properties
+    try:
+        raw_listings.extend(scrape_flatmates_whole_properties(max_pages=3))
+    except Exception as e:
+        print(f"[Warn] Flatmates scraper error: {e}")
+        errors_logged += 1
 
-    # 3. Scrape live Reddit lease transfers (when accessible)
-    raw_listings.extend(scrape_reddit_lease_transfers())
+    # 3. Scrape live Reddit lease transfers
+    try:
+        raw_listings.extend(scrape_reddit_lease_transfers())
+    except Exception as e:
+        print(f"[Warn] Reddit scraper error: {e}")
+        errors_logged += 1
 
-    processed_map: Dict[str, Dict[str, Any]] = {}
-    new_matches_count = 0
+    # Ingest existing listings if raw scrape yields fewer items (safety guard)
+    if not raw_listings and existing_map:
+        print("[Info] Preserving existing listings from backup/state")
+        raw_listings.extend(list(existing_map.values()))
+
+    # Process and score raw listings
+    processed_properties: List[Property] = []
+    seen_ids = set()
 
     for raw in raw_listings:
         enriched = score_and_classify_listing(raw)
-        # 1. Completely exclude Student Only Accommodation & Rooming Houses
+
+        # Exclude Student Only Accommodation & Rooming Houses
         if enriched.get("is_student_only"):
             continue
 
-        # 2. Exclude missing prices, dummy titles, or sub-$200 listings (storage, carparks, scams)
+        # Exclude missing prices or sub-$200 listings
         weekly_rent = enriched.get("weekly_rent")
         if weekly_rent is None or weekly_rent < 200:
             continue
         if (enriched.get("title") or "").strip().lower() in ("lease listing", "wanted:"):
             continue
 
-        # 3. Enforce strict freshness cutoffs:
-        #    - Lease Transfers: posted within last 15 days
-        #    - Normal Listings: posted within last 10 days
+        # Enforce freshness cutoffs: 15 days for lease transfers, 10 days for normal listings
         age_days = get_listing_age_days(enriched.get("listed_at", ""))
         if enriched.get("is_lease_transfer"):
             if age_days > 15.0:
@@ -148,46 +177,60 @@ def main() -> None:
             if age_days > 10.0:
                 continue
 
-        lid = enriched["id"]
-        if lid not in existing_map:
-            enriched["is_new"] = True
-        if enriched.get("is_new") and enriched.get("pass_strict_filter"):
-            new_matches_count += 1
-        processed_map[lid] = enriched
+        # Convert to unified Property model
+        prop_obj = Property.from_legacy(enriched)
+        # Apply 100-point explainable scoring engine
+        prop_obj = score_property_v2(prop_obj)
 
-    # Sort: strict matches first, then lease transfers, then score descending, then rent
-    all_listings = list(processed_map.values())
-    all_listings.sort(
-        key=lambda x: (
-            1 if x.get("pass_strict_filter") else 0,
-            1 if x.get("is_lease_transfer") else 0,
-            x.get("match_score", 0),
-            -(x.get("weekly_rent") or 9999),
-        ),
-        reverse=True,
+        processed_properties.append(prop_obj)
+        seen_ids.add(prop_obj.property_id)
+        seen_ids.add(prop_obj.source_listing_id)
+
+    # Cross-source duplicate detection
+    deduped_properties, flagged_duplicates = deduplicate_properties(processed_properties)
+
+    # Freshness and lifecycle tracking
+    updated_catalog, freshness_stats = update_catalog_freshness(
+        catalog=deduped_properties,
+        current_run_ids=seen_ids,
+        verify_sample_size=0,
     )
 
+    # Persist into relational SQLite database
+    new_count = 0
+    updated_count = 0
+    for prop in updated_catalog:
+        is_new = db.upsert_property(prop)
+        if is_new:
+            new_count += 1
+        else:
+            updated_count += 1
+
+    # Log execution telemetry
+    duration = time.time() - start_time
+    exec_log = ScraperExecutionLog(
+        run_timestamp=datetime.now(timezone.utc).isoformat(),
+        source="all",
+        listings_scanned=len(raw_listings),
+        listings_new=new_count,
+        listings_updated=updated_count,
+        errors_logged=errors_logged,
+        duration_seconds=round(duration, 2),
+        status="success" if errors_logged == 0 else "partial",
+    )
+    db.log_execution(exec_log)
+
+    # Export to docs/data/listings.json for static site deployment
+    portal_links = build_portal_quick_links()
+    export_payload = db.export_to_listings_json(
+        output_file=LISTINGS_FILE,
+        criteria=USER_CRITERIA,
+        portal_links=portal_links,
+    )
+
+    all_listings = export_payload.get("listings", [])
     strict_matches = [x for x in all_listings if x.get("pass_strict_filter")]
-    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    payload = {
-        "last_updated": now_iso,
-        "criteria": USER_CRITERIA,
-        "stats": {
-            "total_scanned": len(all_listings),
-            "strict_matches": len(strict_matches),
-            "normal_under_600": sum(1 for x in all_listings if x.get("is_normal_listing") and x.get("is_under_600")),
-            "total_under_600": sum(1 for x in all_listings if x.get("is_under_600")),
-            "lease_transfers": sum(1 for x in all_listings if x.get("is_lease_transfer")),
-            "two_bhk_matches": sum(1 for x in all_listings if x.get("bedrooms") == 2 and x.get("is_under_600")),
-            "new_today": new_matches_count,
-        },
-        "portal_quick_links": build_portal_quick_links(),
-        "hawthorn_corridor_suburbs": HAWTHORN_DIRECT_SUBURBS,
-        "listings": all_listings,
-    }
-
-    LISTINGS_FILE.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    now_iso = export_payload.get("last_updated", "")
 
     # Generate daily digest Markdown
     digest_lines = [
@@ -208,13 +251,14 @@ def main() -> None:
         bed_badge = f"{item['bedrooms']}BHK" + (" 🔄 Lease Transfer" if item["is_lease_transfer"] else "")
         transit = f"**{item['suburb']}** ({item['commute_mode']}, ~{item['commute_mins']}m)"
         station = item.get("station_distance_display", "Near station")
+        score_val = item.get("match_score", 0)
         digest_lines.append(
-            f"| **{item['match_score']}%** | {rent_badge} | {bed_badge} | {transit} | {station} | {item['availability_display']} | [Open Property]({item['url']}) |"
+            f"| **{score_val}%** | {rent_badge} | {bed_badge} | {transit} | {station} | {item.get('availability_display', 'Flexible')} | [Open Property]({item['url']}) |"
         )
 
     DIGEST_FILE.write_text("\n".join(digest_lines) + "\n", encoding="utf-8")
     print(
-        f"[Done] Wrote {len(all_listings)} 100% real listings ({len(strict_matches)} strict Hawthorn matches) to {LISTINGS_FILE}"
+        f"[Done V2] Processed {len(all_listings)} properties ({len(strict_matches)} strict Hawthorn matches) saved to {DATABASE_FILE} and {LISTINGS_FILE}"
     )
 
 
