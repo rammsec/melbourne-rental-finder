@@ -23,10 +23,16 @@ from typing import Dict, Any, List, Optional
 
 def generate_property_id(source: str, source_listing_id: str, address: str = "", suburb: str = "") -> str:
     """Generate a consistent unique identifier for a property."""
-    if source_listing_id and source:
-        clean_src = re.sub(r"[^a-zA-Z0-9_-]", "", source.lower())
+    if source_listing_id:
         clean_id = re.sub(r"[^a-zA-Z0-9_-]", "", str(source_listing_id))
-        return f"prop_{clean_src}_{clean_id}"
+        if clean_id.startswith("prop_"):
+            return clean_id
+        clean_src = re.sub(r"[^a-zA-Z0-9_-]", "", source.lower()) if source else ""
+        if clean_src and clean_id.lower().startswith(f"{clean_src}_"):
+            return f"prop_{clean_id}"
+        if clean_src:
+            return f"prop_{clean_src}_{clean_id}"
+        return f"prop_{clean_id}"
     
     # Hash address + suburb if listing ID missing
     seed = f"{suburb.lower()}|{address.lower()}"
