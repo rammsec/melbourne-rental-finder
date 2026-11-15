@@ -607,6 +607,9 @@ class TestFacebookMarketplaceSource(unittest.TestCase):
             cap = get_budget_cap(bedrooms, is_furn)
             self.assertLessEqual(item["weekly_rent"], cap)
             self.assertTrue(item.get("is_lease_transfer"))
+            # Must use working live search query URLs rather than broken item IDs
+            self.assertIn("https://www.facebook.com/marketplace/melbourne/search", item["url"])
+            self.assertNotIn("/marketplace/item/", item["url"])
 
     def test_primary_search_url_in_quick_links(self):
         portal_links = build_portal_quick_links()

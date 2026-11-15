@@ -94,6 +94,10 @@
         <span class="metric-pill-num" id="stat-shortlisted-top">0</span>
         <span class="metric-pill-label">🟢 Shortlisted</span>
       </button>
+      <button class="metric-pill" id="tile-skipped" data-metric="skipped" type="button" title="View properties you disliked / skipped">
+        <span class="metric-pill-num" id="stat-skipped-top">0</span>
+        <span class="metric-pill-label">🔴 Skipped</span>
+      </button>
       <div class="metric-pill-refresh" title="Scraper automation refresh status">
         🕒 Refreshed: <span id="stat-last-refresh">Today 6:00 PM</span>
       </div>
@@ -250,9 +254,12 @@
           <div>
             <h3>🔴 Not Interested / Skipped Properties (<span id="count-skipped">0</span>)</h3>
             <p class="helper-text">
-              Properties you clicked twice (<strong>Red Star ★</strong>) are moved here so you can skip them next time. Click the red star once more to reset back to normal.
+              Properties you marked with <strong>👎 Don't Like</strong> or <strong>Red Star ★</strong> are kept here so you don't have to review them again. Click <strong>↩ Restore</strong> on any card to bring it back.
             </p>
           </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-restore-all-skipped" style="font-weight: 700; border-color: #fca5a5; color: #b91c1c;">
+            ↺ Restore All Skipped
+          </button>
         </div>
         <div class="listings-grid skipped-grid" id="skipped-container"></div>
       </div>
@@ -358,9 +365,12 @@
           <div>
             <h3>🔴 Not Interested / Skipped Properties (<span id="count-normal-skipped">0</span>)</h3>
             <p class="helper-text">
-              Properties you clicked twice (<strong>Red Star ★</strong>) are moved here so you can skip them next time. Click the red star once more to reset back to normal.
+              Properties you marked with <strong>👎 Don't Like</strong> or <strong>Red Star ★</strong> are kept here. Click <strong>↩ Restore</strong> on any card to bring it back.
             </p>
           </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-restore-all-normal-skipped" style="font-weight: 700; border-color: #fca5a5; color: #b91c1c;">
+            ↺ Restore All Skipped
+          </button>
         </div>
         <div class="listings-grid skipped-grid" id="normal-skipped-container"></div>
       </div>
@@ -597,6 +607,7 @@
     </div>
   </div>
 
+  <div id="app-toast-container" class="app-toast-container"></div>
   <script src="app.js"></script>
 </body>
 </html>

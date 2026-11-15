@@ -125,10 +125,15 @@ function cycleStarStatus(listingId) {
   const st = current[listingId] || 'none';
   if (st === 'none') {
     setSavedStatus(listingId, 'shortlist');
+    showToast('⭐ Added to Shortlist & Applied!');
   } else if (st === 'shortlist' || st === 'inspecting' || st === 'applied') {
     setSavedStatus(listingId, 'skipped');
+    showToast('Moved to Skipped section at bottom 🔴', 'Undo', () => {
+      setSavedStatus(listingId, 'none');
+    });
   } else {
     setSavedStatus(listingId, 'none');
+    showToast('Star reset to normal');
   }
 }
 
@@ -144,6 +149,75 @@ function recordUserDecision(listingId, action) {
     // Keep last 150 decisions
     localStorage.setItem(logKey, JSON.stringify(logs.slice(-150)));
   } catch {}
+}
+
+function showToast(message, actionLabel, actionFn) {
+  let container = document.getElementById('app-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'app-toast-container';
+    container.className = 'app-toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'app-toast';
+  toast.innerHTML = `
+    <span>${escapeHtml(message)}</span>
+    ${actionLabel ? `<button type="button" class="app-toast-undo">${escapeHtml(actionLabel)}</button>` : ''}
+  `;
+  if (actionLabel && actionFn) {
+    const undoBtn = toast.querySelector('.app-toast-undo');
+    if (undoBtn) {
+      undoBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        actionFn();
+        toast.remove();
+      });
+    }
+  }
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(10px)';
+    setTimeout(() => toast.remove(), 280);
+  }, 4000);
+}
+
+function getListingUrl(item) {
+  let url = (item.url || item.source_url || '').trim();
+  const src = (item.source || '').toLowerCase();
+  const key = (item.source_key || '').toLowerCase();
+
+  // If Facebook Marketplace listing:
+  if (src.includes('facebook') || key.includes('facebook')) {
+    // If it points to an invalid/placeholder item ID or is missing, convert to live search for that suburb
+    if (!url || url.includes('/marketplace/item/') || url === '#' || url.includes('placeholder')) {
+      const sub = (item.suburb || '').trim();
+      const query = encodeURIComponent(`lease transfer 2 bedroom ${sub}`.trim());
+      return `https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=${query}&exact=false`;
+    }
+  }
+
+  if (!url || url === '#') {
+    return 'https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom&exact=false';
+  }
+  return url;
+}
+
+function restoreAllSkipped() {
+  const current = getSavedStatuses();
+  let restored = 0;
+  for (const [id, st] of Object.entries(current)) {
+    if (st === 'skipped' || st === 'hidden') {
+      delete current[id];
+      restored++;
+    }
+  }
+  localStorage.setItem(STORAGE_STATUS_KEY, JSON.stringify(current));
+  renderAll();
+  showToast(`Restored ${restored} properties back to active discoveries! ↺`);
 }
 
 function getUserDecisionLogs() {
@@ -464,9 +538,15 @@ function createListingCardHTML(item) {
   }
   badgePills.push(`<span class="spec-badge highlight-dec">📅 ${escapeHtml(item.availability_display || item.date_available || "Dec 2026")}</span>`);
 
+  const resolvedUrl = getListingUrl(item);
+  const isFbListing = (item.source || '').toLowerCase().includes('facebook') || (item.source_key || '').toLowerCase().includes('facebook');
+  const openBtnLabel = isFbListing && resolvedUrl.includes('/marketplace/melbourne/search')
+    ? `Open FB Search (${item.suburb || 'Corridor'}) ↗`
+    : 'Open Listing ↗';
+
   return `
     <article class="${cardClasses}" data-id="${escapeHtml(item.id)}">
-      <!-- Visual Card Image with Badges & Top Star -->
+      <!-- Visual Card Image with Badges, Top Star & Skip Action -->
       <div class="listing-media">
         <img src="${escapeHtml(photoUrl)}" alt="${escapeHtml(item.title)}" loading="lazy" onerror="if(this.dataset.fallback!=='1'){this.dataset.fallback='1';this.src='${fallbackSvg}';}">
         <div class="media-top-badges">
@@ -476,16 +556,27 @@ function createListingCardHTML(item) {
             ${isNew ? `<span class="new-listing-badge">✨ NEW LISTING</span>` : ""}
             ${item.is_lease_transfer ? `<span class="lease-transfer-ribbon">🔄 Lease Transfer</span>` : `<span class="lease-transfer-ribbon normal-ribbon">🏠 Normal Rental</span>`}
           </div>
-          <button
-            type="button"
-            class="${starBtnClass}"
-            data-star-id="${escapeHtml(item.id)}"
-            title="${escapeHtml(starTitle)}"
-            aria-label="${escapeHtml(starTitle)}"
-          >
-            <span class="star-icon">${starIcon}</span>
-            <span>${starLabel}</span>
-          </button>
+          <div class="media-right-actions">
+            <button
+              type="button"
+              class="${starBtnClass}"
+              data-star-id="${escapeHtml(item.id)}"
+              title="${escapeHtml(starTitle)}"
+              aria-label="${escapeHtml(starTitle)}"
+            >
+              <span class="star-icon">${starIcon}</span>
+              <span>${starLabel}</span>
+            </button>
+            <button
+              type="button"
+              class="btn-skip-top ${isRedStar ? "is-skipped" : ""}"
+              data-dislike-id="${escapeHtml(item.id)}"
+              title="${isRedStar ? "Restore this property back to active listings" : "Don't like this property? Move to Skipped section at bottom"}"
+              aria-label="${isRedStar ? "Restore property" : "Don't like property"}"
+            >
+              <span>${isRedStar ? "↩ Restore" : "👎 Skip"}</span>
+            </button>
+          </div>
         </div>
         <div class="price-overlay">
           $${item.weekly_rent || "—"}/wk
@@ -573,6 +664,14 @@ function createListingCardHTML(item) {
         <!-- Action Footer -->
         <div class="card-action-bar" style="margin-top: 0.5rem; padding-top: 0.65rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+            <button
+              type="button"
+              class="btn-action-sm btn-dislike-action ${isRedStar ? "is-skipped" : ""}"
+              data-dislike-id="${escapeHtml(item.id)}"
+              title="${isRedStar ? "Restore this property back to active listings" : "Don't like this listing? Move it to the Skipped section at the bottom"}"
+            >
+              <span>${isRedStar ? "↩ Restore" : "👎 Don't Like"}</span>
+            </button>
             <button type="button" class="btn-action-sm" data-inspect-id="${escapeHtml(item.id)}" title="Add inspection date and personal notes">
               <span>🗓️ Inspection</span>
             </button>
@@ -581,8 +680,8 @@ function createListingCardHTML(item) {
             </button>
           </div>
 
-          <a href="${escapeHtml(item.url || item.source_url || "#")}" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 0.38rem 0.85rem; font-size: 0.82rem;">
-            Open Listing ↗
+          <a href="${escapeHtml(resolvedUrl)}" target="_blank" rel="noopener" class="btn btn-primary" style="padding: 0.38rem 0.85rem; font-size: 0.82rem;">
+            ${escapeHtml(openBtnLabel)}
           </a>
         </div>
       </div>
@@ -690,35 +789,57 @@ function renderListings() {
     return (a.weekly_rent || 9999) - (b.weekly_rent || 9999);
   });
 
-  // Render main active listings
-  if (activeListings.length === 0) {
-    container.innerHTML = `
-      <div class="state-container">
-        <div class="state-icon">🔍</div>
-        <div class="state-title">No properties match your current filter combination</div>
-        <div class="state-desc">
-          Try broadening your search, adjusting the commute limit, or clearing active chips.
+  // Render main active listings (or skipped if user clicked the Skipped metric pill)
+  if (filterState.activeMetric === 'skipped') {
+    if (skippedListings.length === 0) {
+      container.innerHTML = `
+        <div class="state-container">
+          <div class="state-icon">🔴</div>
+          <div class="state-title">You haven't skipped any properties yet</div>
+          <div class="state-desc">
+            Click <strong>👎 Don't Like</strong> or <strong>👎 Skip</strong> on any property card you aren't interested in to move it here.
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-empty-reset" style="margin-top: 0.5rem;">
+            ↺ Back to All Discoveries
+          </button>
         </div>
-        <button type="button" class="btn btn-primary" id="btn-empty-reset" style="margin-top: 0.5rem;">
-          ↺ Reset All Filters
-        </button>
-      </div>
-    `;
-    const emptyResetBtn = document.getElementById('btn-empty-reset');
-    if (emptyResetBtn) emptyResetBtn.addEventListener('click', resetAllFilters);
-  } else {
-    container.innerHTML = activeListings.map(createListingCardHTML).join('');
-  }
-
-  // Render Skipped section
-  if (skippedSection && skippedContainer) {
-    if (skippedListings.length > 0) {
-      skippedSection.style.display = 'block';
-      if (countSkippedEl) countSkippedEl.textContent = skippedListings.length;
-      skippedContainer.innerHTML = skippedListings.map(createListingCardHTML).join('');
+      `;
+      const emptyResetBtn = document.getElementById('btn-empty-reset');
+      if (emptyResetBtn) emptyResetBtn.addEventListener('click', resetAllFilters);
     } else {
-      skippedSection.style.display = 'none';
-      skippedContainer.innerHTML = '';
+      container.innerHTML = skippedListings.map(createListingCardHTML).join('');
+    }
+    if (skippedSection) skippedSection.style.display = 'none';
+  } else {
+    if (activeListings.length === 0) {
+      container.innerHTML = `
+        <div class="state-container">
+          <div class="state-icon">🔍</div>
+          <div class="state-title">No properties match your current filter combination</div>
+          <div class="state-desc">
+            Try broadening your search, adjusting the commute limit, or clearing active chips.
+          </div>
+          <button type="button" class="btn btn-primary" id="btn-empty-reset" style="margin-top: 0.5rem;">
+            ↺ Reset All Filters
+          </button>
+        </div>
+      `;
+      const emptyResetBtn = document.getElementById('btn-empty-reset');
+      if (emptyResetBtn) emptyResetBtn.addEventListener('click', resetAllFilters);
+    } else {
+      container.innerHTML = activeListings.map(createListingCardHTML).join('');
+    }
+
+    // Render Skipped section at bottom
+    if (skippedSection && skippedContainer) {
+      if (skippedListings.length > 0) {
+        skippedSection.style.display = 'block';
+        if (countSkippedEl) countSkippedEl.textContent = skippedListings.length;
+        skippedContainer.innerHTML = skippedListings.map(createListingCardHTML).join('');
+      } else {
+        skippedSection.style.display = 'none';
+        skippedContainer.innerHTML = '';
+      }
     }
   }
 
@@ -747,8 +868,10 @@ function renderListings() {
     }
   }
 
-  // Re-bind interactive card elements
-  bindCardInteractions(document);
+  // Re-bind interactive card elements inside panel-matches and panel-shortlist
+  bindCardInteractions(container);
+  if (skippedContainer) bindCardInteractions(skippedContainer);
+  if (shortlistContainer) bindCardInteractions(shortlistContainer);
 }
 
 // --- Normal Listings Tab ---
@@ -849,12 +972,33 @@ function renderNormalListings() {
 // --- Card Interaction Event Binders ---
 
 function bindCardInteractions(rootElement) {
+  if (!rootElement) return;
   // 1. Star / Shortlist toggle
   rootElement.querySelectorAll('button[data-star-id]').forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
       cycleStarStatus(btn.getAttribute('data-star-id'));
+    });
+  });
+
+  // 1b. Explicit Don't Like / Skip / Restore button
+  rootElement.querySelectorAll('button[data-dislike-id]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const lid = btn.getAttribute('data-dislike-id');
+      const current = getSavedStatuses();
+      const st = current[lid] || 'none';
+      if (st === 'skipped' || st === 'hidden') {
+        setSavedStatus(lid, 'none');
+        showToast('Restored property back to active listings! ↩');
+      } else {
+        setSavedStatus(lid, 'skipped');
+        showToast('Moved to Skipped section at bottom 🔴', 'Undo', () => {
+          setSavedStatus(lid, 'none');
+        });
+      }
     });
   });
 
@@ -1252,6 +1396,7 @@ function updateOverviewMetrics() {
   const withinBudget = all.filter(i => (i.weekly_rent || 0) <= getBudgetCap(i.bedrooms, i.is_furnished)).length;
   const newToday = all.filter(isRecentNewListing).length;
   const shortlisted = all.filter(i => statuses[i.id] === 'shortlist' || statuses[i.id] === 'inspecting' || statuses[i.id] === 'applied').length;
+  const skippedCount = all.filter(i => statuses[i.id] === 'skipped' || statuses[i.id] === 'hidden').length;
   const leaseTransfers = all.filter(i => i.is_lease_transfer).length;
 
   const setTxt = (id, val) => {
@@ -1265,6 +1410,7 @@ function updateOverviewMetrics() {
   setTxt('stat-under-budget', withinBudget);
   setTxt('stat-new-today', newToday);
   setTxt('stat-shortlisted-top', shortlisted);
+  setTxt('stat-skipped-top', skippedCount);
   setTxt('stat-lease-transfers', leaseTransfers);
 
   if (appData.last_updated) {
@@ -1413,6 +1559,12 @@ async function initApp() {
 
   const btnReset = document.getElementById('btn-reset-filters');
   if (btnReset) btnReset.addEventListener('click', resetAllFilters);
+
+  const btnRestoreSkipped = document.getElementById('btn-restore-all-skipped');
+  if (btnRestoreSkipped) btnRestoreSkipped.addEventListener('click', restoreAllSkipped);
+
+  const btnRestoreNormalSkipped = document.getElementById('btn-restore-all-normal-skipped');
+  if (btnRestoreNormalSkipped) btnRestoreNormalSkipped.addEventListener('click', restoreAllSkipped);
 
   // Normal tab filter controls
   const searchNorm = document.getElementById('search-input-normal');
@@ -1635,7 +1787,7 @@ async function initApp() {
   const btnLoadSample = document.getElementById('btn-load-sample-fb');
   if (btnLoadSample) {
     btnLoadSample.addEventListener('click', () => {
-      document.getElementById('fb-post-url').value = 'https://www.facebook.com/marketplace/item/4819401829481920';
+      document.getElementById('fb-post-url').value = 'https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom%20bayswater&exact=false';
       document.getElementById('fb-post-text').value =
         'LEASE TRANSFER — Bayswater (3153)! Entire 2 bedroom, 1 bathroom unit with private garden and carpark. $520 per week (unfurnished). 400m from Bayswater Station (Belgrave line direct to Hawthorn, ~35 mins single-seat commute). Move-in date: December 15, 2026. Whole property lease transfer until October 2027.';
     });
