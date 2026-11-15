@@ -1300,6 +1300,120 @@
       "listed_at": "2026-11-10T04:44:08.520566+00:00"
     },
     {
+      "property_id": "prop_flatmateswholeproperty_flatmates-2050577",
+      "source": "Flatmates (Whole Property)",
+      "source_listing_id": "flatmates-2050577",
+      "source_url": "https://flatmates.com.au/whole-property-melbourne-st-kilda-3182-P2050577",
+      "title": "Whole property with 2 rooms for rent in St Kilda",
+      "address": "St Kilda, Melbourne",
+      "suburb": "St Kilda",
+      "postcode": "3182",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 390.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "9 December 2026",
+      "lease_duration": null,
+      "description": "Perfect for two friends looking to move in together and make a place their own! With two separate bedrooms, you'll each have your own space while still getting to enjoy the little things that come with living together \u2014 sharing meals, having a chat after work and creating a cosy home together. The apartment offers a lovely balance of independence and shared living, with everything you need close by, including shops, caf\u00e9s, restaurants and public transport. Plus, with secure parking, heating, air conditioning and WIFI included, it's a great place to settle in and enjoy living together.\ninc. bills",
+      "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/dnirvqkz8sfv5bvuzkak",
+      "first_seen": "2026-11-14T05:45:48.136Z",
+      "last_seen": "2026-11-14T13:57:30.989343+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 90.0,
+      "score_version": "2.0",
+      "score_confidence": "medium",
+      "sources": [
+        {
+          "id": 161,
+          "property_id": "prop_flatmateswholeproperty_flatmates-2050577",
+          "source_name": "Flatmates (Whole Property)",
+          "source_listing_id": "flatmates-2050577",
+          "source_url": "https://flatmates.com.au/whole-property-melbourne-st-kilda-3182-P2050577",
+          "raw_title": "Whole property with 2 rooms for rent in St Kilda",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-14T05:45:48.136Z",
+          "last_seen": "2026-11-14T13:57:30.960934+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$390/wk is well below the $560/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 18.0,
+          "max": 25,
+          "reason": "Direct Tram 16 to Hawthorn (~28 mins). ~890m to Balaclava Station (~11 min walk)"
+        },
+        "property_suitability": {
+          "score": 20.0,
+          "max": 20,
+          "reason": "2-bedroom Apartment perfectly matches preferred solo space requirement"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 9, 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 7.0,
+          "max": 10,
+          "reason": "Parking included, Unfurnished, Bills included, Modern features"
+        },
+        "freshness": {
+          "score": 5.0,
+          "max": 5,
+          "reason": "Discovered in last 24 hours (8h ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $390/wk ($170/wk under budget)",
+        "Direct Tram 16 to Hawthorn (~28 min)",
+        "Entire private property (zero housemates)",
+        "2 Bedrooms (Preferred layout)",
+        "Ideal move-in timing (Dec 9, 2026)",
+        "Dedicated parking space"
+      ],
+      "potential_concerns": [],
+      "commute_mode": "Tram 16",
+      "commute_line": "Direct Tram 16 to Hawthorn (Glenferrie Rd)",
+      "commute_mins": 28,
+      "commute_tier": 2,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Balaclava Station",
+      "station_distance_m": 890,
+      "station_walking_mins": 11,
+      "station_distance_display": "~890m to Balaclava Station (~11 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 9, 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
+      "pass_strict_filter": true,
+      "rejection_reason": null,
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_flatmateswholeproperty_flatmates-2050577",
+      "url": "https://flatmates.com.au/whole-property-melbourne-st-kilda-3182-P2050577",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-14T05:45:48.136Z"
+    },
+    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345623522",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345623522",
@@ -2684,7 +2798,7 @@
         "freshness": {
           "score": 2.5,
           "max": 5,
-          "reason": "Listed within the past week (4d ago)"
+          "reason": "Listed within the past week (3d ago)"
         }
       },
       "positive_factors": [
@@ -3585,7 +3699,7 @@
       "verification_status": "unverified",
       "match_score": 80.0,
       "score_version": "2.0",
-      "score_confidence": "medium",
+      "score_confidence": "high",
       "sources": [
         {
           "id": 7,
@@ -6944,13 +7058,13 @@
       "postcode": "",
       "state": "VIC",
       "property_type": "apartment",
-      "bedrooms": 3,
-      "bathrooms": 1,
+      "bedrooms": 4,
+      "bathrooms": 2,
       "parking": 0,
       "weekly_rent": 350.0,
       "furnished": false,
       "property_entire": true,
-      "lease_transfer": true,
+      "lease_transfer": false,
       "available_date": "Dec 2026",
       "lease_duration": null,
       "description": "Property features:\n- Sunny dining area with spacious kitchen\n- Lounge area with wood heater\n- Main bedroom with walk-in robe\n- 2nd & 3rd bedrooms both with built-in wardrobes\n- Bathroom with separate shower & bath\n- Small, easy care yard area\n- Single carport with lock up storage shed in rear\n- Timber deck area Break Lease- 15/12/2026 to 28/02/2027 ** How to apply **\nPlease either call into the office to get our rental application form or phone the office to have one emailed to you. (03) 64",
@@ -6992,7 +7106,7 @@
         "property_suitability": {
           "score": 16.0,
           "max": 20,
-          "reason": "3-bedroom entire property offers generous living area"
+          "reason": "4-bedroom entire property offers generous living area"
         },
         "move_in_timing": {
           "score": 15.0,
@@ -7013,9 +7127,8 @@
       "positive_factors": [
         "Exceptional value at $350/wk ($210/wk under budget)",
         "Entire private property (zero housemates)",
-        "3 Bedrooms entire property",
-        "Ideal move-in timing (Dec 2026)",
-        "Lease transfer / break opportunity (frequently lower rent)"
+        "4 Bedrooms entire property",
+        "Ideal move-in timing (Dec 2026)"
       ],
       "potential_concerns": [
         "No direct train or tram to Hawthorn from Smithton",
@@ -7043,8 +7156,8 @@
       "id": "prop_gumtreemelbourne_gumtree-1345688369",
       "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345688369",
       "is_furnished": false,
-      "is_lease_transfer": true,
-      "is_normal_listing": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
       "is_under_600": true,
       "is_entire_property": true,
       "listed_at": "2026-11-13T09:00:00+00:00"
@@ -9497,6 +9610,120 @@
       "listed_at": "2026-11-10T12:03:58.174154+00:00"
     },
     {
+      "property_id": "prop_flatmateswholeproperty_flatmates-2049292",
+      "source": "Flatmates (Whole Property)",
+      "source_listing_id": "flatmates-2049292",
+      "source_url": "https://flatmates.com.au/whole-property-melbourne-meadow-heights-3048-P2049292",
+      "title": "Whole property with 3 rooms for rent in Meadow Heights",
+      "address": "Meadow Heights, Melbourne",
+      "suburb": "Meadow Heights",
+      "postcode": "",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 495.0,
+      "furnished": false,
+      "property_entire": false,
+      "lease_transfer": false,
+      "available_date": "1 December 2026",
+      "lease_duration": null,
+      "description": "Meadow Heights Vic, 3048\r\n3 comfortable bedrooms and a clean, central family bathroom.\r\n\u2022 Secure drive-through carport with plenty of space for parking.\r\n\u2022 Covered outdoor undercover area for entertaining.\r\n\u2022 Within walking distance to Meadow Heights Primary School and close to Meadow Heights Shopping Centre.",
+      "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/j02iecwoihm3tmibe6pr",
+      "first_seen": "2026-11-11T11:38:57.091Z",
+      "last_seen": "2026-11-14T13:57:30.989343+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 0.0,
+      "score_version": "2.0",
+      "score_confidence": "low",
+      "sources": [
+        {
+          "id": 162,
+          "property_id": "prop_flatmateswholeproperty_flatmates-2049292",
+          "source_name": "Flatmates (Whole Property)",
+          "source_listing_id": "flatmates-2049292",
+          "source_url": "https://flatmates.com.au/whole-property-melbourne-meadow-heights-3048-P2049292",
+          "raw_title": "Whole property with 3 rooms for rent in Meadow Heights",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-11T11:38:57.091Z",
+          "last_seen": "2026-11-14T13:57:30.961851+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$495/wk is well below the $560/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 5.0,
+          "max": 25,
+          "reason": "Indirect transit from Meadow Heights (transfer required to reach Hawthorn)"
+        },
+        "property_suitability": {
+          "score": 8.0,
+          "max": 20,
+          "reason": "Studio / compact living format"
+        },
+        "move_in_timing": {
+          "score": 11.0,
+          "max": 15,
+          "reason": "Available Dec 1, 2026 (early flexible start before Dec 5)"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Parking included, Unfurnished"
+        },
+        "freshness": {
+          "score": 2.5,
+          "max": 5,
+          "reason": "Listed within the past week (3d ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $495/wk ($65/wk under budget)",
+        "Early move-in available (Dec 1, 2026)",
+        "Dedicated parking space"
+      ],
+      "potential_concerns": [
+        "No direct train or tram to Hawthorn from Meadow Heights",
+        "Not an entire property"
+      ],
+      "commute_mode": "Indirect / Transfer required",
+      "commute_line": "Requires interchange to reach Hawthorn",
+      "commute_mins": 45,
+      "commute_tier": 4,
+      "has_direct_hawthorn_transit": false,
+      "station_name": "Meadow Heights Station",
+      "station_distance_m": 860,
+      "station_walking_mins": 11,
+      "station_distance_display": "~860m to Meadow Heights Station (~11 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 1, 2026",
+      "availability_fit": "early_flex",
+      "is_student_only": false,
+      "is_sharehouse": true,
+      "is_new": false,
+      "pass_strict_filter": false,
+      "rejection_reason": "Sharehouse or individual room (solo entire place required)",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_flatmateswholeproperty_flatmates-2049292",
+      "url": "https://flatmates.com.au/whole-property-melbourne-meadow-heights-3048-P2049292",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": false,
+      "is_under_600": true,
+      "is_entire_property": false,
+      "listed_at": "2026-11-11T11:38:57.091Z"
+    },
+    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345558821",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345558821",
@@ -10465,12 +10692,12 @@
       "furnished": false,
       "property_entire": false,
       "lease_transfer": false,
-      "available_date": "13 November 2026",
+      "available_date": "now",
       "lease_duration": null,
       "description": "Comfortable Family Home for Rent in Craigieburn | Walk to Station\r\n\r\nA fantastic opportunity to secure a 3-bedroom, 2-bathroom home in a convenient and peaceful Craigieburn location.\r\n\r\nEnjoy year-round comfort with central heating and cooling, the benefit of solar panels to help reduce electricity costs, plus a double garage.\r\n\r\n\ud83d\ude86 Craigieburn Station: ~10-minute walk\r\n\ud83d\ude8c Bus stop: ~4-minute walk\r\n\u2600\ufe0f Solar panels\r\n\ud83d\udecf\ufe0f 3 bedrooms | \ud83d\udec1 2 bathrooms\r\n\ud83d\ude97 Double garage\r\n\r\nIdeal for a family or professionals looking for convenience, comfort and easy commuting.\r\n\r\n\ud83d\udce9 Message me directly for details or inspection enquiries.",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/fficy3mkskdzhi8whzxa",
       "first_seen": "2026-11-05T12:01:56.227Z",
-      "last_seen": "2026-11-10T22:51:27.750033+00:00",
+      "last_seen": "2026-11-14T13:57:30.989343+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -10511,7 +10738,7 @@
         "move_in_timing": {
           "score": 11.0,
           "max": 15,
-          "reason": "Available Nov 13, 2026 (early flexible start before Dec 5)"
+          "reason": "Available now (early flexible start before Dec 5)"
         },
         "amenities": {
           "score": 5.0,
@@ -10519,14 +10746,14 @@
           "reason": "Parking included, Unfurnished, Modern features"
         },
         "freshness": {
-          "score": 2.5,
+          "score": 1.0,
           "max": 5,
-          "reason": "Listed within the past week (5d ago)"
+          "reason": "Listed 9 days ago"
         }
       },
       "positive_factors": [
         "Comfortably within budget ($530/wk)",
-        "Early move-in available (Nov 13, 2026)",
+        "Early move-in available (now)",
         "Dedicated parking space"
       ],
       "potential_concerns": [
@@ -10543,7 +10770,7 @@
       "station_walking_mins": 12,
       "station_distance_display": "~920m to Craigieburn Station (~12 min walk)",
       "station_is_explicit": false,
-      "availability_display": "Nov 13, 2026",
+      "availability_display": "now",
       "availability_fit": "early_flex",
       "is_student_only": false,
       "is_sharehouse": true,
@@ -13512,7 +13739,7 @@
       "description": "Sure to impress this 3 bedroom unit comprises of lounge, kitchen/meals with stainless steel appliances, all rooms with built in robes, the third bedroom with double doors additionally could be used as a study or formal dining, bathroom with shower and bath, separate toilet & separate laundry. Extras include ducted heating, evaporative cooling, remote double garage with rear access, landscaped gardens with entertainers deck. All this situated at the back of the block.",
       "photo": "",
       "first_seen": "2026-11-05T09:00:00+00:00",
-      "last_seen": "2026-11-10T22:51:27.750033+00:00",
+      "last_seen": "2026-11-14T13:57:30.989343+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -13561,9 +13788,9 @@
           "reason": "Parking included, Unfurnished, Modern features"
         },
         "freshness": {
-          "score": 2.5,
+          "score": 1.0,
           "max": 5,
-          "reason": "Listed within the past week (5d ago)"
+          "reason": "Listed 9 days ago"
         }
       },
       "positive_factors": [
@@ -13990,7 +14217,7 @@
       "description": "**Scheduling your property inspection is now a breeze! Simply click on the \"Book an Inspection\" or \"Request a Time\" button to secure your appointment. You'll instantly receive a confirmation and be kept up-to-date with any alterations or cancellations concerning your scheduled visit. Please be aware, inspections may be subject to cancellation if no bookings are registered. Make your booking today and take the first step in finding your ideal home** This bright and expansive two-bedroom apartme",
       "photo": "",
       "first_seen": "2026-11-05T09:00:00+00:00",
-      "last_seen": "2026-11-10T22:51:27.750033+00:00",
+      "last_seen": "2026-11-14T13:57:30.989343+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -14039,9 +14266,9 @@
           "reason": "Unfurnished"
         },
         "freshness": {
-          "score": 2.5,
+          "score": 1.0,
           "max": 5,
-          "reason": "Listed within the past week (5d ago)"
+          "reason": "Listed 9 days ago"
         }
       },
       "positive_factors": [
@@ -17224,7 +17451,7 @@
       "description": "An entire 3-bedroom, 2-bathroom apartment in Box Hill, Melbourne VIC 3128 is available for a proposed lease transfer, with one car space. Rent: AUD 865 per week for the entire property, not per room.\nBond: AUD 3,759. Bond handover arrangements must be confirmed through the formal process.\nAvailable from: 16 November 2026.\nCurrent lease ends: 31 January 2027. Gas included. Water, electricity and internet are excluded. Landlord has indicated agreement to the proposed arrangement. Formal lease",
       "photo": "",
       "first_seen": "2026-10-31T09:00:00+00:00",
-      "last_seen": "2026-11-10T22:51:27.750033+00:00",
+      "last_seen": "2026-11-14T13:57:30.989343+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -17275,7 +17502,7 @@
         "freshness": {
           "score": 1.0,
           "max": 5,
-          "reason": "Listed 10 days ago"
+          "reason": "Listed 14 days ago"
         }
       },
       "positive_factors": [
