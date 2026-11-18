@@ -407,7 +407,7 @@ def scrape_facebook_marketplace_aligned() -> List[Dict[str, Any]]:
     2. Budget Caps: 2BHK Unfurn <= $560, Furn <= $625; 1BHK Unfurn <= $400, Furn <= $500.
     3. Non-interstate verification.
     """
-    from .config import HAWTHORN_DIRECT_SUBURBS, get_budget_cap
+    from ..config import HAWTHORN_DIRECT_SUBURBS, get_budget_cap
 
     results: List[Dict[str, Any]] = []
     seen_item_ids = set()

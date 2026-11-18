@@ -3,7 +3,7 @@
 - **Decision Goal**: `Dec 3, 2026` (Current contract ends `Jan 10, 2027`)
 - **Move-In Window**: `Dec 5, 2026 – Jan 15, 2027`
 - **Budget Cap**: `≤ $525/wk` Unfurnished | `≤ $560/wk` Furnished
-- **Scanned Live Ads**: `195` | **Strict Hawthorn Matches**: `65`
+- **Scanned Live Ads**: `285` | **Strict Hawthorn Matches**: `81`
 
 ## Top Matching Entire Properties (Direct Train/Tram to Hawthorn)
 

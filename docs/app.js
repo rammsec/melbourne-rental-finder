@@ -592,7 +592,7 @@ function createListingCardHTML(item) {
       <div class="listing-body">
         <div class="listing-meta-row">
           <span class="suburb-pill">📍 ${escapeHtml(item.suburb || "Melbourne")} ${escapeHtml(item.postcode || "")}</span>
-          <span>${escapeHtml(item.source || "Verified Source")}</span>
+          <span class="source-attribution-badge" title="Listing Source Attribution">🏢 ${escapeHtml(item.agency_office || item.source || "Verified Source")}${(Array.isArray(item.source_provenance || item.sources) && (item.source_provenance || item.sources).length > 1) ? ` (+${(item.source_provenance || item.sources).length - 1} more)` : ""}</span>
         </div>
 
         <h3 class="listing-title">${escapeHtml(item.title)}</h3>
@@ -615,6 +615,12 @@ function createListingCardHTML(item) {
           ${positiveHTML}
           ${concernHTML}
         </div>
+
+        ${(Array.isArray(item.inspection_times) && item.inspection_times.length > 0) ? `
+          <div style="background: #eff6ff; border-left: 3px solid #3b82f6; padding: 0.4rem 0.65rem; border-radius: 4px; font-size: 0.78rem; color: #1e3a8a; margin-top: 0.2rem;">
+            <strong>🕒 Agency Inspection:</strong> ${escapeHtml(item.inspection_times[0])}
+          </div>
+        ` : ""}
 
         ${inspectionInfo ? `
           <div style="background: #ecfdf5; border-left: 3px solid #10b981; padding: 0.45rem 0.7rem; border-radius: 4px; font-size: 0.8rem; color: #065f46; margin-top: 0.2rem;">
@@ -662,6 +668,17 @@ function createListingCardHTML(item) {
           <div style="margin-top: 0.5rem;">
             <strong style="display: block; font-size: 0.78rem; margin-bottom: 0.2rem; color: var(--text-primary);">Original Listing Summary:</strong>
             <p style="font-size: 0.8rem; line-height: 1.45; color: var(--text-secondary);">${escapeHtml(item.description || item.subhead || "No detailed description provided.")}</p>
+          </div>
+
+          <div style="margin-top: 0.5rem; padding-top: 0.45rem; border-top: 1px dashed var(--border-color); font-size: 0.76rem; color: var(--text-secondary);">
+            <strong style="color: var(--text-primary);">Source Attribution &amp; Provenance:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.25rem;">
+              ${((item.source_provenance && item.source_provenance.length) ? item.source_provenance : (item.sources && item.sources.length ? item.sources : [{ source_name: item.source, source_url: resolvedUrl, agency_office: item.agency_office }])).map(src => `
+                <a href="${escapeHtml(src.source_url || src.url || resolvedUrl)}" target="_blank" rel="noopener" style="text-decoration: underline; color: var(--brand-forest); font-weight: 600;">
+                  ${escapeHtml(src.agency_office || src.source_name || src.source || item.source || "Direct Source")}${src.source_listing_id ? ` (#${escapeHtml(String(src.source_listing_id))})` : ""} ↗
+                </a>
+              `).join(" • ")}
+            </div>
           </div>
         </div>
 
