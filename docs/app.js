@@ -190,14 +190,18 @@ function getListingUrl(item) {
   const src = (item.source || '').toLowerCase();
   const key = (item.source_key || '').toLowerCase();
 
-  // If Facebook Marketplace listing:
+  // If Facebook Marketplace listing: preserve real /marketplace/item/<id>/ URLs
   if (src.includes('facebook') || key.includes('facebook')) {
-    // If it points to an invalid/placeholder item ID or is missing, convert to live search for that suburb
-    if (!url || url.includes('/marketplace/item/') || url === '#' || url.includes('placeholder')) {
-      const sub = (item.suburb || '').trim();
-      const query = encodeURIComponent(`lease transfer 2 bedroom ${sub}`.trim());
-      return `https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=${query}&exact=false`;
+    if (url && url.startsWith('http') && !url.includes('placeholder')) {
+      return url;
     }
+    const idMatch = String(item.id || '').match(/fb-marketplace-(\d{10,25})/);
+    if (idMatch) {
+      return `https://www.facebook.com/marketplace/item/${idMatch[1]}/`;
+    }
+    const sub = (item.suburb || '').trim();
+    const query = encodeURIComponent(`lease transfer 2 bedroom ${sub}`.trim());
+    return `https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=${query}&exact=false`;
   }
 
   if (!url || url === '#') {
