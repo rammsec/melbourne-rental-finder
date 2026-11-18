@@ -1293,7 +1293,7 @@ function renderInsightsAndAnalytics() {
   const stats = appData.stats || {};
   pipelineContainer.innerHTML = `
     <div><strong>Total Verified Properties:</strong> ${stats.total_scanned || all.length}</div>
-    <div><strong>Active Corridor Suburbs Covered:</strong> 27 (Belgrave, Lilydale, Inner East, Clayton)</div>
+    <div><strong>Active Corridor Suburbs Covered:</strong> Belgrave, Lilydale, Inner East (Ringwood, Mitcham, Bayswater)</div>
     <div><strong>Fresh Discoveries (≤48h):</strong> ${stats.new_today || 0}</div>
     <div><strong>Duplicates Detected &amp; Merged:</strong> ${stats.duplicates_detected || 'Resolved'}</div>
     <div><strong>Scraper Reliability:</strong> 100% (Gumtree RSS, Flatmates &amp; Portals Operational)</div>
@@ -1713,7 +1713,6 @@ async function initApp() {
       { name: 'Surrey Hills', key: 'surrey hills', mins: 12, mode: 'Train / Tram 70', line: 'Belgrave/Lilydale Line + Tram 70', pc: '3127' },
       { name: 'Mont Albert', key: 'mont albert', mins: 13, mode: 'Train', line: 'Belgrave/Lilydale Line (Union Station)', pc: '3127' },
       { name: 'Ringwood East', key: 'ringwood east', mins: 32, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3135' },
-      { name: 'Clayton South', key: 'clayton south', mins: 29, mode: 'Train', line: 'Clayton corridor via Richmond', pc: '3169' },
       { name: 'Melbourne CBD', key: 'melbourne cbd', mins: 12, mode: 'Train / Tram', line: 'Direct Train (Flinders St / Loop)', pc: '3000' },
       { name: 'Hawthorn', key: 'hawthorn', mins: 2, mode: 'Train / Tram 70, 75, 16', line: 'Belgrave/Lilydale/Alamein Line + Tram 70/75/16', pc: '3122' },
       { name: 'Glenferrie', key: 'glenferrie', mins: 2, mode: 'Train / Tram 16', line: 'Belgrave/Lilydale Line (1 stop) + Tram 16', pc: '3122' },
@@ -1737,7 +1736,6 @@ async function initApp() {
       { name: 'Croydon', key: 'croydon', mins: 35, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3136' },
       { name: 'Mooroolbark', key: 'mooroolbark', mins: 38, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3138' },
       { name: 'Lilydale', key: 'lilydale', mins: 44, mode: 'Train', line: 'Lilydale Line (direct)', pc: '3140' },
-      { name: 'Clayton', key: 'clayton', mins: 26, mode: 'Train', line: 'Pakenham Line (direct connection via Richmond)', pc: '3168' },
       { name: 'Kew', key: 'kew', mins: 8, mode: 'Tram 16 / Bus 609', line: 'Tram 16 (Glenferrie Rd) / Bus 609 to Hawthorn', pc: '3101' },
       { name: 'Melbourne', key: 'melbourne', mins: 12, mode: 'Train / Tram', line: 'Direct Train (Flinders St / Loop)', pc: '3000' }
     ];
@@ -1751,6 +1749,7 @@ async function initApp() {
 
     // Check known unaligned / western / northern / distant or interstate suburbs
     const unalignedSuburbs = [
+      'clayton south', 'clayton',
       'tarneit', 'werribee', 'point cook', 'hoppers crossing', 'truganina', 'footscray',
       'sunshine', 'geelong', 'frankston', 'dandenong', 'cranbourne', 'pakenham', 'epping',
       'craigieburn', 'southbank', 'docklands', 'st kilda', 'prahran', 'south yarra',

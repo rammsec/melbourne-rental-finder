@@ -360,7 +360,7 @@ class TestPersistentDatabase(unittest.TestCase):
             source="flatmates",
             source_listing_id="f1",
             source_url="https://flatmates.com/f1",
-            suburb="Clayton",
+            suburb="Ringwood",
             bedrooms=2,
             weekly_rent=490.0,
             match_score=84.0,
@@ -375,15 +375,17 @@ class TestPersistentDatabase(unittest.TestCase):
         self.assertIn("listings", payload)
         self.assertEqual(len(payload["listings"]), 1)
         self.assertEqual(payload["listings"][0]["id"], "prop_db_export")
-        self.assertEqual(payload["listings"][0]["suburb"], "Clayton")
+        self.assertEqual(payload["listings"][0]["suburb"], "Ringwood")
 
 
 class TestV1Regression(unittest.TestCase):
     """Ensure all V1 criteria, suburb transit mappings, and scoring baselines remain intact."""
 
     def test_hawthorn_direct_corridor_suburbs(self):
-        # All target suburbs must exist and have transit mappings
-        key_suburbs = ["hawthorn", "richmond", "burnley", "camberwell", "box hill", "clayton", "bayswater", "boronia"]
+        # All target suburbs must exist and have transit mappings; Clayton must be excluded
+        self.assertNotIn("clayton", HAWTHORN_DIRECT_SUBURBS)
+        self.assertNotIn("clayton south", HAWTHORN_DIRECT_SUBURBS)
+        key_suburbs = ["hawthorn", "richmond", "burnley", "camberwell", "box hill", "mitcham", "ringwood", "bayswater", "boronia"]
         for sub in key_suburbs:
             self.assertIn(sub, HAWTHORN_DIRECT_SUBURBS)
             info = HAWTHORN_DIRECT_SUBURBS[sub]
@@ -554,7 +556,7 @@ class TestHawthornTransitFilter(unittest.TestCase):
     """Test direct train or tram line to Hawthorn classification."""
 
     def test_direct_suburbs_flagged(self):
-        direct_examples = ["Hawthorn", "Camberwell", "Box Hill", "Bayswater", "Boronia", "Clayton", "Richmond", "Belgrave"]
+        direct_examples = ["Hawthorn", "Camberwell", "Box Hill", "Mitcham", "Ringwood", "Bayswater", "Boronia", "Richmond", "Belgrave"]
         for sub in direct_examples:
             p = Property(
                 property_id=f"p_{sub.lower()}",
@@ -570,7 +572,7 @@ class TestHawthornTransitFilter(unittest.TestCase):
             self.assertTrue(scored.has_direct_hawthorn_transit, f"{sub} should have direct Hawthorn transit")
 
     def test_indirect_or_distant_suburbs_flagged_false(self):
-        indirect_examples = ["Tarneit", "Geelong", "Ballarat", "Craigieburn", "Werribee"]
+        indirect_examples = ["Clayton", "Tarneit", "Geelong", "Ballarat", "Craigieburn", "Werribee"]
         for sub in indirect_examples:
             p = Property(
                 property_id=f"p_{sub.lower()}",

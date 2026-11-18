@@ -505,21 +505,6 @@ HAWTHORN_DIRECT_SUBURBS: Dict[str, Dict[str, Any]] = {
         "commute_mins": 25,
         "tier": 2,
     },
-    # South-East Corridor (Pakenham/Cranbourne Line via Richmond)
-    "clayton": {
-        "postcode": "3168",
-        "mode": "Train (Pakenham/Cranbourne Line)",
-        "line": "Express to Richmond (18m) + 1-stop to Hawthorn (4m)",
-        "commute_mins": 26,
-        "tier": 2,
-    },
-    "clayton south": {
-        "postcode": "3169",
-        "mode": "Train via Richmond",
-        "line": "Clayton Station / Westall corridor to Hawthorn",
-        "commute_mins": 29,
-        "tier": 2,
-    },
 }
 
 # Domain / REA / Rent.com.au search suburb slugs (prioritizing inner-east & direct train/tram)
@@ -558,7 +543,6 @@ PRIORITY_SUBURB_SLUGS: List[str] = [
     "mooroolbark-vic-3138",
     "lilydale-vic-3140",
     "mont-albert-vic-3127",
-    "clayton-vic-3168",
     "caulfield-north-vic-3161",
     "st-kilda-east-vic-3183",
     "east-melbourne-vic-3002",

@@ -31,7 +31,7 @@
       <div class="app-title-group">
         <h1>Melbourne Lease Transfer &amp; Hawthorn Commute Finder</h1>
         <p class="app-subtitle">
-          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong> across all 27 Belgrave, Lilydale &amp; Inner-East line suburbs plus <strong>Clayton, Bayswater, Boronia</strong>.
+          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong> across all Belgrave, Lilydale &amp; Inner-East line suburbs including <strong>Mitcham, Ringwood, Bayswater, Boronia</strong>.
         </p>
       </div>
       <div class="header-actions">
@@ -146,7 +146,13 @@
           <select id="suburb-filter" class="filter-select" aria-label="Filter by suburb">
             <option value="all">All Suburbs (All Melbourne Listings)</option>
             <option value="direct_hawthorn">🚆 Direct Train / Tram to Hawthorn Only</option>
-            <optgroup label="Inner East & City (Direct Train / Tram)">
+            <optgroup label="⭐ Priority Suburbs (Ringwood, Mitcham, Bayswater)">
+              <option value="mitcham">Mitcham (3132)</option>
+              <option value="ringwood">Ringwood (3134)</option>
+              <option value="bayswater">Bayswater (3153)</option>
+              <option value="boronia">Boronia (3155)</option>
+            </optgroup>
+            <optgroup label="Inner East &amp; City (Direct Train / Tram)">
               <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
               <option value="camberwell">Camberwell (3124)</option>
               <option value="canterbury">Canterbury (3126)</option>
@@ -160,11 +166,7 @@
               <option value="box hill">Box Hill (3128)</option>
               <option value="blackburn">Blackburn (3130)</option>
               <option value="nunawading">Nunawading (3131)</option>
-              <option value="mitcham">Mitcham (3132)</option>
-              <option value="ringwood">Ringwood (3134)</option>
               <option value="heathmont">Heathmont (3135)</option>
-              <option value="bayswater">Bayswater (3153)</option>
-              <option value="boronia">Boronia (3155)</option>
               <option value="ferntree gully">Ferntree Gully (3156)</option>
               <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
               <option value="upwey">Upwey (3158)</option>
@@ -177,8 +179,7 @@
               <option value="mooroolbark">Mooroolbark (3138)</option>
               <option value="lilydale">Lilydale (3140)</option>
             </optgroup>
-            <optgroup label="South-East & Tram Corridors">
-              <option value="clayton">Clayton (3168)</option>
+            <optgroup label="Tram Corridors">
               <option value="burwood">Burwood (3125)</option>
               <option value="kew">Kew (3101)</option>
             </optgroup>
@@ -270,7 +271,7 @@
       <div class="panel-card" style="margin-bottom: 1.25rem;">
         <h2>🏠 Normal Property Rentals (Below $600 / week)</h2>
         <p class="helper-text">
-          Standard residential leases (whole properties: 1 BHK, 2 BHK &amp; 3 BHK, zero sharehouses, no student-only housing) asking <strong>≤ $600/wk</strong> across Hawthorn, Clayton, Bayswater, Boronia, Box Hill, Camberwell, Richmond, and direct transit lines.
+          Standard residential leases (whole properties: 1 BHK, 2 BHK &amp; 3 BHK, zero sharehouses, no student-only housing) asking <strong>≤ $600/wk</strong> across Hawthorn, Mitcham, Ringwood, Bayswater, Boronia, Box Hill, Camberwell, Richmond, and direct transit lines.
         </p>
       </div>
 
@@ -284,9 +285,15 @@
             aria-label="Search normal listings"
           >
           <select id="suburb-filter-normal" class="filter-select" aria-label="Filter by suburb">
-            <option value="all">All Suburbs (All 27 Corridors)</option>
+            <option value="all">All Suburbs (All Direct Corridors)</option>
             <option value="direct_hawthorn">🚆 Direct Train / Tram to Hawthorn Only</option>
-            <optgroup label="Inner East & City (Direct Train / Tram)">
+            <optgroup label="⭐ Priority Suburbs (Ringwood, Mitcham, Bayswater)">
+              <option value="mitcham">Mitcham (3132)</option>
+              <option value="ringwood">Ringwood (3134)</option>
+              <option value="bayswater">Bayswater (3153)</option>
+              <option value="boronia">Boronia (3155)</option>
+            </optgroup>
+            <optgroup label="Inner East &amp; City (Direct Train / Tram)">
               <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
               <option value="camberwell">Camberwell (3124)</option>
               <option value="canterbury">Canterbury (3126)</option>
@@ -300,11 +307,7 @@
               <option value="box hill">Box Hill (3128)</option>
               <option value="blackburn">Blackburn (3130)</option>
               <option value="nunawading">Nunawading (3131)</option>
-              <option value="mitcham">Mitcham (3132)</option>
-              <option value="ringwood">Ringwood (3134)</option>
               <option value="heathmont">Heathmont (3135)</option>
-              <option value="bayswater">Bayswater (3153)</option>
-              <option value="boronia">Boronia (3155)</option>
               <option value="ferntree gully">Ferntree Gully (3156)</option>
               <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
               <option value="upwey">Upwey (3158)</option>
@@ -317,8 +320,7 @@
               <option value="mooroolbark">Mooroolbark (3138)</option>
               <option value="lilydale">Lilydale (3140)</option>
             </optgroup>
-            <optgroup label="South-East & Tram Corridors">
-              <option value="clayton">Clayton (3168)</option>
+            <optgroup label="Tram Corridors">
               <option value="burwood">Burwood (3125)</option>
               <option value="kew">Kew (3101)</option>
             </optgroup>
