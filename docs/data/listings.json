@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-18T13:29:02Z",
+  "last_updated": "2026-11-18T16:10:57Z",
   "version": "2.0",
   "criteria": {
     "max_rent_2bhk_unfurnished": 560,
@@ -18,10 +18,10 @@
     "target_hub": "Hawthorn, VIC 3122"
   },
   "stats": {
-    "total_scanned": 194,
+    "total_scanned": 195,
     "strict_matches": 65,
-    "normal_under_600": 128,
-    "total_under_600": 183,
+    "normal_under_600": 129,
+    "total_under_600": 184,
     "lease_transfers": 53,
     "two_bhk_matches": 76,
     "new_today": 103
@@ -695,7 +695,7 @@
       "description": "2 Bed 1 Bath Whole Apartment in Hawthorn 3122 ($580/wk furnished). Walk to Hawthorn & Glenferrie stations and Tram 70/75/16. Entire apartment with kitchen, laundry, and off-street parking.",
       "photo": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T21:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.252182+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -923,7 +923,7 @@
       "description": "2 bedroom apartment lease transfer right in Melbourne CBD ($370/wk). Direct train to Hawthorn from Flinders St / Parliament (~12 mins).",
       "photo": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T19:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.463793+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -1039,7 +1039,7 @@
       "description": "Lease transfer in Hawthorn ($1,738/month = ~$401/wk). Entire unfurnished unit close to Glenferrie Station and Swinburne precinct.",
       "photo": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T13:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.406543+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -1381,7 +1381,7 @@
       "description": "Entire 2 bedroom lease transfer in Richmond ($2,064/month = $476/wk). 1 stop on train to Hawthorn Station (4 mins), or Tram 70 along Swan St.",
       "photo": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T15:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.451025+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -1495,7 +1495,7 @@
       "description": "Bright & spacious fully furnished 2-bedroom apartment in Camberwell (3124). Direct access to Tram 70/75 and Camberwell Station (6 mins to Hawthorn). Ready to move in.",
       "photo": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T17:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.338175+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -1725,7 +1725,7 @@
       "description": "Please register your attendance for the inspection. Private Inspection Available, please contact the agent! Looking for space, convenience, and easy commuting? This bright 2-bedroom apartment features a new kitchen, separated living and dining areas, a huge bathroom, and split-system A/C. Offered furnished as pictured (furniture can be removed if needed), with your own private balcony, separate entrance via the back laneway, and access to a shared backyard. All-Inclusive Utility Package (Int",
       "photo": "",
       "first_seen": "2026-11-14T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -1841,7 +1841,7 @@
       "description": "2BR apartment lease transfer ($525/wk) 300m to Box Hill Station (Belgrave/Lilydale express train to Hawthorn in 15 mins). Split-system AC, built-in robes, car park included.",
       "photo": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T12:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.457175+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -2367,7 +2367,7 @@
       "description": "Perfect for two friends looking to move in together and make a place their own! With two separate bedrooms, you'll each have your own space while still getting to enjoy the little things that come with living together \u2014 sharing meals, having a chat after work and creating a cosy home together. The apartment offers a lovely balance of independence and shared living, with everything you need close by, including shops, caf\u00e9s, restaurants and public transport. Plus, with secure parking, heating, air conditioning and WIFI included, it's a great place to settle in and enjoy living together.\ninc. bills",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/dnirvqkz8sfv5bvuzkak",
       "first_seen": "2026-11-14T05:45:48.136Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -2829,7 +2829,7 @@
       "description": "Enjoy the ultimate city lifestyle in this freshly painted, fully furnished studio apartment located at 408 Lonsdale Street, Melbourne. This well-presented studio features a bright open-plan living and bedroom area, a modern kitchen, and a private bathroom. Freshly updated and ready to move in, it offers everything you need for comfortable and convenient inner-city living. Situated just moments from Melbourne Central, RMIT University, public transport, caf\u00e9s, and shopping \u2014 you\u2019ll have the bes",
       "photo": "",
       "first_seen": "2026-11-17T12:43:55.111659+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -3306,7 +3306,7 @@
       "description": "Entire 2 bedroom house in Mitcham / Blackburn corridor. Walk to Mitcham Station (Belgrave/Lilydale Line direct single-seat train to Hawthorn in ~25 mins). Private courtyard and lock-up garage.",
       "photo": "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-16T13:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.425100+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -3420,7 +3420,7 @@
       "description": "2BR entire townhouse in Ringwood. Short walk to Ringwood Station (Belgrave/Lilydale express train direct to Hawthorn in ~28 mins). Secure garage, split-system heating/cooling.",
       "photo": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T13:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.418869+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -3534,7 +3534,7 @@
       "description": "Please refer below for inspection instructions. Afforded the space and proportion synonymous with its era, this secure 2 bedroom apartment is centrally located to a host of lifestyle attractions. This previously updated first floor abode includes a large welcoming entrance hall, generously proportioned living/dining room featuring a convenient oversized servery to a well-appointed separate 'gas' kitchen, two doubled bedrooms with built-in robes, sparkling bathroom (laundry facilities), separat",
       "photo": "",
       "first_seen": "2026-11-18T03:44:02.924438+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -3585,7 +3585,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (10h ago)"
+          "reason": "Discovered in last 24 hours (13h ago)"
         }
       },
       "positive_factors": [
@@ -3650,7 +3650,7 @@
       "description": "Welcome to 13/60 Harp Road, Kew! Where luxury meets convenience, this stunning apartment is set to the very rear of a stunning contemporary complex soaking up the sublime sense of space and tranquility. Situated in the prestigious suburb of kew, renowned for its leafy streets and vibrant community atmosphere. See below for property features:\n- Spacious living\n- Two bedrooms with built in wardrobes\n- Main bathroom with bath\n- European laundry\n- Split system\n- Secure basement parking Experienc",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T12:44:41.382402+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -3880,7 +3880,7 @@
       "description": "Please contact us to book a private inspection. ********6800 You can't get any closer to Deakin University! This building is located immediately across the road from Deakin University. This boutique property built in 2008 and opened in 2009, features 7 one bedroom apartments and 16 two bedroom apartments. This furnished one bedroom apartment comes with intercom security entrance, a bed, full kitchen with gas cooking, gas heating, microwave and fridge, cutlery and crockery, stylish bathroom,",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -3996,7 +3996,7 @@
       "description": "Click *Add to plan and register* to register for an inspection time Enjoy space, comfort and exceptional convenience with this light-filled two-bedroom apartment, ideally positioned within walking distance of Box Hill Central and Box Hill Train Station. Offering generous living areas, two private balconies and a practical floorplan, this well-located residence delivers an easy, low-maintenance lifestyle with shopping, dining and public transport at your doorstep. The spacious living and dinin",
       "photo": "",
       "first_seen": "2026-11-12T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -4598,7 +4598,7 @@
       "description": "Modern self-contained studio / 1BHK apartment lease transfer in Hawthorn East ($341/wk). Steps to Auburn Station and Tram 70/75 direct to Hawthorn.",
       "photo": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-16T13:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.412745+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -4828,7 +4828,7 @@
       "description": "Entire townhouse in Bayswater. 400m from Bayswater Station (Belgrave line direct to Hawthorn in ~35 mins). Private courtyard, split system AC.",
       "photo": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-16T13:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.431687+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -5058,7 +5058,7 @@
       "description": "Entire 2BR unit lease transfer in Bayswater ($520/wk). Direct Belgrave line train to Hawthorn. Lock-up garage and private courtyard.",
       "photo": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T18:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.438169+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -5760,7 +5760,7 @@
       "description": "Click *Add to plan and register* to register for an inspection time Enjoy modern comfort, low-maintenance living and exceptional convenience with this stylish two-bedroom apartment, perfectly positioned in the heart of Ringwood. Offering a practical open-plan layout, contemporary finishes and a private balcony, this inviting residence is ideal for those seeking an easy-care lifestyle with everything at their doorstep. The light-filled open-plan living and dining area connects seamlessly to a",
       "photo": "",
       "first_seen": "2026-11-13T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -5902,7 +5902,7 @@
       "description": "Jellis Craig Monash is proud to present this comfortable and low maintenance unit located in a highly sought-after pocket of Glen Waverley. \nJust a short stroll to Burwood East Primary School and Highbury Park, with the 768 bus providing direct access to Glen Waverley Station, the Glen Shopping Centre, and surrounding amenities. Easy access to Eastlink ensures effortless commuting. \nConsisting of: \u2022 Both bedrooms are well sized with built in robes \u2022 The central bathroom includes a separat",
       "photo": "",
       "first_seen": "2026-11-18T02:44:32.108571+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -5953,7 +5953,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (11h ago)"
+          "reason": "Discovered in last 24 hours (14h ago)"
         }
       },
       "positive_factors": [
@@ -6134,7 +6134,7 @@
       "description": "AVAILABLE NOW\nThis two bedrooms Townhouse, both bedroom with build in robes and split systems.\nUpstairs Master bedroom with ensuite and downstairs second bedroom with another bathroom and toilet\nThe Open plan living /meal area with split system adjoining to the balcony, floating boards throughout living, meal, kitchen area The Modern kitchen with stainless appliance and dishwasher, security alarm, ducted vacuum system, single garage with remote control, Close to all amenities *PLEASE NOTE: AL",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -6261,7 +6261,7 @@
       "description": "Beautifully presented and freshly renovated, this lovely two-bedroom unit offers modern comfort and convenience in a fantastic location at the foothills of the Dandenong Ranges. Step inside to discover a light-filled open-plan living and kitchen area, featuring a brand-new kitchen, polished flooring and a split system for year-round heating and cooling. Both bedrooms are carpeted and include built-in robes, while the stylishly brand new bathroom incorporates a convenient laundry area, with a s",
       "photo": "",
       "first_seen": "2026-11-18T12:44:16.024676+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -6312,7 +6312,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (2h ago)"
+          "reason": "Discovered in last 24 hours (5h ago)"
         }
       },
       "positive_factors": [
@@ -6377,7 +6377,7 @@
       "description": "AVAILABLE NOW.\nTwo bedrooms, both with build in robes and split systems. Master bedroom down stairs with ensuite. Second bedroom upstairs with bathroom and toilet.\nOpen plan living /meal area with split system adjoining to the balcony.\nFloating boards throughout living, meal, kitchen area.\nModern kitchen with stainless appliance and dishwasher.\nSecurity alarm, Ducted vacuum system, Single garage with remote control.\nClose to all amenities, walking distance to Supermarkets, Shops, Bus Stop & Tra",
       "photo": "",
       "first_seen": "2026-11-10T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -6504,7 +6504,7 @@
       "description": "Situated in a highly sought-after location within the prestigious Box Hill High School zone, this well-maintained 2-bedroom, 1-bathroom home offers comfortable, low-maintenance living in a convenient and established neighbourhood. Featuring a practical floor plan, two generously sized bedrooms with plenty of natural light, a neat and functional bathroom, and a dedicated car space, this property is ideal for couples, small families, or professionals seeking a convenient lifestyle. Property Fea",
       "photo": "",
       "first_seen": "2026-11-11T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -6631,7 +6631,7 @@
       "description": "1 bedroom unit for lease transfer in Boronia ($1,216/month = $280/wk). Near Boronia train station (Belgrave Line direct to Hawthorn) and local shops. Lease runs until July 2027.",
       "photo": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
       "first_seen": "2026-11-17T11:28:57.033547+00:00",
-      "last_seen": "2026-11-18T13:29:02.444965+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -7000,7 +7000,7 @@
       "description": "Delightfully appealing in every way, this charming three-bedroom character home is perfectly positioned on a generous corner block, close to shops, schools and public transport. The home features an open-plan living area with an adjoining kitchen, a separate dining room and a master bedroom complete with an ensuite. A central bathroom and separate laundry provide additional convenience. Further features include polished floorboards, ducted heating, air conditioning, a storage shed, double car",
       "photo": "",
       "first_seen": "2026-11-18T06:44:28.341263+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -7051,7 +7051,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (6h ago)"
+          "reason": "Discovered in last 24 hours (9h ago)"
         }
       },
       "positive_factors": [
@@ -7116,7 +7116,7 @@
       "description": "A well furnished new house is for rent in south east Melbourne with all essential amenities installed as listed below - 1.Solar panels are installed\n2. Air conditioning is installed in every room\n3. Smoke alarms and heating systems\n4. NBN internet\n5. Extra parking space\n6. Double storey house\n6. Bird protections around the windows and walls\n7. Very close to train station and supermarkets\n8. Bus facilities Just outside the street\n9. Catholic school just behind the street.\nTwo bedrooms , two liv",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -7348,7 +7348,7 @@
       "description": "Sitting in a tree lined street in the heart of Ringwood East is this charming two bedroom unit. Boasting spacious and light filled interiors throughout, this home offers an inviting blend of comfort, space and convenience. Enjoy the ease of being just moments from Ringwood Private Hospital, Eastern Health, Eastland shopping and dining precinct, Ringwood Lake Park and East Ringwood Train Station for an easy commute to Melbourne's CBD and surrounds. Other features include:\n-Gas ducted heating",
       "photo": "",
       "first_seen": "2026-11-17T12:44:09.564446+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -7812,7 +7812,7 @@
       "description": "**Scheduling your property inspection is now a breeze! Simply click on the \"Book an Inspection\" or \"Request a Time\" button to secure your appointment. You'll instantly receive a confirmation and be kept up-to-date with any alterations or cancellations concerning your scheduled visit. Please be aware, inspections may be subject to cancellation if no bookings are registered. Make your booking today and take the first step in finding your ideal home** Located at 209/466 Swanston Street, Carlton,",
       "photo": "",
       "first_seen": "2026-11-17T12:43:55.111763+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -8274,7 +8274,7 @@
       "description": "This classic 1 bedroom, 1 bathroom abode is overflowing with charm and character. Enjoying wooden flooring throughout, open lounge with split system, built-in storage and loads of natural light, dining and retro kitchen with classic tiling, timber trim and electric stovetop, bedroom has BIRs and floating vanity and adjoining ensuite is equipped with all you'd require. The laundry has washing machine provided and the extensive yard space is shared and provides wonderful vistas and beautiful sens",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -8505,7 +8505,7 @@
       "description": "Updated 2 bedroom house located 6 minutes from Smithton Township - Open plan living area with heat pump\n- Kitchen with breakfast bar and ample space\n- Main bedroom with built ins\n- Updated bathroom with separate shower\n- Separate toilet\n- Recently polished floor boards and new floor coverings in wet areas\n- Fully fenced yard with garden shed\n- 6km from Smithton town boundary Break Lease- 1/12/2026 to 27/05/2027 **Call into the office to pick up our rental application form or phone the offi",
       "photo": "",
       "first_seen": "2026-11-12T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -8621,7 +8621,7 @@
       "description": "Comfortable and private, this fully furnished self-contained flat is located in the downstairs area of a house. The flat comprises:\n\u2022\tBathroom with separate shower and toilet and storage\n\u2022\tSmall kitchen with oven and storage\n\u2022\tMain bedroom with wardrobe\n\u2022\tLounge area with heat pump for year-round comfort\n\u2022\tWater costs are included in the rent\n\u2022\tOff street parking available Ideal for a single tenant. Break Lease- 30/11/2026 to 28/04/2027",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -8737,7 +8737,7 @@
       "description": "Studio/Office Space For Lease In Bayswater Shopping District.\nAir conditioning, heating and cooling.\nThis studio has carpet flooring and no natural light.\nClean, bright, semi soundproof studios suitable for Private Tuition, Instrument Rehearsal, Recording Studio, Art Studio, Practice Room, Arts And Crafts, Audio, Brainstorming, Conference, Creative Writing, Digital Art, Digital Desktop, Drama, Drawing, Edit Suite, Electronic Arts, Hot desk, Industrial Design, Interior Design, Jewellery, Multime",
       "photo": "",
       "first_seen": "2026-11-13T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -8853,7 +8853,7 @@
       "description": "WOULD YOU LIKE TO VIEW THIS PROPERTY? To schedule an appointment and view this property, please click \"GET IN TOUCH OR EMAIL AGENT\" to submit your details. You will then receive instructions via email on how to apply and view the property (be sure to check your junk mail!). To avoid disappointment, we encourage you to register your interest so we can keep you informed during all stages of the leasing process. By registering, you will be informed of any updates regarding the property INCLUDIN",
       "photo": "",
       "first_seen": "2026-11-18T13:16:01.581824+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -8904,7 +8904,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (0h ago)"
+          "reason": "Discovered in last 24 hours (3h ago)"
         }
       },
       "positive_factors": [
@@ -8969,7 +8969,7 @@
       "description": "Set adjacent a tranquil nature reserve, Carrum Park Estate is an inspired architectural expression of open-plan living. Here you will find the perfect environment in which to relax, expand your horizons, and build the life you've dreamed of. Including stylish two apartments fitted with high quality fixtures and internal finishes, Carrum Park Estate provides an easy living lifestyle with a premium feel. Each apartment features: - secure parking\n- open, light filled living spaces\n- spacious ro",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -9201,7 +9201,7 @@
       "description": "This is a tidy, low-maintenance unit on a quiet tree-lined street in Keswick. It suits professionals, a couple or a small family who want to live close to the city without paying CBD prices. What you get: - 3 good-sized bedrooms\n- Bright living area that flows into the kitchen\n- Gas cooking\n- Bathroom with shower\n- Internal laundry\n- 1 allocated car park\n- Partly furnished Location:\nHonestly, the location is the best part. You're a short walk to the Adelaide Showground and Keswick train stat",
       "photo": "",
       "first_seen": "2026-11-12T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -9317,7 +9317,7 @@
       "description": "\ud83d\udca5\ud83d\udca5ONLY LOOKING FOR TENANT that is:\r\n\r\n_ NO DRUG, NO MARIJUANA, NO DRUNKARD\r\n_ NO PARTY NOISY\r\n_ NO FRIENDS COMING OVER ALL THE TIMES ( once in a while is ok )\r\n_ CLEAN and TIDY\r\n_ RESPECTING\r\n_ PAY RENT ON TIME\r\n_ WORKING OR STUDENT W JOB\r\n\r\n\ud83d\udc4dIF ITS YOU, PLS GIV ME A CALL OR TEXT\r\n\r\n\u274cIF NOT, REALLY SORRY, THE HOUSE IS NOT SUITABLE FOR YOU.\r\n\r\n\ud83d\udca5\ud83d\udca5Hi guys, i hav a really nice beautiful unit, fully furnish w BIG QUEEN BED, SMART TV 42\u201d, DINING TABLE, DESK, BIG FRIDGE, WASHING MACHINE, AIR CON SPLIT SYSTEM, Etc etc and much more :)\r\n\r\n\ud83d\udccdWELWYN PARADE, DEER PARK, 3023\r\n\r\n\ud83d\udcb0RENT : $385 PER WEEK ( NO BILL) , u apply your own bill\r\n\r\n\ud83d\udcb0\ud83d\udcb0BOND IS 1 MONTH , RENT IS 1 MONTH\r\n\r\n\ud83c\udfe1BEAUTIFUL NEWLY RENOVATED KITCHEN, BATHROOM and TOILET .\r\n\r\n\ud83c\udfeaSAFE , QUITE and SECURE , with 8 Camera around the house, own Walk way, own entrance and Parking spot\r\n\r\n\ud83d\udc4dGREAT LOCATION:\r\n_ 1-2 mins Walk to Bus stop\r\n_ 1 min Drive to Brimbank shopping centre\r\n_ 2-3 mins Drive to Deer park shopping street &amp; all restaurant\r\n_ 3-4 mins Drive to Free way Western ring road\r\n_ 5-6 mins Drive to St alban Shopping Centre and all restaurants\r\n\r\n\ud83d\udca5\ud83d\udca5\ud83d\udca5Looking for Professional/ working full time , nice and friendly, clean and tidy and respecting .\r\n\r\n\u274c\u274cNO DRUG, NO MARIJUANA, NO PARTY HOUSE,\r\n\r\n\u2705PAYSLIP and Reference may require.",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/bgqs7gvmuwfx60wgejdy",
       "first_seen": "2026-11-10T09:57:53.294Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -9432,7 +9432,7 @@
       "description": "I'm looking for someone to take over my lease for a 4 bedroom townhouse the end of Nov Property Details: - Bedrooms: 4 good-sized bedrooms - Bathroom: 2 Full bathroom and toilet combined - Living Space: Separate lounge room - Parking: undercover parking available - Rent: $420/ week, water bill included. Can be unfurnished or partially furnished My current Lease End Date: mid Jan 2027 (with option to extend/renew with the landlord/agent) It\u2019s a comfortable home in a great location and i",
       "photo": "",
       "first_seen": "2026-11-05T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -9548,7 +9548,7 @@
       "description": "Just off Toorak Road and Burke Road in the Heart of Glen Iris, this gorgeous walk-up 1 bed 1 bath awaits. Nestled in the tranquil, (no-through) tree-lined Bickleigh street, be surrounded by nature and parkland while being only minutes from the action - with Tooronga Village, Camberwell Junction, as well as the dining, shopping, and entertainment precincts of High Street all within easy reach. With a designated, off-street secure car space, and the M1/Monash freeway access around the corner, G",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -9663,7 +9663,7 @@
       "description": "Please note : This property will only be available for 11 months (11 month lease) \nWelcome to 17 Frances Street Heathmont! This charming 3-bedroom, 1-bathroom house is now available for lease. Situated in a peaceful neighborhood, this property offers a comfortable and convenient lifestyle. Upon entering the house, you will be greeted by a spacious and well-designed interior. The kitchen is equipped with free standing cooker and ample storage space, making it a joy to cook and entertain in.",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -10127,7 +10127,7 @@
       "description": "Property features:\n- Sunny dining area with spacious kitchen\n- Lounge area with wood heater\n- Main bedroom with walk-in robe\n- 2nd & 3rd bedrooms both with built-in wardrobes\n- Bathroom with separate shower & bath\n- Small, easy care yard area\n- Single carport with lock up storage shed in rear\n- Timber deck area Break Lease- 15/12/2026 to 28/02/2027 ** How to apply **\nPlease either call into the office to get our rental application form or phone the office to have one emailed to you. (03) 64",
       "photo": "",
       "first_seen": "2026-11-13T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -10334,6 +10334,121 @@
       "is_under_600": true,
       "is_entire_property": true,
       "listed_at": "2026-11-06T09:00:00+00:00"
+    },
+    {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345695920",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345695920",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345695920",
+      "title": "32 Brunswick Crescent, Craigieburn, Victoria 3064",
+      "address": "Craigieburn, VIC",
+      "suburb": "Craigieburn",
+      "postcode": "",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "parking": 0,
+      "weekly_rent": 550.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Welcome to this appealing single-storey home, offering practical living, a welcoming street presence and convenience in the popular suburb of Craigieburn. Featuring a neat brick fa\u00e7ade, tiled roof and a generous double lock-up garage, this property offers excellent street appeal and practical off-street parking. Property features: Attractive single-storey brick home Spacious double lock-up garage Wide driveway with additional off-street parking Convenient and practical layout Situated in",
+      "photo": "",
+      "first_seen": "2026-11-14T09:00:00+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 63.0,
+      "score_version": "2.0",
+      "score_confidence": "low",
+      "sources": [
+        {
+          "id": 298,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345695920",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345695920",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345695920",
+          "raw_title": "32 Brunswick Crescent, Craigieburn, Victoria 3064",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-14T09:00:00+00:00",
+          "last_seen": "2026-11-18T16:10:57.176058+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 20.8,
+          "max": 25,
+          "reason": "$550/wk is within target budget ($560/wk)"
+        },
+        "commute_convenience": {
+          "score": 5.0,
+          "max": 25,
+          "reason": "Indirect transit from Craigieburn (transfer required to reach Hawthorn)"
+        },
+        "property_suitability": {
+          "score": 16.0,
+          "max": 20,
+          "reason": "3-bedroom entire property offers generous living area"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Parking included, Unfurnished"
+        },
+        "freshness": {
+          "score": 2.5,
+          "max": 5,
+          "reason": "Listed within the past week (4d ago)"
+        }
+      },
+      "positive_factors": [
+        "Comfortably within budget ($550/wk)",
+        "Entire private property (zero housemates)",
+        "3 Bedrooms entire property",
+        "Ideal move-in timing (Dec 2026)",
+        "Dedicated parking space"
+      ],
+      "potential_concerns": [
+        "No direct train or tram to Hawthorn from Craigieburn"
+      ],
+      "commute_mode": "Indirect / Transfer required",
+      "commute_line": "Requires interchange to reach Hawthorn",
+      "commute_mins": 45,
+      "commute_tier": 4,
+      "has_direct_hawthorn_transit": false,
+      "station_name": "Craigieburn Station",
+      "station_distance_m": 500,
+      "station_walking_mins": 6,
+      "station_distance_display": "~500m to Craigieburn Station (~6 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": false,
+      "pass_strict_filter": false,
+      "rejection_reason": "No direct train/tram to Hawthorn",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345695920",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345695920",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-14T09:00:00+00:00"
     },
     {
       "property_id": "prop_gumtreemelbourne_gumtree-1345525976",
@@ -11389,122 +11504,6 @@
       "listed_at": "2026-10-27T09:00:00+00:00"
     },
     {
-      "property_id": "prop_gumtreemelbourne_gumtree-1345533359",
-      "source": "Gumtree Melbourne",
-      "source_listing_id": "gumtree-1345533359",
-      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345533359",
-      "title": "3 Carcoola Rise, Clyde North, Victoria 3978",
-      "address": "Clyde North, VIC",
-      "suburb": "Clyde North",
-      "postcode": "",
-      "state": "VIC",
-      "property_type": "apartment",
-      "bedrooms": 4,
-      "bathrooms": 2,
-      "parking": 0,
-      "weekly_rent": 595.0,
-      "furnished": false,
-      "property_entire": true,
-      "lease_transfer": true,
-      "available_date": "Dec 2026",
-      "lease_duration": null,
-      "description": "Positioned in a quiet and family-friendly pocket of Clyde North, this beautifully presented single-storey home offers space, functionality and effortless living. Property Features: 4 generously sized bedrooms with built-in robes\nMaster bedroom with private ensuite and ample wardrobe space\n2 modern bathrooms\nDouble remote-control garage with internal access\nLight-filled open plan living and dining area with loads of natural light\nSeparate second living area / formal lounge \u2013 ideal as a theatre",
-      "photo": "",
-      "first_seen": "2026-11-05T09:00:00+00:00",
-      "last_seen": "2026-11-10T21:02:04.891300+00:00",
-      "last_verified": null,
-      "listing_status": "active",
-      "verification_status": "unverified",
-      "match_score": 52.0,
-      "score_version": "2.0",
-      "score_confidence": "low",
-      "sources": [
-        {
-          "id": 34,
-          "property_id": "prop_gumtreemelbourne_gumtree-1345533359",
-          "source_name": "Gumtree Melbourne",
-          "source_listing_id": "gumtree-1345533359",
-          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345533359",
-          "raw_title": "3 Carcoola Rise, Clyde North, Victoria 3978",
-          "raw_price_text": "",
-          "raw_description": "",
-          "first_seen": "2026-11-05T09:00:00+00:00",
-          "last_seen": "2026-11-10T21:02:04.891300+00:00",
-          "is_active": 1
-        }
-      ],
-      "score_breakdown": {
-        "rent_affordability": {
-          "score": 14.3,
-          "max": 25,
-          "reason": "$595/wk is slightly above $560/wk target but under $600/wk ceiling"
-        },
-        "commute_convenience": {
-          "score": 5.0,
-          "max": 25,
-          "reason": "Indirect transit from Clyde North (transfer required to reach Hawthorn)"
-        },
-        "property_suitability": {
-          "score": 16.0,
-          "max": 20,
-          "reason": "4-bedroom entire property offers generous living area"
-        },
-        "move_in_timing": {
-          "score": 11.0,
-          "max": 15,
-          "reason": "Available Check Listing (early flexible start before Dec 5)"
-        },
-        "amenities": {
-          "score": 3.5,
-          "max": 10,
-          "reason": "Parking included, Unfurnished"
-        },
-        "freshness": {
-          "score": 2.5,
-          "max": 5,
-          "reason": "Listed within the past week (5d ago)"
-        }
-      },
-      "positive_factors": [
-        "Entire private property (zero housemates)",
-        "4 Bedrooms entire property",
-        "Early move-in available (Check Listing)",
-        "Lease transfer / break opportunity (frequently lower rent)",
-        "Dedicated parking space"
-      ],
-      "potential_concerns": [
-        "Weekly rent of $595 exceeds target of $560/wk",
-        "No direct train or tram to Hawthorn from Clyde North"
-      ],
-      "commute_mode": "Indirect / Transfer required",
-      "commute_line": "Requires interchange to reach Hawthorn",
-      "commute_mins": 45,
-      "commute_tier": 4,
-      "has_direct_hawthorn_transit": false,
-      "station_name": "Clyde North Station",
-      "station_distance_m": 770,
-      "station_walking_mins": 10,
-      "station_distance_display": "~770m to Clyde North Station (~10 min walk)",
-      "station_is_explicit": false,
-      "availability_display": "Check Listing",
-      "availability_fit": "early_flex",
-      "is_student_only": false,
-      "is_sharehouse": false,
-      "is_new": false,
-      "pass_strict_filter": false,
-      "rejection_reason": "No direct train/tram to Hawthorn",
-      "rejection_reasons": [],
-      "raw_metadata": {},
-      "id": "prop_gumtreemelbourne_gumtree-1345533359",
-      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345533359",
-      "is_furnished": false,
-      "is_lease_transfer": true,
-      "is_normal_listing": false,
-      "is_under_600": true,
-      "is_entire_property": true,
-      "listed_at": "2026-11-05T09:00:00+00:00"
-    },
-    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345481741",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345481741",
@@ -11642,7 +11641,7 @@
       "description": "Room with Key. \ud83d\udd11 \r\nHappy to have anyone working full time and can provide rental references. \r\n\r\nAbout me: Brad 31, Chef and dog dad.  Henry and I  have just moved down from the Sunshine Coast, very chill. Kinda like melbourne but totally different. \r\n\r\nWith permission from the real estate, I am looking at getting a tenant asap, to help with rent and also help with the melbourne experience with for me and Henry. My dog. \r\n\r\nThe house is newly renovated with two bathrooms and two living rooms. \r\n\r\nIt is a 4 bedroom property with heaps of backyard space and front yard space. \r\n\r\nI have lived here now for 3 months and it is incredibly quiet for only being 10kms from Melbourne CBD. \r\n\r\nLooking for someone who wants to explore Melbourne in the spare time - adventurous. Happy and working full time or at least trying. \r\n\r\nAlso I am a sport fanatic, love having a beer and a banter with right roommate or roommates.\r\n\r\nHappy for smokers outside in one of the courtyard.",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/jp7hoeaav7lzggw7kmxj",
       "first_seen": "2026-11-16T20:11:10.855Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -11757,7 +11756,7 @@
       "description": "Cosy Private  Room ( All Guys ) \r\n\r\n\u25a0 Address : 270 King street\r\n\r\n\r\n- Window and door lock for security and safety \r\n\r\n- Housemates from NZ, Japan and Aussies\r\n\r\n* Multi cultural ( Good to improve english , learn and experience other culture )\r\n\r\n* Friendly and tidy, clean housemates\r\n\r\n* Homely environment\r\n\r\n- Full Laundry facilities - dryer and washer\r\n\r\n- Full Kitchen equipment - Microwave, fridge, Air fryer, pots and pans \r\n\r\n* Respectful\r\n\r\n\u25a0 Good location\r\n\r\n-Tram and railway station\r\n\r\n- free tram zone\r\n\r\n\u25a0 All furnished room : Queen bed / closet / desk\r\n\r\n\u25a0 2 weeks bond\r\n\r\n3 Months Minimum Stay\r\n\r\n$280 per week plus $10  all bills  \r\n \r\n\r\nReady 1 December \ninc. bills",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/jlaja5ubdmrdwa7kvznm",
       "first_seen": "2026-11-18T00:30:51.272Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -11808,7 +11807,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (12h ago)"
+          "reason": "Discovered in last 24 hours (15h ago)"
         }
       },
       "positive_factors": [
@@ -11991,7 +11990,7 @@
       "description": "ROOM FOR RENT IN CAMBERWELL!\nLooking for a happy, cozy, and super convenient place to call home? We have a fully furnished room available right now, exactly as shown in the pictures! Whether you need a short-term spot or a long-term home, this is perfect for you.\nWhy you'll love it here:\n1. Amazing Location: Just a quick 200m stroll to Hartwell Station!\n2. All-Inclusive Price: Just $300/week, and that includes absolutely all bills! No hidden costs, just easy living.\nIf you're interested and wa",
       "photo": "",
       "first_seen": "2026-11-11T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -12108,7 +12107,7 @@
       "description": "a short-term month lease or sublet December 8th to February 10th | possibility of renewing lease in February rent will go up from $3824 to $3889 ($1275 to $1296 each room).\r\n \r\n\ud83d\udccd Location: \r\nLocated in Elwood, gorgeous bay-side suburb, short walk to the beach, Elsternwick park and the new nature reserve!! We are right along Ormond road close to cafe, shops, restaurants and laundromat. It is easily accessible St kilda 5 mins away and Elsternwick station 10 minutes away with multiple ptv routes right outside the apartment! \r\n\r\n\ud83c\udfe1 About the home: \r\nThe house will come unfurnished, It is a large 3 bedroom, 1 bathroom apartment with a balcony, 1 secure car spot ( gated ) \ud83d\ude97 and a private off street view\u2728 there is a large kitchen with all amenities including a dishwasher\r\n\r\nAbout the room: \r\n\r\n The rent is paid per calendar month $1275 for each room. \r\n\r\nThe largest room comes furnished with bed, bedside drawers and table. The three rooms come with a built-in wardrobe. This will be a lease transfer, you will need to be approved by the owner and our lovely agent, bond is one months rent. \r\n\r\nplease dm me with a little information about yourself and your history with house shares\ud83c\udf38 we can organise inspections times asap!",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/dyr7k7k6xn8oqlkeh6rb",
       "first_seen": "2026-11-15T03:13:33.244Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -12223,7 +12222,7 @@
       "description": "None\ninc. bills",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/eqc9et6whneegjtz8lmu",
       "first_seen": "2026-11-14T13:14:12.589Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -12569,7 +12568,7 @@
       "description": "None",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/f3d67dnuysbuedclibvo",
       "first_seen": "2026-11-18T10:48:32.341Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -12620,7 +12619,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (2h ago)"
+          "reason": "Discovered in last 24 hours (5h ago)"
         }
       },
       "positive_factors": [
@@ -12800,7 +12799,7 @@
       "description": "This is a fully furnished house available for rent short term from 1 week to 1 month. All bills are included.\ninc. bills",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/ixldvo4iyfpm00x53sou",
       "first_seen": "2026-11-14T12:26:11.837Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -13380,7 +13379,7 @@
       "description": "Retaining its charming heritage fa\u00e7ade, the sought-after Park West Apartments offers the perfect city fringe lifestyle. Ideally positioned within walking distance to Flagstaff Gardens, Queen Victoria Market, Flagstaff Station, tram routes, North Melbourne's popular cafes and restaurants, as well as Melbourne CBD, this unfurnished one-bedroom, one-bathroom apartment with one secure car space combines convenience and modern living. The apartment is unfurnished and features: - Secure entry with",
       "photo": "",
       "first_seen": "2026-11-17T12:43:55.111971+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -13496,7 +13495,7 @@
       "description": "Near New Upgraded 4 Bedroom House\r\n\r\n37 CANUNDA WAY, TARNEIT\r\n\r\n$500.00 per week, bills not included\r\n\r\nWelcome to this charming family home, designed to fulfill every family's dream. From the stunning facade to the beautifully landscaped backyard, every corner of this home has been thoughtfully crafted with practicality and comfort in mind. This property is truly a place to call home.\r\n\r\nFeatures Include:\r\n\r\nMaster Bedroom with Ensuite (double vanity) and Walk-In Robe (WIR).\r\nThree Additional Bedrooms with Built-In Robes (BIR).\r\nOpen Plan Living & Dining areas, perfect for family gatherings.\r\nContemporary Style Kitchen with ample cupboard space, walk-in pantry, quality stone bench tops and stainless-steel appliances.\r\nFormal Lounge for relaxation and entertainment.\r\nUpgraded Laundry with convenient backyard access.\r\nWell-Designed Pergola for outdoor living and entertainment.\r\nDouble Garage with remote control access.",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/otj74wof1sephvmullea",
       "first_seen": "2026-11-17T04:49:40.459Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -13726,7 +13725,7 @@
       "description": "Enjoy the perfect combination of modern comfort, convenience and low-maintenance living in this stylish one-bedroom apartment, ideally positioned just moments from Blackburn Station. Set within a contemporary apartment complex, this beautifully presented residence offers a functional floorplan, modern finishes and a private balcony, making it an ideal home for professionals, couples or anyone seeking an easy, connected lifestyle. Property Features:\n* Spacious bedroom with split-system heating",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -13842,7 +13841,7 @@
       "description": "Unfurnished--Meadow Heights Vic, 3048\r\n3 comfortable bedrooms and a clean, central family bathroom.\r\n\u2022 Secure drive-through carport with plenty of space for parking.\r\n\u2022 Covered outdoor undercover area for entertaining.\r\n\u2022 Within walking distance to Meadow Heights Primary School and close to Meadow Heights Shopping Centre.",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/tn7a7x5orpbnlqucdme9",
       "first_seen": "2026-11-11T11:38:57.091Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -13956,7 +13955,7 @@
       "description": "HOW DO I REGISTER TO INSPECT ? - Instructions available below this ad. Located in one of Melbourne\u2019s popular lane-ways full of boutique buildings this furnished apartment features : - Situated on the sixth floor of this historic building\n- Great natural lighting\n- Fully furnished for your convenience\n- Kitchen fully equipped with dishwasher, Bar Fridge, 2 burner electric stove top and Washing Machine.\n- Carpeted living area\n- Split system heating and cooling\n- Built-in-wardrobe in master bedr",
       "photo": "",
       "first_seen": "2026-11-10T12:18:08.258774+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -14470,7 +14469,7 @@
       "description": "Bathed in natural northerly sunlight, this well-presented one-bedroom, one-bathroom apartment offers comfortable inner-city living within the highly sought-after Zen Harmony complex. Ideally located in the heart of Melbourne CBD, you will enjoy easy access to Queen Victoria Market, Melbourne Central, RMIT University, public transport, caf\u00e9s, restaurants, and an array of lifestyle attractions right at your doorstep. The apartment is unfurnished and features: - Secure entry with intercom access",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -14586,7 +14585,7 @@
       "description": "Located in the convenient and vibrant Box Hill precinct, this apartment offers comfortable living with easy access to a wide range of local amenities. Enjoy the convenience of being within close proximity to Box Hill Central, public transport, supermarkets, restaurants, cafes and local shopping facilities. With Box Hill train station and tram services nearby, commuting to Melbourne CBD and surrounding suburbs is easy. **Property Features:**\n- Well-designed apartment with comfortable living sp",
       "photo": "",
       "first_seen": "2026-11-11T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -14650,7 +14649,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (11h ago)"
+          "reason": "Discovered in last 24 hours (14h ago)"
         }
       },
       "positive_factors": [
@@ -14832,7 +14831,7 @@
       "description": "Positioned in the heart of Southbank, this contemporary apartment offers the perfect combination of comfort, convenience and inner-city living. Located within the modern Opus Tower, the apartment provides an excellent opportunity to enjoy Melbourne's vibrant lifestyle, with an abundance of dining, shopping, entertainment and public transport options just moments from your doorstep. Designed for easy everyday living, the apartment features a light-filled open-plan living and dining area, comple",
       "photo": "",
       "first_seen": "2026-11-18T06:43:55.110841+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -14883,7 +14882,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (7h ago)"
+          "reason": "Discovered in last 24 hours (10h ago)"
         }
       },
       "positive_factors": [
@@ -15310,7 +15309,7 @@
       "description": "Nestled amongst the trees on the Yarra River, adjacent to Studley Park and Kew, and metres away from Victoria Gardens shopping centre, the Park House complex is bursting with amenities for your enjoyment. With direct access to the Yarra River Trail, a 20m swimming pool, timber lined sauna and a golf simulator, leisure and exercise are always just minutes away. For recreation, residents can spend time in the cinema, residents lounge or the children's playroom. Beautiful interiors designed by C",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T12:44:41.382402+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -15657,7 +15656,7 @@
       "description": "Well presented 1 bedroom apartment in the well regarded Ikon Apartment complex situated in the heart of Glen Waverley.\nWith Glen Waverley train station and bus depot, The Glen Shopping Centre and Glen Waverley Secondary School all at your doorstep, plus the convenience of Eastlink & Monash freeway access, Wesley College, a variety of primary schools and local reserves all nearby.\nThe apartment provides open plan living, modern kitchen with gas stove top, electric oven and dishwasher, European",
       "photo": "",
       "first_seen": "2026-11-10T06:18:27.078865+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -16117,7 +16116,7 @@
       "description": "Comfortable 3-Bedroom House for Rent \u2013 Cranbourne\r\n\r\nLooking for a comfortable, spacious home in a convenient Cranbourne location? This well-located, unfurnished 3-bedroom house is available for rent as an entire property.\r\n\r\nThe property offers three bedrooms, a comfortable living area, a functional kitchen and convenient access to essential amenities. Ideal for a family, couple or working professionals looking for a home with privacy and space.\r\n\r\nConveniently located approximately 10 minutes\u2019 walking distance from Cranbourne Train Station, with Woolworths, schools, parks, cafes, restaurants and medical facilities nearby.\r\n\r\nEnjoy the convenience of having the entire property to yourself in a well-connected and established residential neighbourhood.\r\n\r\nAvailable for inspection by arrangement.",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/p1wcqjkbnh6sd9dmtrgr",
       "first_seen": "2026-11-11T22:28:51.677Z",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -16231,7 +16230,7 @@
       "description": "Enjoy a convenient lifestyle in this well-located one-bedroom apartment at 913/478 St Kilda Road, Melbourne. Situated along the iconic St Kilda Road boulevard, this apartment offers easy access to Melbourne CBD, Albert Park, local cafes, restaurants and public transport. Whether you are a professional or a student, this is an ideal place to enjoy a convenient inner-city lifestyle. Property Features: -One comfortable bedroom\n-One bathroom\n-Practical and functional floorplan\n-Light-filled livi",
       "photo": "",
       "first_seen": "2026-11-18T12:44:08.224834+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -16282,7 +16281,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (0h ago)"
+          "reason": "Discovered in last 24 hours (4h ago)"
         }
       },
       "positive_factors": [
@@ -16709,7 +16708,7 @@
       "description": "Perfectly Positioned within walking distance to Schools, Lilydale Train Station, close to Main Street shopping, restaurants and cafes and with easy access to the Maroondah Highway all within a short drive to Eastlink. This two bedroom modern double story town house offers low maintenance living with all modern comforts being catered for. Situated at the front of the complex offering an open plan living with stylish kitchen including stainless steel appliances, gas cooktop and electric oven. Th",
       "photo": "",
       "first_seen": "2026-11-17T12:44:28.341361+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -16826,7 +16825,7 @@
       "description": "Overlooking the stunning Box Hill Gardens, Astrina offers a vibrant urban reality in truly picturesque surroundings. This apartment is at the top location of Box Hill within minute's walk to Box Hill Central, with trams and train station just minutes away. This furnished apartment features: - Open plan living and dining area with access to a private balcony brings in generous natural light - Modern kitchen with quality appliances - Good size bedroom with BIRs - A study nook providing extra",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -17173,7 +17172,7 @@
       "description": "Positioned down this quiet North Melbourne street, this non furnished one-bedroom apartment which has the option of a smaller second bedroom/study offers comfortable, low-maintenance living with the added benefit of an allocated off-street car space. This apartment provides a practical layout with one bedroom, a central bathroom and easy-care living. The light-filled living and dining area features floor-to-ceiling glazing, polished timber flooring, split system air-conditioning and sliding do",
       "photo": "",
       "first_seen": "2026-11-18T12:43:55.110524+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -17224,7 +17223,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (2h ago)"
+          "reason": "Discovered in last 24 hours (5h ago)"
         }
       },
       "positive_factors": [
@@ -17290,7 +17289,7 @@
       "description": "Discover the epitome of urban living at 2313 / 80 A'Beckett Street, Melbourne. This stunning 1-bedroom, 1-bathroom apartment offers the perfect blend of style, comfort, and convenience. Situated in the vibrant heart of the city, this property is ideal for those seeking a cosmopolitan lifestyle. Step inside and be captivated by the contemporary design and impeccable attention to detail. The open-plan living area is bathed in natural light, creating a warm and inviting ambiance. The sleek kitche",
       "photo": "",
       "first_seen": "2026-11-18T05:43:55.111139+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -17341,7 +17340,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (7h ago)"
+          "reason": "Discovered in last 24 hours (10h ago)"
         }
       },
       "positive_factors": [
@@ -17895,7 +17894,7 @@
       "description": "HOW DO I REGISTER TO INSPECT ? - Instructions available below this ad. Located on the fringe of the city, this apartment is located in a premier location with convenience at your doorstep, a minutes walk from the North Melbourne train station for easy commuting and a Metro supermarket across the road. - Located on level 2\n- Desirable split level\n- Charming light filled living space with floorboards throughout the lower area\n- Sleek kitchen with electric cooking and stainless-steel appliances",
       "photo": "",
       "first_seen": "2026-11-17T12:43:55.109997+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -18604,7 +18603,7 @@
       "description": "UNFURNISHED - With a spacious building area of 52sqm, the apartment features a well-designed layout that maximizes both space and functionality. The bright living room flows seamlessly into a private balcony, perfect for enjoying your morning coffee or evening relaxation. *Fridge & Dryer will stay in the property. The bedroom comes complete with built-in robes, providing ample storage while maintaining a clean and uncluttered aesthetic. The contemporary bathroom is designed with modern fixtur",
       "photo": "",
       "first_seen": "2026-11-18T06:43:55.110939+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -18655,7 +18654,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (7h ago)"
+          "reason": "Discovered in last 24 hours (10h ago)"
         }
       },
       "positive_factors": [
@@ -18720,7 +18719,7 @@
       "description": "Positioned in a convenient and well-established pocket of Ferntree Gully, this property presents a wonderful opportunity for renters seeking comfort, convenience and a lifestyle close to everything this popular suburb has to offer. Offering an appealing location with easy access to local shopping precincts, public transport, schools, parks and everyday amenities, this property provides an excellent foundation for comfortable living. Property Highlights\n- Three well-proportioned bedrooms\n- Cen",
       "photo": "",
       "first_seen": "2026-11-11T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -18850,7 +18849,7 @@
       "description": "Jellis Craig is proud to present this single-level house, balancing the brilliance of space with a lifestyle of easy maintenance. This single level house is certain to be a winning attraction. \nPlaced in a peaceful court, it enjoys close proximity to Westfield Knox, Boronia Junction, Boronia Train Station, buses, walking trails, parkland, Knox Central Primary, Fairhills High School, and easy access to EastLink Freeway. The Glen and Eastland Shopping Centres are just 10mins away. \nConsisting",
       "photo": "",
       "first_seen": "2026-11-18T02:16:22.060969+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -18901,7 +18900,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (11h ago)"
+          "reason": "Discovered in last 24 hours (14h ago)"
         }
       },
       "positive_factors": [
@@ -19713,7 +19712,7 @@
       "description": "Tucked at the rear of the well-crafted ARK building and blessed with a North facing position providing spades of light, this modern apartment offers effortless convenience inside and out. This fantastic property has plenty of appeal, featuring: - Bright queen size bedroom with mirrored built-in robes and floor to ceiling windows\n- Sleek kitchen with stone benchtop, Miele appliances, gas cooktop, dishwasher and plenty of cupboard space\n- Spacious open plan living/dining zone, bathed in natural",
       "photo": "",
       "first_seen": "2026-11-02T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -19855,7 +19854,7 @@
       "description": "Discover comfortable modern living at 1 / 70 Belmont Road, Croydon South. This appealing three-bedroom home offers a practical layout, two bathrooms and a single garage. Designed for easy everyday living, the property provides generous accommodation for families, couples or those seeking additional space for guests or a home office. Positioned in a convenient Croydon South location, this inviting residence is ready to welcome its next occupants. Enquire today to arrange an inspection.",
       "photo": "",
       "first_seen": "2026-11-11T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -20090,6 +20089,122 @@
       "listed_at": "2026-11-10T09:00:00+00:00"
     },
     {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345533359",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345533359",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345533359",
+      "title": "3 Carcoola Rise, Clyde North, Victoria 3978",
+      "address": "Clyde North, VIC",
+      "suburb": "Clyde North",
+      "postcode": "",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "parking": 0,
+      "weekly_rent": 595.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": true,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Positioned in a quiet and family-friendly pocket of Clyde North, this beautifully presented single-storey home offers space, functionality and effortless living. Property Features: 4 generously sized bedrooms with built-in robes\nMaster bedroom with private ensuite and ample wardrobe space\n2 modern bathrooms\nDouble remote-control garage with internal access\nLight-filled open plan living and dining area with loads of natural light\nSeparate second living area / formal lounge \u2013 ideal as a theatre",
+      "photo": "",
+      "first_seen": "2026-11-05T09:00:00+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 0.0,
+      "score_version": "2.0",
+      "score_confidence": "low",
+      "sources": [
+        {
+          "id": 34,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345533359",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345533359",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345533359",
+          "raw_title": "3 Carcoola Rise, Clyde North, Victoria 3978",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-05T09:00:00+00:00",
+          "last_seen": "2026-11-10T21:02:04.891300+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 14.3,
+          "max": 25,
+          "reason": "$595/wk is slightly above $560/wk target but under $600/wk ceiling"
+        },
+        "commute_convenience": {
+          "score": 5.0,
+          "max": 25,
+          "reason": "Indirect transit from Clyde North (transfer required to reach Hawthorn)"
+        },
+        "property_suitability": {
+          "score": 16.0,
+          "max": 20,
+          "reason": "4-bedroom entire property offers generous living area"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Parking included, Unfurnished"
+        },
+        "freshness": {
+          "score": 1.0,
+          "max": 5,
+          "reason": "Listed 13 days ago"
+        }
+      },
+      "positive_factors": [
+        "Entire private property (zero housemates)",
+        "4 Bedrooms entire property",
+        "Ideal move-in timing (Dec 2026)",
+        "Lease transfer / break opportunity (frequently lower rent)",
+        "Dedicated parking space"
+      ],
+      "potential_concerns": [
+        "Weekly rent of $595 exceeds target of $560/wk",
+        "No direct train or tram to Hawthorn from Clyde North"
+      ],
+      "commute_mode": "Indirect / Transfer required",
+      "commute_line": "Requires interchange to reach Hawthorn",
+      "commute_mins": 45,
+      "commute_tier": 4,
+      "has_direct_hawthorn_transit": false,
+      "station_name": "Clyde North Station",
+      "station_distance_m": 770,
+      "station_walking_mins": 10,
+      "station_distance_display": "~770m to Clyde North Station (~10 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": false,
+      "pass_strict_filter": false,
+      "rejection_reason": "Over budget: rental price ($595/wk) exceeds cap ($560/wk for 4BHK unfurnished)",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345533359",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345533359",
+      "is_furnished": false,
+      "is_lease_transfer": true,
+      "is_normal_listing": false,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-05T09:00:00+00:00"
+    },
+    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345553998",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345553998",
@@ -20228,7 +20343,7 @@
       "description": "Tucked away within a quiet establishment in the heart of Box Hill North is this spacious two bedroom unit. Beautifully renovated throughout, boasting light filled interiors and only the highest quality brand new fittings and finishes throughout. Sitting in a highly sought after pocket due to its close proximity to an array of amenities, this unit is just moments to Box Hill Hospital, Box Hill Gardens, Box Hill Central, and Box Hill Senior. Box Hill Station and the Eastern Freeway are also jus",
       "photo": "",
       "first_seen": "2026-11-17T12:44:08.223397+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -20345,7 +20460,7 @@
       "description": "Metro Property Management offers you this two bedroom townhouse. Conveniently located and with high quality design and finishes it is not to be missed. Located on a quiet tree lined street and a short walk to Main Street cafes and shops and with easy access to Lilydale train station, Melba Park and schools. Spend your weekends exploring the Yarra Valley region, with all that it has to offer, that is on your doorstep. This two storey home with lovely high ceilings boasts two bedrooms both with",
       "photo": "",
       "first_seen": "2026-11-18T01:44:31.254821+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -20396,7 +20511,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (11h ago)"
+          "reason": "Discovered in last 24 hours (14h ago)"
         }
       },
       "positive_factors": [
@@ -20836,7 +20951,7 @@
       "description": "Combining a practical layout with generous accommodation, this appealing residence offers three bedrooms, two bathrooms and double-car accommodation, creating a comfortable setting for everyday living. The thoughtfully designed floorplan provides three well-proportioned bedrooms, including a main bedroom complemented by its own ensuite, while a central bathroom services the remaining accommodation. The living spaces offer a welcoming environment to relax and unwind, with the added benefit of a",
       "photo": "",
       "first_seen": "2026-11-10T02:18:32.291642+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -21298,7 +21413,7 @@
       "description": "Discover the space and comfort this impressive five-bedroom home has to offer. All five bedrooms feature built-in robes, while themaster bedroom boasts a walk-in robe and a spacious ensuite, creating the perfect private retreat.\nDesigned for modern living, the home features a dedicated media room, along with an open-plan kitchen, living and dining area that flows seamlessly onto a covered decking area, ideal for entertaining family and friends or relaxing outdoors.\nEnjoy year-round comfort with",
       "photo": "",
       "first_seen": "2026-11-04T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -21529,7 +21644,7 @@
       "description": "This well-presented two-bedroom unit is sure to impress. Positioned on the corner of a quiet group of three, it offers a convenient location, excellent dual street access, and a generous sized rear yard. With practical storage options both inside and out, this unit offers comfort, convenience, and low-maintenance living. Freshly painted throughout, the home is light and bright, featuring polished timber floorboards throughout and ducted air conditioning for year-round comfort. The light-fille",
       "photo": "",
       "first_seen": "2026-11-12T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -21644,7 +21759,7 @@
       "description": "Perfectly located next to COSTCO, Only 100 Metres away from Eastland Shopping centre and 500 Metres to the Ringwood station. Design by Embrace Architects presides over a cosmopolitan lifestyle destination. This spacious, north-east facing light-filled and luxury two bedrooms residence redefining modern living in Ringwood. What makes this home unique:\n- Two living spaces that offer a separate dining area\n- Marble splashback & kitchen bench\n- Miele appliances, airconditioning\n- Timber floorboar",
       "photo": "",
       "first_seen": "2026-11-12T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -21993,7 +22108,7 @@
       "description": "Enjoy your urban lifestyle and live in luxury 5 star Melbourne Quarter.\nThis stylish apartment with unrivalled location. Flanked by the renowned Collins and Flinders Streets. It is a step away from the city's major train and bus. Southern Cross Station is just across the road.\nEnjoy exclusive access to Club MQ, three levels of resident resort style facilities including: Resident Lounge, Business Centre, theatre, private dining spaces cater, 25 meter indoor Heated Pool, Spa, Sauna, State -of-",
       "photo": "",
       "first_seen": "2026-11-16T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -22070,7 +22185,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (6h ago)"
+          "reason": "Discovered in last 24 hours (9h ago)"
         }
       },
       "positive_factors": [
@@ -22136,7 +22251,7 @@
       "description": "Experience the pinnacle of urban sophistication in this stylish one bedroom apartment located in the highly sought-after ID building. Just a stone\u2019s throw from the scenic waterfront, vibrant shops, and bustling cafes, this apartment showcases contemporary luxury. The open-plan layout enhances the sense of space, featuring a light-filled living area that flows effortlessly between the outdoor balcony and the modern kitchen. The spacious bedroom boasts a built-in wardrobe, complemented by a centr",
       "photo": "",
       "first_seen": "2026-11-18T02:43:55.111239+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -22187,7 +22302,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (10h ago)"
+          "reason": "Discovered in last 24 hours (13h ago)"
         }
       },
       "positive_factors": [
@@ -22252,7 +22367,7 @@
       "description": "This elegant, practical and sophisticated two bedroom apartment offers: -\telegant kitchen with European appliances. -\tprivate balcony -\tmodern fixtures and fittings -\tSplit system for cooling and heating -\tGarage Stacker parking \nAll CONVENIENTLY LOCATED close to transport, retail and education! \nEnjoy parklands with sporting facilities, playgrounds and water features. Study at nearby educational institutions such as Box Hill TAFE. Healthcare centers and even more parklands are all o",
       "photo": "",
       "first_seen": "2026-11-10T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -22316,7 +22431,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (12h ago)"
+          "reason": "Discovered in last 24 hours (15h ago)"
         }
       },
       "positive_factors": [
@@ -22381,7 +22496,7 @@
       "description": "Wonderful brick veneer house backing onto Upwey South Reserve consisting of easy to maintain polished floor boards throughout, 3 bedrooms with built in robes and original main bathroom with separate toilet.\nUpdated Kitchen with stainless steel appliances and dishwasher opening up to a huge undercover entertaining area. Extras including split system in the lounge and ducted heating through-out. Large backyard, single garage/storage shed with enough space for more cars to be parked behind a secu",
       "photo": "",
       "first_seen": "2026-11-18T05:16:22.060866+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -22432,7 +22547,7 @@
         "freshness": {
           "score": 5.0,
           "max": 5,
-          "reason": "Discovered in last 24 hours (8h ago)"
+          "reason": "Discovered in last 24 hours (10h ago)"
         }
       },
       "positive_factors": [
@@ -22497,7 +22612,7 @@
       "description": "*****LEASE BREAK*******\nLEASE UNTIL: 27/04/2027\nRENT: $640 PER WEEK UNTIL 27/04/2027 Set within the Carranballac P-9 College school zone is this lovely home equipped with everything you need for a comfortable living environment. You will get to enjoy radiant spaces over 2 lavish levels whilst being conveniently surrounded by amenities and facilities that will cater your everyday needs. This home comprises of 4 bedrooms - perfect for anybody wanting relaxing space and room for leisure; open pl",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -22962,7 +23077,7 @@
       "description": "BREAK LEASE - Commercial Factory Commercial factory available for lease in Tulip Street, Cheltenham. Lease option December 2028 for a further 5 Years until 2033. \nThis property offers: Near new warehouse with potential to erect a mezzanine office or grow your storage within the warehouse 175sqm of total floor space High clearance, floor to ceiling, container roller doors Container access Two car spaces on title Bathroom Front office Solar Panels Close to gyms, golf course and pool",
       "photo": "",
       "first_seen": "2026-11-10T01:18:05.409421+00:00",
-      "last_seen": "2026-11-18T13:17:10.808461+00:00",
+      "last_seen": "2026-11-18T16:10:57.227394+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
