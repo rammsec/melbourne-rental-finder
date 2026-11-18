@@ -946,10 +946,10 @@
       "lease_transfer": false,
       "available_date": "Dec 2026",
       "lease_duration": null,
-      "description": "Discover a quiet and private sanctuary in the heart of Melbourne\u2019s \"Paris End.\" This fully furnished, 2nd-floor apartment at 39 Lonsdale Street is designed for effortless city living, featuring sleek hard flooring throughout\u2014perfect for those seeking a modern, low-maintenance, and hypoallergenic home. The Residence:\n- Clean & Modern: Hard flooring throughout ensures a stylish look and easy cleaning.\n- Fully Furnished: Move-in ready with a curated furniture package; just bring your suitcase.\n-",
+      "description": "Discover a quiet and private sanctuary in the heart of Melbourne\u2019s \"Paris End.\" This fully furnished, 2nd-floor apartment at 39 Lonsdale Street is designed for effortless city living, featuring sleek hard flooring throughout\u2014perfect for those seeking a modern, low-maintenance, and hypoallergenic home. The Residence:\n- Clean & Modern: tiled flooring throughout ensures a stylish look and easy cleaning.\n- Fully Furnished: Move-in ready with a curated furniture package; just bring your suitcase.\n-",
       "photo": "",
       "first_seen": "2026-11-13T09:00:00+00:00",
-      "last_seen": "2026-11-15T13:29:04.625808+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -1000,7 +1000,7 @@
         "freshness": {
           "score": 2.5,
           "max": 5,
-          "reason": "Listed within the past week (2d ago)"
+          "reason": "Listed within the past week (4d ago)"
         }
       },
       "positive_factors": [
@@ -1630,6 +1630,148 @@
       "listed_at": "2026-11-14T05:45:48.136Z"
     },
     {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345761920",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345761920",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345761920",
+      "title": "810/408 Lonsdale Street, Melbourne, Victoria 3000",
+      "address": "Melbourne CBD, VIC",
+      "suburb": "Melbourne Cbd",
+      "postcode": "3000",
+      "state": "VIC",
+      "property_type": "studio",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 390.0,
+      "furnished": true,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Enjoy the ultimate city lifestyle in this freshly painted, fully furnished studio apartment located at 408 Lonsdale Street, Melbourne. This well-presented studio features a bright open-plan living and bedroom area, a modern kitchen, and a private bathroom. Freshly updated and ready to move in, it offers everything you need for comfortable and convenient inner-city living. Situated just moments from Melbourne Central, RMIT University, public transport, caf\u00e9s, and shopping \u2014 you\u2019ll have the bes",
+      "photo": "",
+      "first_seen": "2026-11-15T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 88.0,
+      "score_version": "2.0",
+      "score_confidence": "high",
+      "sources": [
+        {
+          "id": 179,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345761920",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345761920",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345761920",
+          "raw_title": "810/408 Lonsdale Street, Melbourne, Victoria 3000",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-17T06:40:04.513397+00:00",
+          "last_seen": "2026-11-17T16:41:15.356583+00:00",
+          "is_active": 1
+        },
+        {
+          "id": 180,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345761920",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345756286",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345756286",
+          "raw_title": "810/408 Lonsdale Street, Melbourne, Victoria 3000",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-17T02:40:04.513528+00:00",
+          "last_seen": "2026-11-17T16:41:15.357726+00:00",
+          "is_active": 1
+        },
+        {
+          "id": 181,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345761920",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345728679",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345728679",
+          "raw_title": "810/408 Lonsdale Street, Melbourne, Victoria 3000",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-15T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.362155+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$390/wk is well below the $500/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "Direct Train / Tram 70, 75 to Hawthorn (~12 mins). ~320m to Melbourne Central Station (~4 min walk)"
+        },
+        "property_suitability": {
+          "score": 14.0,
+          "max": 20,
+          "reason": "1-bedroom Studio provides private solo accommodation"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Furnished"
+        },
+        "freshness": {
+          "score": 5.0,
+          "max": 5,
+          "reason": "Discovered in last 24 hours (10h ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $390/wk ($110/wk under budget)",
+        "Short walk to Melbourne Central Station (~320m, 4 min)",
+        "Direct Train / Tram 70, 75 to Hawthorn (~12 min)",
+        "Entire private property (zero housemates)",
+        "1 Bedroom entire place",
+        "Ideal move-in timing (Dec 2026)"
+      ],
+      "potential_concerns": [
+        "No off-street parking confirmed"
+      ],
+      "commute_mode": "Train / Tram 70, 75",
+      "commute_line": "Flinders St / Parliament direct to Hawthorn (12 mins)",
+      "commute_mins": 12,
+      "commute_tier": 1,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Melbourne Central Station",
+      "station_distance_m": 320,
+      "station_walking_mins": 4,
+      "station_distance_display": "~320m to Melbourne Central Station (~4 min walk)",
+      "station_is_explicit": true,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": false,
+      "pass_strict_filter": true,
+      "rejection_reason": null,
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345761920",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345761920",
+      "is_furnished": true,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-15T09:00:00+00:00"
+    },
+    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345728679",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345728679",
@@ -2129,7 +2271,7 @@
       "description": "HOW DO I REGISTER TO INSPECT ? - Instructions available below this ad. - Located on the 9th floor\n- Furnished - No linen provided\n- Functional kitchen with electric cooking appliances\n- Shower over bathtub\n- Wall panel heater fixed to the wall\n- Balcony\n- Communal laundry within in the building Building location within the Paris End of Town.\nA short stroll to all delights Melbourne Theaters, Restaurants & Bars.\nWell positioned with walking distance to the QV Melbourne & tramlines IMPORTANT",
       "photo": "",
       "first_seen": "2026-11-13T09:00:00+00:00",
-      "last_seen": "2026-11-15T13:29:04.625808+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -2180,7 +2322,7 @@
         "freshness": {
           "score": 2.5,
           "max": 5,
-          "reason": "Listed within the past week (2d ago)"
+          "reason": "Listed within the past week (4d ago)"
         }
       },
       "positive_factors": [
@@ -2785,6 +2927,234 @@
       "is_student_only": false,
       "is_sharehouse": false,
       "is_new": false,
+      "pass_strict_filter": true,
+      "rejection_reason": null,
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345743112",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743112",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345763565",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345763565",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345763565",
+      "title": "206/5-7 Dixon Street, Clayton, Victoria 3168",
+      "address": "Clayton, VIC",
+      "suburb": "Clayton",
+      "postcode": "3168",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 550.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "This apartment offers open plan living, two good size bedrooms with BIR'S, hostess kitchen with gas cooking, open plan living, dishwasher, central bathroom with euro style laundry & two split system air conditioners . Clayton provides all facilities and amenities right at your doorstep, including Monash University, Monash Hospital, public transport, parks, schools and restaurants. On site basement parking with bird cage. DON'T MISS OUT INSPECTION WILL IMPRESS!! PLEASE REGISTER TO INSPECT THE P",
+      "photo": "",
+      "first_seen": "2026-11-17T07:41:03.922658+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 86.0,
+      "score_version": "2.0",
+      "score_confidence": "high",
+      "sources": [
+        {
+          "id": 203,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345763565",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345763565",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345763565",
+          "raw_title": "206/5-7 Dixon Street, Clayton, Victoria 3168",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-17T07:41:03.922658+00:00",
+          "last_seen": "2026-11-17T16:41:15.384196+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 20.8,
+          "max": 25,
+          "reason": "$550/wk is within target budget ($560/wk)"
+        },
+        "commute_convenience": {
+          "score": 20.0,
+          "max": 25,
+          "reason": "Direct Train (Pakenham/Cranbourne Line) to Hawthorn (~26 mins). ~140m to Clayton Station (2 min walk)"
+        },
+        "property_suitability": {
+          "score": 20.0,
+          "max": 20,
+          "reason": "2-bedroom Apartment perfectly matches preferred solo space requirement"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 5.0,
+          "max": 10,
+          "reason": "Parking included, Unfurnished, Modern features"
+        },
+        "freshness": {
+          "score": 5.0,
+          "max": 5,
+          "reason": "Discovered in last 24 hours (9h ago)"
+        }
+      },
+      "positive_factors": [
+        "Comfortably within budget ($550/wk)",
+        "Short walk to Clayton Station (~140m, 2 min)",
+        "Direct Train (Pakenham/Cranbourne Line) to Hawthorn (~26 min)",
+        "Entire private property (zero housemates)",
+        "2 Bedrooms (Preferred layout)",
+        "Ideal move-in timing (Dec 2026)"
+      ],
+      "potential_concerns": [],
+      "commute_mode": "Train (Pakenham/Cranbourne Line)",
+      "commute_line": "Express to Richmond (18m) + 1-stop to Hawthorn (4m)",
+      "commute_mins": 26,
+      "commute_tier": 2,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Clayton Station",
+      "station_distance_m": 140,
+      "station_walking_mins": 2,
+      "station_distance_display": "~140m to Clayton Station (2 min walk)",
+      "station_is_explicit": true,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
+      "pass_strict_filter": true,
+      "rejection_reason": null,
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345763565",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345763565",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-17T07:41:03.922658+00:00"
+    },
+    {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345743112",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345743112",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743112",
+      "title": "13/60 Harp Rd, Kew, Victoria 3101",
+      "address": "Kew, VIC",
+      "suburb": "Kew",
+      "postcode": "3101",
+      "state": "VIC",
+      "property_type": "unit",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 550.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Welcome to 13/60 Harp Road, Kew! Where luxury meets convenience, this stunning apartment is set to the very rear of a stunning contemporary complex soaking up the sublime sense of space and tranquility. Situated in the prestigious suburb of kew, renowned for its leafy streets and vibrant community atmosphere. See below for property features:\n- Spacious living\n- Two bedrooms with built in wardrobes\n- Main bathroom with bath\n- European laundry\n- Split system\n- Secure basement parking Experienc",
+      "photo": "",
+      "first_seen": "2026-11-16T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 86.0,
+      "score_version": "2.0",
+      "score_confidence": "medium",
+      "sources": [
+        {
+          "id": 205,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345743112",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345743112",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743112",
+          "raw_title": "13/60 Harp Rd, Kew, Victoria 3101",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.390896+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 20.8,
+          "max": 25,
+          "reason": "$550/wk is within target budget ($560/wk)"
+        },
+        "commute_convenience": {
+          "score": 23.0,
+          "max": 25,
+          "reason": "Direct Tram 16 / Bus 609 to Hawthorn (~8 mins). ~920m to Glenferrie Station (via Tram 16) (~12 min walk)"
+        },
+        "property_suitability": {
+          "score": 20.0,
+          "max": 20,
+          "reason": "2-bedroom Unit perfectly matches preferred solo space requirement"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Parking included, Unfurnished"
+        },
+        "freshness": {
+          "score": 4.0,
+          "max": 5,
+          "reason": "Discovered in last 48 hours (1d ago)"
+        }
+      },
+      "positive_factors": [
+        "Comfortably within budget ($550/wk)",
+        "Direct Tram 16 / Bus 609 to Hawthorn (~8 min)",
+        "Entire private property (zero housemates)",
+        "2 Bedrooms (Preferred layout)",
+        "Ideal move-in timing (Dec 2026)",
+        "Dedicated parking space"
+      ],
+      "potential_concerns": [],
+      "commute_mode": "Tram 16 / Bus 609",
+      "commute_line": "Direct Tram 16 (Glenferrie Rd) & Bus 609 to Hawthorn",
+      "commute_mins": 8,
+      "commute_tier": 1,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Glenferrie Station (via Tram 16)",
+      "station_distance_m": 920,
+      "station_walking_mins": 12,
+      "station_distance_display": "~920m to Glenferrie Station (via Tram 16) (~12 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
       "pass_strict_filter": true,
       "rejection_reason": null,
       "rejection_reasons": [],
@@ -4244,6 +4614,122 @@
       "is_under_600": true,
       "is_entire_property": true,
       "listed_at": "2026-11-12T09:00:00+00:00"
+    },
+    {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345767493",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345767493",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345767493",
+      "title": "2/23 Shasta Avenue, Ringwood East, Victoria 3135",
+      "address": "Ringwood East, VIC",
+      "suburb": "Ringwood East",
+      "postcode": "3135",
+      "state": "VIC",
+      "property_type": "unit",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 335.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Sitting in a tree lined street in the heart of Ringwood East is this charming two bedroom unit. Boasting spacious and light filled interiors throughout, this home offers an inviting blend of comfort, space and convenience. Enjoy the ease of being just moments from Ringwood Private Hospital, Eastern Health, Eastland shopping and dining precinct, Ringwood Lake Park and East Ringwood Train Station for an easy commute to Melbourne's CBD and surrounds. Other features include:\n-Gas ducted heating",
+      "photo": "",
+      "first_seen": "2026-11-17T11:40:31.449761+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 79.0,
+      "score_version": "2.0",
+      "score_confidence": "medium",
+      "sources": [
+        {
+          "id": 195,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345767493",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345767493",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345767493",
+          "raw_title": "2/23 Shasta Avenue, Ringwood East, Victoria 3135",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-17T11:40:31.449761+00:00",
+          "last_seen": "2026-11-17T16:41:15.373396+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$335/wk is well below the $560/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 14.0,
+          "max": 25,
+          "reason": "Direct Train to Hawthorn (~32 mins). ~740m to Ringwood East Station (~9 min walk)"
+        },
+        "property_suitability": {
+          "score": 20.0,
+          "max": 20,
+          "reason": "2-bedroom Unit perfectly matches preferred solo space requirement"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 0.0,
+          "max": 10,
+          "reason": "Unfurnished"
+        },
+        "freshness": {
+          "score": 5.0,
+          "max": 5,
+          "reason": "Discovered in last 24 hours (5h ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $335/wk ($225/wk under budget)",
+        "Convenient station access (~740m to Ringwood East Station)",
+        "Direct Train to Hawthorn (~32 min)",
+        "Entire private property (zero housemates)",
+        "2 Bedrooms (Preferred layout)",
+        "Ideal move-in timing (Dec 2026)"
+      ],
+      "potential_concerns": [
+        "No off-street parking confirmed"
+      ],
+      "commute_mode": "Train",
+      "commute_line": "Lilydale Line (direct to Hawthorn)",
+      "commute_mins": 32,
+      "commute_tier": 3,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Ringwood East Station",
+      "station_distance_m": 740,
+      "station_walking_mins": 9,
+      "station_distance_display": "~740m to Ringwood East Station (~9 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
+      "pass_strict_filter": true,
+      "rejection_reason": null,
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345767493",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345767493",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-17T11:40:31.449761+00:00"
     },
     {
       "property_id": "prop_gumtreemelbourne_gumtree-1345615535",
@@ -6735,6 +7221,122 @@
       "listed_at": "2026-11-06T09:00:00+00:00"
     },
     {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345744734",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345744734",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345744734",
+      "title": "50 Western Road, Boronia, Victoria 3155",
+      "address": "Boronia, VIC",
+      "suburb": "Boronia",
+      "postcode": "3155",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 330.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "This classic 1 bedroom, 1 bathroom abode is overflowing with charm and character. Enjoying wooden flooring throughout, open lounge with split system, built-in storage and loads of natural light, dining and retro kitchen with classic tiling, timber trim and electric stovetop, bedroom has BIRs and floating vanity and adjoining ensuite is equipped with all you'd require. The laundry has washing machine provided and the extensive yard space is shared and provides wonderful vistas and beautiful sens",
+      "photo": "",
+      "first_seen": "2026-11-16T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 71.0,
+      "score_version": "2.0",
+      "score_confidence": "medium",
+      "sources": [
+        {
+          "id": 200,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345744734",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345744734",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345744734",
+          "raw_title": "50 Western Road, Boronia, Victoria 3155",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.380291+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$330/wk is well below the $400/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 13.0,
+          "max": 25,
+          "reason": "Direct Train to Hawthorn (~38 mins). ~960m to Boronia Station (~12 min walk)"
+        },
+        "property_suitability": {
+          "score": 14.0,
+          "max": 20,
+          "reason": "1-bedroom Apartment provides private solo accommodation"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 0.0,
+          "max": 10,
+          "reason": "Unfurnished"
+        },
+        "freshness": {
+          "score": 4.0,
+          "max": 5,
+          "reason": "Discovered in last 48 hours (1d ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $330/wk ($70/wk under budget)",
+        "Direct Train to Hawthorn (~38 min)",
+        "Entire private property (zero housemates)",
+        "1 Bedroom entire place",
+        "Ideal move-in timing (Dec 2026)",
+        "Recently posted listing (<48h)"
+      ],
+      "potential_concerns": [
+        "No off-street parking confirmed"
+      ],
+      "commute_mode": "Train",
+      "commute_line": "Belgrave Line (direct to Hawthorn)",
+      "commute_mins": 38,
+      "commute_tier": 3,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Boronia Station",
+      "station_distance_m": 960,
+      "station_walking_mins": 12,
+      "station_distance_display": "~960m to Boronia Station (~12 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
+      "pass_strict_filter": true,
+      "rejection_reason": null,
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345744734",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345744734",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
       "property_id": "prop_flatmateswholeproperty_flatmates-2043905",
       "source": "Flatmates (Whole Property)",
       "source_listing_id": "flatmates-2043905",
@@ -6849,6 +7451,122 @@
       "is_under_600": true,
       "is_entire_property": true,
       "listed_at": "2026-11-01T06:56:09.420Z"
+    },
+    {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345743275",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345743275",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743275",
+      "title": "1/21 Grnja Way, Carrum Downs, Victoria 3201",
+      "address": "Carrum Downs, VIC",
+      "suburb": "Carrum Downs",
+      "postcode": "",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "parking": 0,
+      "weekly_rent": 540.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Set adjacent a tranquil nature reserve, Carrum Park Estate is an inspired architectural expression of open-plan living. Here you will find the perfect environment in which to relax, expand your horizons, and build the life you've dreamed of. \nIncluding stylish two apartments fitted with high quality fixtures and internal finishes, Carrum Park Estate provides an easy living lifestyle with a premium feel. \nEach apartment features: \n- secure parking - open, light filled living spaces - spa",
+      "photo": "",
+      "first_seen": "2026-11-16T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 69.0,
+      "score_version": "2.0",
+      "score_confidence": "low",
+      "sources": [
+        {
+          "id": 188,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345743275",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345743275",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743275",
+          "raw_title": "1/21 Grnja Way, Carrum Downs, Victoria 3201",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.360008+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 21.6,
+          "max": 25,
+          "reason": "$540/wk is within target budget ($560/wk)"
+        },
+        "commute_convenience": {
+          "score": 5.0,
+          "max": 25,
+          "reason": "Indirect transit from Carrum Downs (transfer required to reach Hawthorn)"
+        },
+        "property_suitability": {
+          "score": 20.0,
+          "max": 20,
+          "reason": "2-bedroom Apartment perfectly matches preferred solo space requirement"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Parking included, Unfurnished"
+        },
+        "freshness": {
+          "score": 4.0,
+          "max": 5,
+          "reason": "Discovered in last 48 hours (1d ago)"
+        }
+      },
+      "positive_factors": [
+        "Comfortably within budget ($540/wk)",
+        "Entire private property (zero housemates)",
+        "2 Bedrooms (Preferred layout)",
+        "Ideal move-in timing (Dec 2026)",
+        "Dedicated parking space",
+        "Recently posted listing (<48h)"
+      ],
+      "potential_concerns": [
+        "No direct train or tram to Hawthorn from Carrum Downs"
+      ],
+      "commute_mode": "Indirect / Transfer required",
+      "commute_line": "Requires interchange to reach Hawthorn",
+      "commute_mins": 45,
+      "commute_tier": 4,
+      "has_direct_hawthorn_transit": false,
+      "station_name": "Carrum Downs Station",
+      "station_distance_m": 760,
+      "station_walking_mins": 10,
+      "station_distance_display": "~760m to Carrum Downs Station (~10 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
+      "pass_strict_filter": false,
+      "rejection_reason": "No direct train/tram to Hawthorn",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345743275",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743275",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-16T09:00:00+00:00"
     },
     {
       "property_id": "prop_gumtreemelbourne_gumtree-1345536259",
@@ -10242,7 +10960,7 @@
       "description": "Our home is a happy well built house situated in a safe; clean and classic suburban neighbourhood.\r\n\r\nAll the basic necessities are provided from showers; toilets; kitchen to lounge room and dining area; dishwasher and washing machine.\r\n\r\nNo matter the weather you will feel peace of mind with the cooling breeze of the air conditioning or the warming air of the heater.\r\n\r\nThere is no need to worry about the lawn as we have a mower man to take care of that. Please do feel free to tend to the garden though!\r\n\r\nOut the back we have a basketball ring; cubby house; flowers galore and a nice view of the park surrounding the property. You can get active with a good selection of sports balls; bicycles and even an Electric scooter and bike!\r\n\r\nFor all those gym lovers or those wanting to get fit, you\u2019ll be well at home with the free usage of weights and gym equipment that we have.\r\n\r\nOn those cold winter nights, a fireplace will certainly do the trick for those shivers and colds as there is plenty of firewood available.\r\n\r\nIt is book/dvd bonanza at this place - so you will be easily entertained. We even have a drum kit; bbq; deck and outside dining area; guitar and a porch to put your feet up and relax!\r\n\r\nAs mentioned, it is furnished and complete with four bedrooms.\r\n\r\nLast but not least is that the land is located right next to a vacant lot and park wonderfully adorned with the best of natures gifts - wildlife; plants and lots of green luscious grass!\ninc. bills",
       "photo": "https://flatmates-res.cloudinary.com/image/upload/c_fill,dpr_2.0,f_auto,h_342,q_auto,w_414/v1/user_property/mulqatakoxfvpqahi5f3",
       "first_seen": "2026-11-08T12:35:35.567Z",
-      "last_seen": "2026-11-15T13:29:04.625808+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -10293,7 +11011,7 @@
         "freshness": {
           "score": 1.0,
           "max": 5,
-          "reason": "Listed 7 days ago"
+          "reason": "Listed 9 days ago"
         }
       },
       "positive_factors": [
@@ -10569,6 +11287,123 @@
       "listed_at": "2026-11-15T03:13:33.244Z"
     },
     {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345741219",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345741219",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345741219",
+      "title": "FURNISHED ROOM for RENT in Melbourne CBD Apartment",
+      "address": "Carlton, VIC",
+      "suburb": "Carlton",
+      "postcode": "3053",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 320.0,
+      "furnished": true,
+      "property_entire": false,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Step into this beautifully positioned 2-bedroom apartment(Only one room is available)located in the heart of Carlton, surrounded by Melbourne's best education, lifestyle, and transport options. Perfect for students and non-students, this home delivers ultimate convenience with RMIT, Melbourne University, Logon Street, and the CBD all within easy reach.",
+      "photo": "",
+      "first_seen": "2026-11-16T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 0.0,
+      "score_version": "2.0",
+      "score_confidence": "medium",
+      "sources": [
+        {
+          "id": 189,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345741219",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345741219",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345741219",
+          "raw_title": "FURNISHED ROOM for RENT in Melbourne CBD Apartment",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.360420+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$320/wk is well below the $500/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 20.0,
+          "max": 25,
+          "reason": "Direct Tram 16 / Bus 200+609 to Hawthorn (~25 mins). ~350m to Melbourne Central Station (~4 min walk)"
+        },
+        "property_suitability": {
+          "score": 14.0,
+          "max": 20,
+          "reason": "1-bedroom Apartment provides private solo accommodation"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Furnished"
+        },
+        "freshness": {
+          "score": 4.0,
+          "max": 5,
+          "reason": "Discovered in last 48 hours (1d ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $320/wk ($180/wk under budget)",
+        "Short walk to Melbourne Central Station (~350m, 4 min)",
+        "Direct Tram 16 / Bus 200+609 to Hawthorn (~25 min)",
+        "1 Bedroom entire place",
+        "Ideal move-in timing (Dec 2026)",
+        "Furnished interior"
+      ],
+      "potential_concerns": [
+        "Not an entire property",
+        "No off-street parking confirmed"
+      ],
+      "commute_mode": "Tram 16 / Bus 200+609",
+      "commute_line": "Melbourne Uni Tram 16 direct to Hawthorn (Glenferrie)",
+      "commute_mins": 25,
+      "commute_tier": 2,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Melbourne Central Station",
+      "station_distance_m": 350,
+      "station_walking_mins": 4,
+      "station_distance_display": "~350m to Melbourne Central Station (~4 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": true,
+      "is_new": true,
+      "pass_strict_filter": false,
+      "rejection_reason": "Sharehouse or individual room (solo entire place required)",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345741219",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345741219",
+      "is_furnished": true,
+      "is_lease_transfer": false,
+      "is_normal_listing": false,
+      "is_under_600": true,
+      "is_entire_property": false,
+      "listed_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
       "property_id": "prop_flatmateswholeproperty_flatmates-2050753",
       "source": "Flatmates (Whole Property)",
       "source_listing_id": "flatmates-2050753",
@@ -10685,6 +11520,123 @@
       "listed_at": "2026-11-14T13:14:12.589Z"
     },
     {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345746739",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345746739",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345746739",
+      "title": "Luxurious caravan parked undercover in Clayton South",
+      "address": "Clayton South, VIC",
+      "suburb": "Clayton South",
+      "postcode": "3169",
+      "state": "VIC",
+      "property_type": "house",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 380.0,
+      "furnished": true,
+      "property_entire": false,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Located in Clayton South, opposite the biggest park, Kelly Park, this caravan is parked undercover. 27 feet long, very well furnished, this newly furbished caravan has its own independent bathroom and kitchen. A double bed along with a TV music system, fridge and microwave makes it a conplete home. The caravan has its own separate entrance and a small garden. Laundary is shared but is on the patio so accessible without entering the main house. Housemates in the home are young students who a",
+      "photo": "",
+      "first_seen": "2026-11-16T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 0.0,
+      "score_version": "2.0",
+      "score_confidence": "medium",
+      "sources": [
+        {
+          "id": 204,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345746739",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345746739",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345746739",
+          "raw_title": "Luxurious caravan parked undercover in Clayton South",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.386252+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "$380/wk is well below the $500/wk target (superb value)"
+        },
+        "commute_convenience": {
+          "score": 18.0,
+          "max": 25,
+          "reason": "Direct Train via Richmond to Hawthorn (~29 mins). ~950m to Clayton Station (~12 min walk)"
+        },
+        "property_suitability": {
+          "score": 14.0,
+          "max": 20,
+          "reason": "1-bedroom House provides private solo accommodation"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 3.5,
+          "max": 10,
+          "reason": "Furnished"
+        },
+        "freshness": {
+          "score": 4.0,
+          "max": 5,
+          "reason": "Discovered in last 48 hours (1d ago)"
+        }
+      },
+      "positive_factors": [
+        "Exceptional value at $380/wk ($120/wk under budget)",
+        "Direct Train via Richmond to Hawthorn (~29 min)",
+        "1 Bedroom entire place",
+        "Ideal move-in timing (Dec 2026)",
+        "Furnished interior",
+        "Recently posted listing (<48h)"
+      ],
+      "potential_concerns": [
+        "Not an entire property",
+        "No off-street parking confirmed"
+      ],
+      "commute_mode": "Train via Richmond",
+      "commute_line": "Clayton Station / Westall corridor to Hawthorn",
+      "commute_mins": 29,
+      "commute_tier": 2,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Clayton Station",
+      "station_distance_m": 950,
+      "station_walking_mins": 12,
+      "station_distance_display": "~950m to Clayton Station (~12 min walk)",
+      "station_is_explicit": false,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": true,
+      "is_new": true,
+      "pass_strict_filter": false,
+      "rejection_reason": "Sharehouse or individual room (solo entire place required)",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345746739",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345746739",
+      "is_furnished": true,
+      "is_lease_transfer": false,
+      "is_normal_listing": false,
+      "is_under_600": true,
+      "is_entire_property": false,
+      "listed_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345653550",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345653550",
@@ -10707,7 +11659,7 @@
       "description": "Welcome to the stylish studio apartment located at 105/32 Bray Street, SOUTH YARRA. This stunning apartment is a great opportunity to live in coveted South Yarra location. With a sleek and stylish design, the apartment features a contemporary kitchen with stone bench tops and stainless-steel appliances. The modern bathroom and European laundry offer convenience and comfort.\nThe bedroom can have some privacy from the living spaces due to the wonderful design of a stylish curtain. A pull down mu",
       "photo": "",
       "first_seen": "2026-11-11T09:00:00+00:00",
-      "last_seen": "2026-11-15T13:29:04.625808+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -10758,7 +11710,7 @@
         "freshness": {
           "score": 2.5,
           "max": 5,
-          "reason": "Listed within the past week (4d ago)"
+          "reason": "Listed within the past week (6d ago)"
         }
       },
       "positive_factors": [
@@ -14939,6 +15891,136 @@
       "listed_at": "2026-11-16T09:00:00+00:00"
     },
     {
+      "property_id": "prop_gumtreemelbourne_gumtree-1345743706",
+      "source": "Gumtree Melbourne",
+      "source_listing_id": "gumtree-1345743706",
+      "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743706",
+      "title": "304/311 Burwood Road, Hawthorn, Victoria 3122",
+      "address": "Hawthorn, VIC",
+      "suburb": "Hawthorn",
+      "postcode": "3122",
+      "state": "VIC",
+      "property_type": "apartment",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "parking": 0,
+      "weekly_rent": 560.0,
+      "furnished": false,
+      "property_entire": true,
+      "lease_transfer": false,
+      "available_date": "Dec 2026",
+      "lease_duration": null,
+      "description": "Perfectly positioned in one of Hawthorn's most convenient locations, this stylish contemporary apartment offers an exceptional combination of modern comfort, natural light and low-maintenance living. Featuring a light-filled living area with floor-to-ceiling windows, a sleek modern kitchen and a private balcony, this well-presented residence is ideal for professionals, couples or anyone seeking an inner-city lifestyle. Conveniently located close to Glenferrie Road's vibrant shopping and dinin",
+      "photo": "",
+      "first_seen": "2026-11-16T09:00:00+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
+      "last_verified": null,
+      "listing_status": "active",
+      "verification_status": "unverified",
+      "match_score": 0.0,
+      "score_version": "2.0",
+      "score_confidence": "high",
+      "sources": [
+        {
+          "id": 192,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345743706",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345743706",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743706",
+          "raw_title": "304/311 Burwood Road, Hawthorn, Victoria 3122",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.368229+00:00",
+          "is_active": 1
+        },
+        {
+          "id": 193,
+          "property_id": "prop_gumtreemelbourne_gumtree-1345743706",
+          "source_name": "Gumtree Melbourne",
+          "source_listing_id": "gumtree-1345737534",
+          "source_url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345737534",
+          "raw_title": "304/311 Burwood Road, Hawthorn, Victoria 3122",
+          "raw_price_text": "",
+          "raw_description": "",
+          "first_seen": "2026-11-16T09:00:00+00:00",
+          "last_seen": "2026-11-17T16:41:15.368834+00:00",
+          "is_active": 1
+        }
+      ],
+      "score_breakdown": {
+        "rent_affordability": {
+          "score": 10.0,
+          "max": 25,
+          "reason": "$560/wk is slightly above $400/wk target but under $600/wk ceiling"
+        },
+        "commute_convenience": {
+          "score": 25.0,
+          "max": 25,
+          "reason": "Direct Train / Tram 70, 75, 16 to Hawthorn (~2 mins). ~300m to Hawthorn / Glenferrie Station (~4 min walk)"
+        },
+        "property_suitability": {
+          "score": 14.0,
+          "max": 20,
+          "reason": "1-bedroom Apartment provides private solo accommodation"
+        },
+        "move_in_timing": {
+          "score": 15.0,
+          "max": 15,
+          "reason": "Available Dec 2026, perfectly within Dec 5 \u2013 Jan 15 window"
+        },
+        "amenities": {
+          "score": 1.5,
+          "max": 10,
+          "reason": "Unfurnished, Modern features"
+        },
+        "freshness": {
+          "score": 4.0,
+          "max": 5,
+          "reason": "Discovered in last 48 hours (1d ago)"
+        }
+      },
+      "positive_factors": [
+        "Short walk to Hawthorn / Glenferrie Station (~300m, 4 min)",
+        "Direct Train / Tram 70, 75, 16 to Hawthorn (~2 min)",
+        "Entire private property (zero housemates)",
+        "1 Bedroom entire place",
+        "Ideal move-in timing (Dec 2026)",
+        "Recently posted listing (<48h)"
+      ],
+      "potential_concerns": [
+        "Weekly rent of $560 exceeds target of $400/wk",
+        "No off-street parking confirmed"
+      ],
+      "commute_mode": "Train / Tram 70, 75, 16",
+      "commute_line": "Belgrave/Lilydale/Alamein Line + Tram 70/75/16",
+      "commute_mins": 2,
+      "commute_tier": 1,
+      "has_direct_hawthorn_transit": true,
+      "station_name": "Hawthorn / Glenferrie Station",
+      "station_distance_m": 300,
+      "station_walking_mins": 4,
+      "station_distance_display": "~300m to Hawthorn / Glenferrie Station (~4 min walk)",
+      "station_is_explicit": true,
+      "availability_display": "Dec 2026",
+      "availability_fit": "ideal",
+      "is_student_only": false,
+      "is_sharehouse": false,
+      "is_new": true,
+      "pass_strict_filter": false,
+      "rejection_reason": "Over budget: rental price ($560/wk) exceeds cap ($400/wk for 1BHK unfurnished)",
+      "rejection_reasons": [],
+      "raw_metadata": {},
+      "id": "prop_gumtreemelbourne_gumtree-1345743706",
+      "url": "https://www.gumtree.com.au/web/listing/property-for-rent/1345743706",
+      "is_furnished": false,
+      "is_lease_transfer": false,
+      "is_normal_listing": true,
+      "is_under_600": true,
+      "is_entire_property": true,
+      "listed_at": "2026-11-16T09:00:00+00:00"
+    },
+    {
       "property_id": "prop_gumtreemelbourne_gumtree-1345510839",
       "source": "Gumtree Melbourne",
       "source_listing_id": "gumtree-1345510839",
@@ -15426,7 +16508,7 @@
       "description": "This cosy two-bedroom home has a feature we can all appreciate; a low maintenance lifestyle.\nWith its own street frontage in the sought-after Forest Gardens precinct, within 6-minute walk to Forest Hill Chase Shopping Centre, cafes, restaurants, cinema and more\nOffering two bedrooms, both with robes, main bathroom with bath and separate toilet, living/dining and renovated kitchen. Other features\n- Well-presented kitchen\n- Dishwasher\n- Split system offering heating and cooling\n- Gas wall furnac",
       "photo": "",
       "first_seen": "2026-11-12T09:00:00+00:00",
-      "last_seen": "2026-11-15T13:29:04.625808+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -15477,7 +16559,7 @@
         "freshness": {
           "score": 2.5,
           "max": 5,
-          "reason": "Listed within the past week (3d ago)"
+          "reason": "Listed within the past week (5d ago)"
         }
       },
       "positive_factors": [
@@ -16380,7 +17462,7 @@
       "description": "In a beautifully designed building just around the corner from central Clayton, The Links shopping centre, Huntingdale and Clayton train stations, golf courses and Monash Medical Centre, this beautiful apartment focuses on a relaxed lifestyle in a highly sought after locale. This property features: - Kitchen with ample cupboard space and gas cooking\n- 2 oversized bedrooms with Built in Robes\n- 1 bathroom\n- European laundry\n- Split system heating and cooling\n- Private balcony\n- Intercom securi",
       "photo": "",
       "first_seen": "2026-11-09T09:00:00+00:00",
-      "last_seen": "2026-11-15T13:29:04.625808+00:00",
+      "last_seen": "2026-11-17T16:41:15.407981+00:00",
       "last_verified": null,
       "listing_status": "active",
       "verification_status": "unverified",
@@ -16429,9 +17511,9 @@
           "reason": "Unfurnished, Modern features"
         },
         "freshness": {
-          "score": 2.5,
+          "score": 1.0,
           "max": 5,
-          "reason": "Listed within the past week (6d ago)"
+          "reason": "Listed 8 days ago"
         }
       },
       "positive_factors": [
@@ -17472,7 +18554,7 @@
       "lease_transfer": true,
       "available_date": "Dec 2026",
       "lease_duration": null,
-      "description": "Positioned in a quiet and family-friendly pocket of Clyde North, this beautifully presented single-storey home offers space, functionality and effortless living. Property Features: 4 generously sized bedrooms with built-in robes\nMaster bedroom with private ensuite and ample wardrobe space\n2 modern bathrooms\nDouble remote-control garage with internal access\nLight-filled open plan living and dining area with loads of natural light\nSeparate second living area / formal lounge \u2013 ideal as a theatre",
+      "description": "Lease transfer available in Clyde north\n4 bedrooms, 2 bathrooms\nAll amenities near by\nMessage for more information",
       "photo": "",
       "first_seen": "2026-11-05T09:00:00+00:00",
       "last_seen": "2026-11-18T12:44:41.382402+00:00",
