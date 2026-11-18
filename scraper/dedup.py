@@ -63,6 +63,23 @@ def compute_text_similarity(s1: str, s2: str) -> float:
     return 0.6 * jaccard + 0.4 * seq
 
 
+def _strip_suburb_state_postcode(norm_addr: str, suburb: str, postcode: str) -> str:
+    """Strip trailing suburb, state, and postcode tokens from a normalized address for street comparison."""
+    if not norm_addr:
+        return ""
+    cleaned = norm_addr
+    if postcode:
+        cleaned = re.sub(rf"\b{re.escape(postcode.lower().strip())}\b", " ", cleaned)
+    cleaned = re.sub(r"\b(?:vic|victoria)\b", " ", cleaned)
+    if suburb:
+        sub_low = suburb.lower().strip()
+        if sub_low and cleaned.endswith(sub_low):
+            cleaned = cleaned[: -len(sub_low)]
+        elif sub_low:
+            cleaned = re.sub(rf"\b{re.escape(sub_low)}\s*$", " ", cleaned)
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
 def calculate_match_confidence(p1: Property, p2: Property) -> Tuple[float, List[str]]:
     """
     Evaluate similarity between two properties across multiple dimensions:
@@ -87,14 +104,19 @@ def calculate_match_confidence(p1: Property, p2: Property) -> Tuple[float, List[
     # 2. Address matching
     addr1 = normalize_address(p1.address)
     addr2 = normalize_address(p2.address)
+    street1 = _strip_suburb_state_postcode(addr1, sub1, p1.postcode)
+    street2 = _strip_suburb_state_postcode(addr2, sub2, p2.postcode)
     address_matched = False
 
     if addr1 and addr2:
-        if addr1 == addr2:
+        if addr1 == addr2 or (street1 and street2 and street1 == street2):
             confidence += 0.45
             reasons.append("Exact street address match")
             address_matched = True
-        elif difflib.SequenceMatcher(None, addr1, addr2).ratio() > 0.8:
+        elif (
+            difflib.SequenceMatcher(None, addr1, addr2).ratio() > 0.8
+            or (street1 and street2 and difflib.SequenceMatcher(None, street1, street2).ratio() > 0.82)
+        ):
             confidence += 0.35
             reasons.append("High address similarity")
             address_matched = True
@@ -159,41 +181,94 @@ def calculate_match_confidence(p1: Property, p2: Property) -> Tuple[float, List[
 def merge_properties(primary: Property, secondary: Property) -> Property:
     """
     Merge secondary property details into primary property record,
-    preserving all source URLs and highest-quality data.
+    preserving all source URLs, source_provenance entries, and highest-quality data.
     """
     # Ensure primary itself is in primary.sources
     if not primary.sources:
         primary.sources = [{
             "source_name": primary.source,
+            "source": primary.source,
             "source_listing_id": primary.source_listing_id,
             "source_url": primary.source_url,
+            "url": primary.source_url,
+            "agency_office": primary.agency_office,
+            "discovered_at": primary.first_seen,
             "first_seen": primary.first_seen,
             "last_seen": primary.last_seen,
             "is_active": True,
         }]
 
     existing_source_urls = {s.get("source_url") or s.get("url") for s in primary.sources}
-    
-    # Add secondary sources
-    for s in secondary.sources:
+
+    # Add secondary sources and source_provenance
+    secondary_entries = list(secondary.source_provenance or []) + list(secondary.sources or [])
+    for s in secondary_entries:
         s_url = s.get("source_url") or s.get("url")
         if s_url and s_url not in existing_source_urls:
-            primary.sources.append(s)
+            s_name = s.get("source_name") or s.get("source") or secondary.source
+            s_id = str(s.get("source_listing_id") or s.get("id") or secondary.source_listing_id or "")
+            s_office = s.get("agency_office") or secondary.agency_office or ""
+            s_disc = s.get("discovered_at") or s.get("first_seen") or secondary.first_seen
+            s_last = s.get("last_seen") or secondary.last_seen
+            entry = {
+                "source_name": s_name,
+                "source": s_name,
+                "source_listing_id": s_id,
+                "source_url": s_url,
+                "url": s_url,
+                "agency_office": s_office,
+                "discovered_at": s_disc,
+                "first_seen": s_disc,
+                "last_seen": s_last,
+                "is_active": bool(s.get("is_active", True)),
+            }
+            primary.sources.append(entry)
             existing_source_urls.add(s_url)
 
-    if secondary.source_url not in existing_source_urls:
+    if secondary.source_url and secondary.source_url not in existing_source_urls:
         primary.sources.append({
             "source_name": secondary.source,
+            "source": secondary.source,
             "source_listing_id": secondary.source_listing_id,
             "source_url": secondary.source_url,
+            "url": secondary.source_url,
+            "agency_office": secondary.agency_office,
+            "discovered_at": secondary.first_seen,
             "first_seen": secondary.first_seen,
             "last_seen": secondary.last_seen,
             "is_active": True,
         })
+        existing_source_urls.add(secondary.source_url)
+
+    primary.source_provenance = [dict(s) for s in primary.sources]
 
     # Pick the most complete address
     if not primary.address and secondary.address:
         primary.address = secondary.address
+
+    # Merge agency office if missing on primary
+    if not primary.agency_office and secondary.agency_office:
+        primary.agency_office = secondary.agency_office
+
+    # Merge images and photo
+    if not primary.photo and secondary.photo:
+        primary.photo = secondary.photo
+    existing_images = set(primary.images)
+    for img in secondary.images:
+        if img and img not in existing_images:
+            primary.images.append(img)
+            existing_images.add(img)
+
+    # Merge inspection times
+    existing_inspections = set(primary.inspection_times)
+    for insp in secondary.inspection_times:
+        if insp and insp not in existing_inspections:
+            primary.inspection_times.append(insp)
+            existing_inspections.add(insp)
+
+    # Merge available_date if missing
+    if not primary.available_date and secondary.available_date:
+        primary.available_date = secondary.available_date
 
     # Pick earliest first_seen and latest last_seen
     if secondary.first_seen < primary.first_seen:

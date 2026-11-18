@@ -34,6 +34,7 @@ from .sources import (
     scrape_flatmates_whole_properties,
     scrape_reddit_lease_transfers,
     scrape_facebook_marketplace_aligned,
+    collect_all_agency_sources,
     get_listing_age_days,
     is_outside_melbourne,
 )
@@ -89,6 +90,36 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
             "category": "Realestate.com.au (Live)",
             "url": "https://www.realestate.com.au/rent/with-2-bedrooms-between-0-560-in-hawthorn,+vic+3122%3b+hawthorn+east,+vic+3123%3b+camberwell,+vic+3124%3b+box+hill,+vic+3128%3b+mitcham,+vic+3132%3b+ringwood,+vic+3134%3b+bayswater,+vic+3153%3b+boronia,+vic+3155/list-1?activeSort=list-date&includeSurrounding=false",
             "note": "Exact suburb matches on the Belgrave & Lilydale lines.",
+        },
+        {
+            "name": "Barry Plant: Official Victorian Rental Directory",
+            "category": "Direct Agency (Live)",
+            "url": "https://www.barryplant.com.au/rental-properties/properties-rent/",
+            "note": "Direct agency listings from Barry Plant offices across Whitehorse, Boroondara, Maroondah & Melbourne.",
+        },
+        {
+            "name": "Ray White: Victorian Rental Search",
+            "category": "Direct Agency (Live)",
+            "url": "https://www.raywhite.com/listing",
+            "note": "Direct agency listings from Ray White offices across Melbourne & Eastern corridor.",
+        },
+        {
+            "name": "Nelson Alexander: Properties for Lease",
+            "category": "Direct Agency (Live)",
+            "url": "https://www.nelsonalexander.com.au/rent/properties-for-lease/",
+            "note": "Direct agency rentals across Hawthorn, Kew, Richmond, Fitzroy & Inner Melbourne.",
+        },
+        {
+            "name": "Jellis Craig: Inner-East & Whitehorse Rentals (≤$625/wk)",
+            "category": "Direct Agency (Live)",
+            "url": "https://www.jelliscraig.com.au/rent/list?suburb=Hawthorn;Hawthorn%20East;Richmond;Camberwell;Kew;Surrey%20Hills;Box%20Hill;Blackburn;Mitcham;Ringwood&max_price=625",
+            "note": "Direct Jellis Craig rentals filtered for the Hawthorn transit corridor.",
+        },
+        {
+            "name": "Woodards: Melbourne Rental Properties",
+            "category": "Direct Agency (Live)",
+            "url": "https://www.woodards.com.au/property/?category=Rent",
+            "note": "Direct Woodards rental listings across Camberwell, Hawthorn, Blackburn & Inner Melbourne.",
         },
         {
             "name": "FB Marketplace: 2BR Lease Transfers (Ascending Distance)",
@@ -166,14 +197,26 @@ def main() -> None:
         print(f"[Warn] Facebook Marketplace scraper error: {e}")
         errors_logged += 1
 
+    # 5. Collect from Direct Real Estate Agency Adapters (Barry Plant, Ray White, Nelson Alexander, Jellis Craig, Woodards, Belle Property)
+    agency_properties, agency_health_map, agency_exec_logs = collect_all_agency_sources()
+    for a_log in agency_exec_logs:
+        db.log_execution(a_log)
+        if a_log.status != "success":
+            errors_logged += a_log.errors_logged
+
     # Ingest existing listings if raw scrape yields fewer items (safety guard)
-    if not raw_listings and existing_map:
+    if not raw_listings and not agency_properties and existing_map:
         print("[Info] Preserving existing listings from backup/state")
         raw_listings.extend(list(existing_map.values()))
 
     # Process and score raw listings
     processed_properties: List[Property] = []
     seen_ids = set()
+
+    for prop_obj in agency_properties:
+        processed_properties.append(prop_obj)
+        seen_ids.add(prop_obj.property_id)
+        seen_ids.add(prop_obj.source_listing_id)
 
     for raw in raw_listings:
         enriched = score_and_classify_listing(raw)
@@ -236,7 +279,7 @@ def main() -> None:
     exec_log = ScraperExecutionLog(
         run_timestamp=datetime.now(timezone.utc).isoformat(),
         source="all",
-        listings_scanned=len(raw_listings),
+        listings_scanned=len(raw_listings) + sum(h.get("listings_discovered", 0) for h in agency_health_map.values()),
         listings_new=new_count,
         listings_updated=updated_count,
         errors_logged=errors_logged,
@@ -251,6 +294,7 @@ def main() -> None:
         output_file=LISTINGS_FILE,
         criteria=USER_CRITERIA,
         portal_links=portal_links,
+        source_health=agency_health_map,
     )
 
     all_listings = export_payload.get("listings", [])
