@@ -23,8 +23,14 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from ..config import HAWTHORN_DIRECT_SUBURBS, USER_CRITERIA
-from ..models import Property, ScraperExecutionLog, generate_property_id
+from ..config import (
+    EASTERN_TARGET_SUBURBS,
+    HAWTHORN_DIRECT_SUBURBS,
+    PRIMARY_SUBURBS,
+    SECONDARY_SUBURBS,
+    USER_CRITERIA,
+)
+from ..models import Property, ScraperExecutionLog, generate_property_id, generate_source_key
 from .legacy import DEFAULT_HEADERS, is_outside_melbourne
 
 
@@ -170,24 +176,37 @@ MONTH_MAP = {
 class SourceHealth:
     """
     Comprehensive health and execution metrics for an individual agency source adapter.
+    Captures all Phase 1 Section 7 monitoring and logging fields.
     """
     source_name: str
+    source_key: str = ""
     integration_status: str = "integrated"  # "integrated", "partial", "blocked"
     scrape_start_time: Optional[str] = None
     scrape_end_time: Optional[str] = None
+    scrape_completion_time: Optional[str] = None
     successful_requests: int = 0
     listings_discovered: int = 0
     listings_accepted: int = 0
+    valid_listings: int = 0
+    duplicates_count: int = 0
     listings_rejected: int = 0
     parsing_failures: int = 0
     http_errors: int = 0
     last_successful_collection: Optional[str] = None
     status: str = "idle"  # "idle", "running", "success", "partial", "failed", "blocked"
     last_error: Optional[str] = None
+    errors: List[str] = field(default_factory=list)
+    failure_reasons: List[str] = field(default_factory=list)
     rejection_reasons: Dict[str, int] = field(default_factory=dict)
     duration_seconds: float = 0.0
 
+    def __post_init__(self) -> None:
+        if not self.source_key:
+            self.source_key = generate_source_key(self.source_name)
+
     def to_dict(self) -> Dict[str, Any]:
+        self.scrape_completion_time = self.scrape_completion_time or self.scrape_end_time
+        self.valid_listings = self.listings_accepted
         return asdict(self)
 
 
@@ -437,6 +456,20 @@ def extract_suburb_and_postcode(
                     break
 
         if not suburb:
+            # 1b. If comma-separated segments exist (e.g. "61 Cotters Road, Epping, VIC 3076")
+            # and none matched SUBURB_POSTCODE_MAP, take the non-street segment before VIC 3XXX
+            if len(segments) >= 2:
+                for idx in range(len(segments) - 1, 0, -1):
+                    seg_clean = re.sub(r"\b(?:VIC|Victoria|Australia|3\d{3})\b", " ", segments[idx], flags=re.IGNORECASE)
+                    seg_clean = re.sub(r"\s+", " ", seg_clean).strip(" ,-")
+                    if not seg_clean or re.search(r"\d", seg_clean):
+                        continue
+                    if seg_clean.lower() in ("vic", "victoria", "australia"):
+                        continue
+                    suburb = seg_clean.title()
+                    break
+
+        if not suburb:
             # 2. Match explicit "<Suburb> [VIC] 3XXX" at end of un-comma'd string
             m_tail = re.search(
                 r"\b([A-Za-z][A-Za-z\s]{1,22}?)\s+(?:VIC\s+)?(3\d{3})\b",
@@ -449,7 +482,7 @@ def extract_suburb_and_postcode(
                     if cand_low.endswith(known_sub):
                         suburb = known_sub.title()
                         break
-                if not suburb:
+                if not suburb and cand_low not in ("vic", "victoria", "australia"):
                     suburb = m_tail.group(1).strip().title()
 
     if suburb and not postcode:
@@ -475,6 +508,8 @@ class BaseAgencyAdapter(ABC):
     base_url: str = ""
     integration_status: str = "integrated"  # "integrated", "partial", "blocked"
     request_delay_seconds: float = 0.25
+    max_retries: int = 2
+    retry_backoff_seconds: float = 0.6
 
     def __init__(
         self,
@@ -485,8 +520,17 @@ class BaseAgencyAdapter(ABC):
         self.max_listings = max_listings
         self.health = SourceHealth(
             source_name=self.source_name,
+            source_key=generate_source_key(self.source_name),
             integration_status=self.integration_status,
         )
+
+    def _record_error(self, msg: str) -> None:
+        """Record an error message into health telemetry."""
+        self.health.last_error = msg
+        if msg not in self.health.errors:
+            self.health.errors.append(msg)
+        if msg not in self.health.failure_reasons:
+            self.health.failure_reasons.append(msg)
 
     def _request_url(
         self,
@@ -496,7 +540,10 @@ class BaseAgencyAdapter(ABC):
         headers: Optional[Dict[str, str]] = None,
         timeout: float = 15.0,
     ) -> str:
-        """Perform an HTTP request with health telemetry tracking and polite rate limiting."""
+        """
+        Perform an HTTP request with health telemetry tracking, sensible timeouts,
+        and exponential backoff retries for transient network or 5xx errors.
+        """
         if self._http_fetcher is not None:
             try:
                 resp = self._http_fetcher(url, method=method, data=data, headers=headers, timeout=timeout)
@@ -504,31 +551,40 @@ class BaseAgencyAdapter(ABC):
                 return resp
             except urllib.error.HTTPError as e:
                 self.health.http_errors += 1
-                self.health.last_error = f"HTTP {e.code}: {e.reason} ({url})"
+                self._record_error(f"HTTP {e.code}: {e.reason} ({url})")
                 raise
             except Exception as e:
                 self.health.http_errors += 1
-                self.health.last_error = f"{type(e).__name__}: {e} ({url})"
+                self._record_error(f"{type(e).__name__}: {e} ({url})")
                 raise
 
         req_headers = dict(DEFAULT_HEADERS)
         if headers:
             req_headers.update(headers)
 
-        req = urllib.request.Request(url, data=data, headers=req_headers, method=method)
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as resp:
-                body = resp.read().decode("utf-8", errors="ignore")
-                self.health.successful_requests += 1
-                return body
-        except urllib.error.HTTPError as e:
-            self.health.http_errors += 1
-            self.health.last_error = f"HTTP {e.code}: {e.reason} ({url})"
-            raise
-        except Exception as e:
-            self.health.http_errors += 1
-            self.health.last_error = f"{type(e).__name__}: {e} ({url})"
-            raise
+        attempts = max(1, self.max_retries + 1)
+        for attempt in range(attempts):
+            req = urllib.request.Request(url, data=data, headers=req_headers, method=method)
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    body = resp.read().decode("utf-8", errors="ignore")
+                    self.health.successful_requests += 1
+                    return body
+            except urllib.error.HTTPError as e:
+                # Do not retry deterministic 403/404/429 WAF blocks
+                if e.code in (401, 403, 404, 429) or attempt == attempts - 1:
+                    self.health.http_errors += 1
+                    self._record_error(f"HTTP {e.code}: {e.reason} ({url})")
+                    raise
+                time.sleep(self.retry_backoff_seconds * (2 ** attempt))
+            except Exception as e:
+                if attempt == attempts - 1:
+                    self.health.http_errors += 1
+                    self._record_error(f"{type(e).__name__}: {e} ({url})")
+                    raise
+                time.sleep(self.retry_backoff_seconds * (2 ** attempt))
+
+        raise RuntimeError(f"Request retries exhausted for {url}")
 
     @abstractmethod
     def fetch_listings(self) -> List[Any]:
@@ -570,6 +626,7 @@ class BaseAgencyAdapter(ABC):
             raise ValueError("parsed_item must be a non-empty dictionary")
 
         source_name = parsed_item.get("source") or self.source_name
+        source_key = generate_source_key(source_name)
         listing_id = str(parsed_item.get("listing_id") or parsed_item.get("id") or "").strip()
         url = str(parsed_item.get("url") or parsed_item.get("source_url") or "").strip()
         address = str(parsed_item.get("address") or "").strip()
@@ -609,23 +666,35 @@ class BaseAgencyAdapter(ABC):
         description = clean_html_text(parsed_item.get("description") or "")
         prop_type = normalise_property_type(parsed_item.get("property_type"), title=title, description=description)
 
+        # Infer furnished status ONLY when explicitly stated; otherwise use None/null per Section 4
+        explicit_furnished = parsed_item.get("is_furnished") if "is_furnished" in parsed_item else parsed_item.get("furnished")
+        if explicit_furnished is None:
+            combined_f = f"{title} {description}".lower()
+            if "unfurnished" in combined_f:
+                explicit_furnished = False
+            elif re.search(r"\b(?:fully\s+furnished|furnished\s+apartment|furnished\s+unit|comes\s+furnished)\b", combined_f):
+                explicit_furnished = True
+
         images = [str(img).strip() for img in (parsed_item.get("images") or []) if str(img).strip()]
         photo = str(parsed_item.get("photo") or (images[0] if images else "")).strip()
         if photo and photo not in images:
             images.insert(0, photo)
 
-        available_date = parse_availability_date(parsed_item.get("available_date"))
+        available_date = parse_availability_date(parsed_item.get("available_date") or parsed_item.get("date_available"))
         inspection_times = [
             clean_html_text(str(t)) for t in (parsed_item.get("inspection_times") or []) if str(t).strip()
         ]
-        agency_office = clean_html_text(parsed_item.get("agency_office") or self.source_name)
-        discovered_at = str(parsed_item.get("discovered_at") or datetime.now(timezone.utc).isoformat())
+        agency_office = clean_html_text(parsed_item.get("agency_office") or parsed_item.get("agency_name") or self.source_name)
+        discovered_at = str(parsed_item.get("discovered_at") or parsed_item.get("scraped_at") or datetime.now(timezone.utc).isoformat())
+        listed_at = str(parsed_item.get("listed_at") or discovered_at)
 
         prop_id = generate_property_id(source_name, listing_id, address=address, suburb=suburb)
 
         provenance_entry = {
             "source_name": source_name,
             "source": source_name,
+            "source_key": source_key,
+            "agency_name": agency_office,
             "source_listing_id": listing_id,
             "source_url": url,
             "url": url,
@@ -633,7 +702,7 @@ class BaseAgencyAdapter(ABC):
             "raw_title": title,
             "raw_price_text": str(parsed_item.get("price_text") or (f"${int(weekly_rent)}/wk" if weekly_rent else "")),
             "discovered_at": discovered_at,
-            "first_seen": discovered_at,
+            "first_seen": listed_at,
             "last_seen": discovered_at,
             "is_active": True,
         }
@@ -642,6 +711,8 @@ class BaseAgencyAdapter(ABC):
             "id": listing_id or prop_id,
             "property_id": prop_id,
             "source": source_name,
+            "source_key": source_key,
+            "agency_name": agency_office,
             "source_listing_id": listing_id,
             "url": url,
             "source_url": url,
@@ -655,6 +726,8 @@ class BaseAgencyAdapter(ABC):
             "bathrooms": bathrooms,
             "parking": parking,
             "weekly_rent": weekly_rent,
+            "furnished": explicit_furnished,
+            "is_furnished": explicit_furnished,
             "available_date": available_date,
             "date_available": available_date,
             "description": description,
@@ -662,8 +735,9 @@ class BaseAgencyAdapter(ABC):
             "images": images,
             "inspection_times": inspection_times,
             "agency_office": agency_office,
-            "listed_at": discovered_at,
-            "first_seen": discovered_at,
+            "listed_at": listed_at,
+            "scraped_at": discovered_at,
+            "first_seen": listed_at,
             "last_seen": discovered_at,
             "is_lease_transfer": False,
             "sources": [provenance_entry],
@@ -689,7 +763,10 @@ class BaseAgencyAdapter(ABC):
         enriched["property_type"] = prop_type
         enriched["postcode"] = postcode or enriched.get("postcode", "")
         enriched["state"] = state
+        enriched["furnished"] = explicit_furnished
+        enriched["is_furnished"] = explicit_furnished
         enriched["available_date"] = available_date
+        enriched["date_available"] = available_date
         enriched["images"] = images
         enriched["photo"] = photo
         enriched["inspection_times"] = inspection_times
@@ -698,6 +775,7 @@ class BaseAgencyAdapter(ABC):
         enriched["source_provenance"] = [provenance_entry]
 
         prop = Property.from_legacy(enriched)
+        prop.furnished = explicit_furnished
         prop = score_property_v2(prop)
         return prop
 
@@ -763,19 +841,25 @@ class BaseAgencyAdapter(ABC):
         self.health.status = "running"
         self.health.listings_discovered = 0
         self.health.listings_accepted = 0
+        self.health.valid_listings = 0
+        self.health.duplicates_count = 0
         self.health.listings_rejected = 0
         self.health.parsing_failures = 0
         self.health.rejection_reasons = {}
 
         accepted: List[Property] = []
+        seen_keys: set = set()
 
         try:
             raw_items = self.fetch_listings()
         except Exception as e:
-            self.health.scrape_end_time = datetime.now(timezone.utc).isoformat()
+            now_iso = datetime.now(timezone.utc).isoformat()
+            self.health.scrape_end_time = now_iso
+            self.health.scrape_completion_time = now_iso
             self.health.duration_seconds = round(time.time() - start_ts, 2)
-            self.health.last_error = self.health.last_error or f"{type(e).__name__}: {e}"
-            if self.integration_status == "blocked" or "403" in str(e):
+            err_msg = self.health.last_error or f"{type(e).__name__}: {e}"
+            self._record_error(err_msg)
+            if self.integration_status == "blocked" or "403" in str(e) or "429" in str(e):
                 self.health.status = "blocked"
             else:
                 self.health.status = "failed"
@@ -789,13 +873,23 @@ class BaseAgencyAdapter(ABC):
                 prop = self.normalise_listing(parsed)
             except Exception as e:
                 self.health.parsing_failures += 1
-                self.health.last_error = f"Parse error: {e}"
+                self._record_error(f"Parse error: {e}")
+                continue
+
+            # Track intra-source duplicates by property_id or source_url
+            dedup_key = (prop.property_id, prop.source_url)
+            if prop.property_id in seen_keys or (prop.source_url and prop.source_url in seen_keys):
+                self.health.duplicates_count += 1
                 continue
 
             is_valid, reasons = self.validate_listing(prop)
             if is_valid:
+                seen_keys.add(prop.property_id)
+                if prop.source_url:
+                    seen_keys.add(prop.source_url)
                 accepted.append(prop)
                 self.health.listings_accepted += 1
+                self.health.valid_listings = self.health.listings_accepted
             else:
                 self.health.listings_rejected += 1
                 for r in reasons:
@@ -803,6 +897,8 @@ class BaseAgencyAdapter(ABC):
 
         now_iso = datetime.now(timezone.utc).isoformat()
         self.health.scrape_end_time = now_iso
+        self.health.scrape_completion_time = now_iso
+        self.health.valid_listings = self.health.listings_accepted
         self.health.duration_seconds = round(time.time() - start_ts, 2)
 
         if self.health.successful_requests > 0 and self.health.http_errors == 0:

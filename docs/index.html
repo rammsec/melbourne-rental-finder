@@ -155,17 +155,27 @@
             <optgroup label="Inner East &amp; City (Direct Train / Tram)">
               <option value="hawthorn">Hawthorn / Hawthorn East (3122/3123)</option>
               <option value="camberwell">Camberwell (3124)</option>
+              <option value="glen iris">Glen Iris (3146)</option>
+              <option value="kew">Kew (3101)</option>
+              <option value="balwyn">Balwyn (3103)</option>
               <option value="canterbury">Canterbury (3126)</option>
               <option value="surrey hills">Surrey Hills (3127)</option>
               <option value="mont albert">Mont Albert (3127)</option>
+              <option value="malvern">Malvern (3144)</option>
               <option value="richmond">Richmond / Burnley (3121)</option>
               <option value="east melbourne">East Melbourne (3002)</option>
               <option value="melbourne">Melbourne CBD (3000)</option>
             </optgroup>
-            <optgroup label="Belgrave Line Corridor">
+            <optgroup label="Belgrave &amp; Eastern Corridor">
               <option value="box hill">Box Hill (3128)</option>
               <option value="blackburn">Blackburn (3130)</option>
               <option value="nunawading">Nunawading (3131)</option>
+              <option value="forest hill">Forest Hill (3131)</option>
+              <option value="vermont">Vermont (3133)</option>
+              <option value="doncaster">Doncaster (3108)</option>
+              <option value="templestowe">Templestowe (3106)</option>
+              <option value="mount waverley">Mount Waverley (3149)</option>
+              <option value="wantirna">Wantirna (3152)</option>
               <option value="heathmont">Heathmont (3135)</option>
               <option value="ferntree gully">Ferntree Gully (3156)</option>
               <option value="upper ferntree gully">Upper Ferntree Gully (3156)</option>
@@ -181,7 +191,6 @@
             </optgroup>
             <optgroup label="Tram Corridors">
               <option value="burwood">Burwood (3125)</option>
-              <option value="kew">Kew (3101)</option>
             </optgroup>
           </select>
           <select id="bedroom-filter" class="filter-select" aria-label="Filter by BHK">
@@ -242,6 +251,10 @@
           <button type="button" class="btn-reset-filters" id="btn-reset-filters">
             ↺ Reset Filters
           </button>
+        </div>
+        <!-- Multi-Select Agency / Source Filter & Live Health Strip -->
+        <div class="filter-row-agencies" id="agency-filter-bar" aria-label="Filter by Agency or Source" style="margin-top: 0.65rem; padding-top: 0.65rem; border-top: 1px dashed var(--border-color); display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+          <!-- Populated dynamically by app.js with agency health indicators, counts, and last scrape timestamps -->
         </div>
       </div>
 

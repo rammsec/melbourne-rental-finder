@@ -33,8 +33,12 @@ from scraper.sources import (
     RayWhiteAdapter,
     NelsonAlexanderAdapter,
     JellisCraigAdapter,
-    WoodardsAdapter,
+    HarcourtsAdapter,
     BellePropertyAdapter,
+    McGrathAdapter,
+    WoodardsAdapter,
+    BuxtonAdapter,
+    FletchersAdapter,
     collect_all_agency_sources,
     parse_weekly_rent,
     parse_availability_date,
@@ -324,9 +328,138 @@ BELLE_PROPERTY_FIXTURE_HTML = """<!DOCTYPE html>
 </html>
 """
 
+HARCOURTS_LIST_HTML_FIXTURE = """<!DOCTYPE html>
+<html>
+<body>
+<ul class="card-list">
+  <li class="card listing-card">
+    <a href="/au/office/box-hill/listing/r2-4807867-7-82-campbell-road-hawthorn-east-vic-3123" data-category="rent">
+      <div class="card-image">
+        <div class="swiper-slide" data-src="https://listings-photos.cloudhi.io/harcourts/4807867_1.jpg"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-text">
+          <h6 class="card-title property-title">Bright 2BR Unit Steps from Auburn Station</h6>
+          <p>
+            <span class="price d-block hi-price">$540 /week</span>
+            <span class="address">7/82 Campbell Road, HAWTHORN EAST, VIC 3123</span>
+          </p>
+        </div>
+        <div class="card-footer">
+          <ul class="summary align-items-center">
+            <li><span>2</span><img src="/bedroom.svg" alt="bedroom"></li>
+            <li><span>1</span><img src="/bathroom.svg" alt="bathroom"></li>
+            <li><span>1</span><img src="/garage.svg" alt="garage"></li>
+          </ul>
+        </div>
+      </div>
+    </a>
+  </li>
+</ul>
+</body>
+</html>
+"""
+
+BUXTON_API_JSON_FIXTURE = json.dumps({
+    "results": [
+        {
+            "id": 133708,
+            "source": "listonce",
+            "listing_type": "rental",
+            "transaction_type": "lease",
+            "external_id": "2005888",
+            "listonce_listing_id": 2005888,
+            "title": "",
+            "status": "available",
+            "street_address": "4/19 Carrington Road",
+            "suburb": "Box Hill",
+            "postcode": "3128",
+            "address_state": "VIC",
+            "slug": "2005888-box-hill",
+            "bedrooms": 2,
+            "bathrooms": 1,
+            "parking": 1,
+            "price": 530.0,
+            "publish_date": "2026-11-18T05:00:00Z",
+            "card_badge_payload": {
+                "rent_period": "Weekly",
+                "rent": "530.00",
+                "headline": "Walk to Box Hill Central & Express Trains"
+            },
+            "card_image_urls": [
+                "https://images.listonce.com.au/custom/buxton/2005888_1.jpg",
+                "https://images.listonce.com.au/custom/buxton/2005888_2.jpg"
+            ]
+        }
+    ],
+    "next_cursor": None
+})
+
+FLETCHERS_DIRECTORY_HTML_FIXTURE = """<!DOCTYPE html>
+<html>
+<body>
+<ul class="properties-list">
+  <li data-propertyid="48385" class="unit">
+    <a class="block" href="https://fletchers.net.au/48385/2-14-canterbury-road-blackburn">
+      <div class="photo">
+        <img src="https://docspropertyme.clodflare.pushcreative.com.au/listing/48385_1.jpg" alt="2/14 Canterbury Road, Blackburn" />
+      </div>
+      <div class="details">
+        <h2 class="address">
+          <span class="suburb">Blackburn</span>
+          <span class="streetaddress">2/14 Canterbury Road</span>
+        </h2>
+        <div class="pricetext">
+          <span class="status">For Lease</span> $535 pw
+        </div>
+        <div class="icons">
+          2 <i class="fal fa-bed"></i>
+          1 <i class="fal fa-bath"></i>
+          1 <i class="fal fa-car"></i>
+          Unit
+        </div>
+      </div>
+    </a>
+  </li>
+</ul>
+</body>
+</html>
+"""
+
+MCGRATH_JSONLD_HTML_FIXTURE = """<!DOCTYPE html>
+<html>
+<head>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Apartment",
+  "id": "MC-901234",
+  "name": "Sunlit 2 Bedroom Apartment in Blackburn",
+  "description": "Unfurnished 2 bedroom apartment 350m from Blackburn Station.",
+  "url": "https://www.mcgrath.com.au/rent/apartment-vic-blackburn-901234",
+  "price": "$540 per week",
+  "bedrooms": 2,
+  "bathrooms": 1,
+  "parking": 1,
+  "available_date": "2026-12-12",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "6/24 South Parade",
+    "addressLocality": "Blackburn",
+    "addressRegion": "VIC",
+    "postalCode": "3130"
+  },
+  "image": ["https://images.mcgrath.com.au/901234_1.jpg"]
+}
+</script>
+</head>
+<body></body>
+</html>
+"""
+
 
 class TestDirectAgencySourcesV1(unittest.TestCase):
-    """Comprehensive tests for all 6 Australian real estate agency adapters and utilities."""
+    """Comprehensive tests for all 10 Australian real estate agency adapters and utilities."""
 
     def test_rent_parsing_variations(self):
         """Test weekly rent extraction across agency price strings, date prefixes, and pcm."""
@@ -370,14 +503,18 @@ class TestDirectAgencySourcesV1(unittest.TestCase):
         self.assertEqual(pc2, "3122")
 
     def test_adapter_common_interface_compliance(self):
-        """Verify all 6 agency adapters implement the required 5-method common interface."""
+        """Verify all 10 agency adapters implement the required 5-method common interface."""
         adapters = [
             BarryPlantAdapter(),
             RayWhiteAdapter(),
-            NelsonAlexanderAdapter(),
             JellisCraigAdapter(),
-            WoodardsAdapter(),
+            NelsonAlexanderAdapter(),
+            HarcourtsAdapter(),
             BellePropertyAdapter(),
+            McGrathAdapter(),
+            WoodardsAdapter(),
+            BuxtonAdapter(),
+            FletchersAdapter(),
         ]
         required_methods = (
             "fetch_listings",
@@ -427,22 +564,40 @@ class TestDirectAgencySourcesV1(unittest.TestCase):
         self.assertTrue(prop.pass_strict_filter)
         self.assertIsNotNone(prop.match_score)
 
+        # Verify Phase 1 Section 4 standardised listing dictionary structure
+        std_dict = prop.to_legacy_dict()
+        required_std_keys = (
+            "id", "source", "source_key", "agency_name", "title", "address",
+            "suburb", "postcode", "weekly_rent", "bedrooms", "bathrooms",
+            "parking", "property_type", "is_furnished", "date_available",
+            "description", "photo", "url", "listed_at", "scraped_at",
+            "last_verified_at", "verification_status",
+        )
+        for k in required_std_keys:
+            self.assertIn(k, std_dict, f"Missing standardised key {k}")
+        self.assertEqual(std_dict["source_key"], "barry_plant")
+        self.assertEqual(std_dict["agency_name"], "Barry Plant Whitehorse")
+        self.assertIsNone(std_dict["is_furnished"])
+
         # Verify source_provenance structure
         self.assertEqual(len(prop.source_provenance), 1)
         self.assertEqual(prop.source_provenance[0]["source_name"], "Barry Plant")
         self.assertEqual(prop.source_provenance[0]["source_listing_id"], "213056")
         self.assertEqual(prop.source_provenance[0]["agency_office"], "Barry Plant Whitehorse")
 
-        # Verify source health metrics
+        # Verify source health metrics (including Phase 1 Section 7 fields)
         health = adapter.get_source_health()
         self.assertEqual(health["listings_discovered"], 2)
         self.assertEqual(health["listings_accepted"], 1)
+        self.assertEqual(health["valid_listings"], 1)
+        self.assertEqual(health["duplicates_count"], 0)
         self.assertEqual(health["listings_rejected"], 1)
         self.assertEqual(health["parsing_failures"], 0)
         self.assertEqual(health["http_errors"], 0)
         self.assertEqual(health["status"], "success")
         self.assertIsNotNone(health["scrape_start_time"])
         self.assertIsNotNone(health["scrape_end_time"])
+        self.assertIsNotNone(health["scrape_completion_time"])
         self.assertIsNotNone(health["last_successful_collection"])
 
     def test_ray_white_adapter_fixture_pipeline(self):
@@ -520,6 +675,86 @@ class TestDirectAgencySourcesV1(unittest.TestCase):
         self.assertEqual(prop.agency_office, "Jellis Craig Hawthorn")
         self.assertIn("Hawthorn train station", prop.description)
         self.assertTrue(prop.pass_strict_filter)
+
+    def test_harcourts_adapter_fixture_pipeline(self):
+        """Test Harcourts HTML card extraction, normalisation, and validation."""
+        adapter = HarcourtsAdapter(
+            http_fetcher=lambda url, **kw: HARCOURTS_LIST_HTML_FIXTURE,
+            query_urls=["https://harcourts.net/au/listings/rent?search=VIC&maxPrice=650"],
+        )
+        props = adapter.collect()
+        self.assertEqual(len(props), 1)
+        prop = props[0]
+        self.assertEqual(prop.source, "Harcourts")
+        self.assertEqual(prop.source_listing_id, "r2-4807867")
+        self.assertEqual(prop.suburb, "Hawthorn East")
+        self.assertEqual(prop.postcode, "3123")
+        self.assertEqual(prop.weekly_rent, 540.0)
+        self.assertEqual(prop.bedrooms, 2)
+        self.assertEqual(prop.bathrooms, 1)
+        self.assertEqual(prop.parking, 1)
+        self.assertEqual(prop.agency_office, "Harcourts Box Hill")
+        self.assertTrue(prop.source_url.startswith("https://harcourts.net/au/office/box-hill/listing/"))
+        self.assertTrue(prop.has_direct_hawthorn_transit)
+
+    def test_buxton_adapter_fixture_pipeline(self):
+        """Test Buxton JSON API extraction, normalisation, and validation."""
+        adapter = BuxtonAdapter(
+            http_fetcher=lambda url, **kw: BUXTON_API_JSON_FIXTURE,
+            target_suburbs=[],
+        )
+        props = adapter.collect()
+        self.assertEqual(len(props), 1)
+        prop = props[0]
+        self.assertEqual(prop.source, "Buxton")
+        self.assertEqual(prop.source_listing_id, "2005888")
+        self.assertEqual(prop.suburb, "Box Hill")
+        self.assertEqual(prop.postcode, "3128")
+        self.assertEqual(prop.weekly_rent, 530.0)
+        self.assertEqual(prop.bedrooms, 2)
+        self.assertEqual(prop.bathrooms, 1)
+        self.assertEqual(prop.parking, 1)
+        self.assertTrue(prop.source_url.startswith("https://buxton.com.au/property/2005888/"))
+        self.assertTrue(prop.has_direct_hawthorn_transit)
+
+    def test_fletchers_adapter_fixture_pipeline(self):
+        """Test Fletchers eastern suburbs HTML tile extraction, normalisation, and validation."""
+        adapter = FletchersAdapter(
+            http_fetcher=lambda url, **kw: FLETCHERS_DIRECTORY_HTML_FIXTURE,
+        )
+        props = adapter.collect()
+        self.assertEqual(len(props), 1)
+        prop = props[0]
+        self.assertEqual(prop.source, "Fletchers")
+        self.assertEqual(prop.source_listing_id, "48385")
+        self.assertEqual(prop.suburb, "Blackburn")
+        self.assertEqual(prop.postcode, "3130")
+        self.assertEqual(prop.weekly_rent, 535.0)
+        self.assertEqual(prop.bedrooms, 2)
+        self.assertEqual(prop.property_type, "unit")
+        self.assertEqual(prop.source_url, "https://fletchers.net.au/48385/2-14-canterbury-road-blackburn")
+        self.assertTrue(prop.has_direct_hawthorn_transit)
+
+    def test_mcgrath_fixture_and_http_429_isolation(self):
+        """Test McGrath JSON-LD fixture parsing AND live HTTP 429 rate-limit failure isolation."""
+        adapter_ok = McGrathAdapter(http_fetcher=lambda url, **kw: MCGRATH_JSONLD_HTML_FIXTURE)
+        props = adapter_ok.collect()
+        self.assertEqual(len(props), 1)
+        self.assertEqual(props[0].source, "McGrath")
+        self.assertEqual(props[0].suburb, "Blackburn")
+        self.assertEqual(props[0].weekly_rent, 540.0)
+        self.assertEqual(props[0].furnished, False)
+
+        def rate_limited_fetcher(url, **kwargs):
+            raise urllib.error.HTTPError(url=url, code=429, msg="Too Many Requests", hdrs=None, fp=None)
+
+        adapter_blocked = McGrathAdapter(http_fetcher=rate_limited_fetcher)
+        blocked_props = adapter_blocked.collect()
+        self.assertEqual(blocked_props, [])
+        health = adapter_blocked.get_source_health()
+        self.assertEqual(health["status"], "blocked")
+        self.assertEqual(health["http_errors"], 1)
+        self.assertIn("429", health["last_error"])
 
     def test_woodards_adapter_fixture_pipeline(self):
         """Test Woodards directory card + detail page extraction."""

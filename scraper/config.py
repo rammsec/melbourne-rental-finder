@@ -505,7 +505,100 @@ HAWTHORN_DIRECT_SUBURBS: Dict[str, Dict[str, Any]] = {
         "commute_mins": 25,
         "tier": 2,
     },
+
+    # Phase 1 Eastern & South-Eastern Suburb Coverage Expansion
+    "glen iris": {
+        "postcode": "3146",
+        "mode": "Tram 72 + Train / Alamein Line",
+        "line": "Glen Iris / Gardiner Corridor to Hawthorn",
+        "commute_mins": 14,
+        "tier": 1,
+    },
+    "balwyn": {
+        "postcode": "3103",
+        "mode": "Tram 109 / Bus 285 to Camberwell & Hawthorn",
+        "line": "Whitehorse Rd / Camberwell Station connection to Hawthorn",
+        "commute_mins": 14,
+        "tier": 2,
+    },
+    "vermont": {
+        "postcode": "3133",
+        "mode": "Train via Mitcham / Tram 75",
+        "line": "Mitcham Station (Belgrave/Lilydale) / Tram 75 corridor",
+        "commute_mins": 27,
+        "tier": 2,
+    },
+    "doncaster": {
+        "postcode": "3108",
+        "mode": "Bus 284 / 907 + Box Hill Train",
+        "line": "Box Hill Express Train to Hawthorn",
+        "commute_mins": 24,
+        "tier": 2,
+    },
+    "templestowe": {
+        "postcode": "3106",
+        "mode": "Bus 281 / 905 + Box Hill Train",
+        "line": "Eastern Freeway / Box Hill Train connection to Hawthorn",
+        "commute_mins": 28,
+        "tier": 3,
+    },
+    "forest hill": {
+        "postcode": "3131",
+        "mode": "Train via Nunawading / Blackburn",
+        "line": "Belgrave/Lilydale Line via Nunawading Station",
+        "commute_mins": 24,
+        "tier": 2,
+    },
+    "wantirna": {
+        "postcode": "3152",
+        "mode": "Train via Ringwood / Heathmont",
+        "line": "Belgrave Line via Heathmont/Ringwood Station",
+        "commute_mins": 34,
+        "tier": 3,
+    },
+    "mount waverley": {
+        "postcode": "3149",
+        "mode": "Train (Glen Waverley Line) / Bus 734",
+        "line": "Glen Waverley Line via Richmond / Bus to Camberwell",
+        "commute_mins": 24,
+        "tier": 2,
+    },
 }
+
+# Centralised Phase 1 Eastern & South-Eastern Melbourne Suburb Configuration
+PRIMARY_SUBURBS: List[str] = [
+    "Hawthorn",
+    "Hawthorn East",
+    "Camberwell",
+    "Glen Iris",
+    "Kew",
+    "Balwyn",
+    "Box Hill",
+    "Blackburn",
+    "Mitcham",
+    "Ringwood",
+    "Bayswater",
+    "Boronia",
+    "Croydon",
+    "Vermont",
+    "Nunawading",
+    "Burwood",
+]
+
+SECONDARY_SUBURBS: List[str] = [
+    "Doncaster",
+    "Templestowe",
+    "Forest Hill",
+    "Wantirna",
+    "Heathmont",
+    "Ferntree Gully",
+    "Surrey Hills",
+    "Canterbury",
+    "Malvern",
+    "Mount Waverley",
+]
+
+EASTERN_TARGET_SUBURBS: List[str] = PRIMARY_SUBURBS + SECONDARY_SUBURBS
 
 # Domain / REA / Rent.com.au search suburb slugs (prioritizing inner-east & direct train/tram)
 PRIORITY_SUBURB_SLUGS: List[str] = [
@@ -513,7 +606,9 @@ PRIORITY_SUBURB_SLUGS: List[str] = [
     "hawthorn-east-vic-3123",
     "richmond-vic-3121",
     "camberwell-vic-3124",
+    "glen-iris-vic-3146",
     "kew-vic-3101",
+    "balwyn-vic-3103",
     "burnley-vic-3121",
     "canterbury-vic-3126",
     "surrey-hills-vic-3127",
@@ -528,10 +623,13 @@ PRIORITY_SUBURB_SLUGS: List[str] = [
     "south-yarra-vic-3141",
     "blackburn-vic-3130",
     "nunawading-vic-3131",
+    "forest-hill-vic-3131",
     "mitcham-vic-3132",
+    "vermont-vic-3133",
     "ringwood-vic-3134",
     "ringwood-east-vic-3135",
     "heathmont-vic-3135",
+    "wantirna-vic-3152",
     "bayswater-vic-3153",
     "boronia-vic-3155",
     "ferntree-gully-vic-3156",
@@ -542,9 +640,13 @@ PRIORITY_SUBURB_SLUGS: List[str] = [
     "croydon-vic-3136",
     "mooroolbark-vic-3138",
     "lilydale-vic-3140",
+    "doncaster-vic-3108",
+    "templestowe-vic-3106",
+    "mount-waverley-vic-3149",
     "mont-albert-vic-3127",
     "caulfield-north-vic-3161",
     "st-kilda-east-vic-3183",
     "east-melbourne-vic-3002",
     "melbourne-vic-3000",
 ]
+

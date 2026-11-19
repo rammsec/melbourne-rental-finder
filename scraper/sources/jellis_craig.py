@@ -22,6 +22,7 @@ import urllib.parse
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
+from ..config import EASTERN_TARGET_SUBURBS
 from .base import (
     BaseAgencyAdapter,
     clean_html_text,
@@ -32,29 +33,21 @@ from .base import (
 )
 
 
-JC_TARGET_SUBURBS = [
-    "Hawthorn",
-    "Hawthorn East",
-    "Richmond",
-    "Camberwell",
-    "Kew",
-    "Surrey Hills",
-    "Box Hill",
-    "Blackburn",
-    "Nunawading",
-    "Mitcham",
-    "Ringwood",
-    "Bayswater",
-    "Boronia",
-    "Melbourne",
-    "East Melbourne",
-    "Collingwood",
-    "Abbotsford",
-    "South Yarra",
-    "Malvern",
-    "Armadale",
-    "Toorak",
-]
+JC_TARGET_SUBURBS = list(
+    dict.fromkeys(
+        EASTERN_TARGET_SUBURBS
+        + [
+            "Richmond",
+            "Melbourne",
+            "East Melbourne",
+            "Collingwood",
+            "Abbotsford",
+            "South Yarra",
+            "Armadale",
+            "Toorak",
+        ]
+    )
+)
 
 JC_OFFICE_MAP = {
     "LO-JCBM-RICH": "Jellis Craig Richmond",

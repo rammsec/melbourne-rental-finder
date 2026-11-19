@@ -122,6 +122,24 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
             "note": "Direct Woodards rental listings across Camberwell, Hawthorn, Blackburn & Inner Melbourne.",
         },
         {
+            "name": "Harcourts: Victoria & Eastern Melbourne Rentals (≤$650/wk)",
+            "category": "Direct Agency (Live)",
+            "url": "https://harcourts.net/au/listings/rent?search=VIC&maxPrice=650",
+            "note": "Direct Harcourts rental listings across Hawthorn, Box Hill, Ringwood, Boronia & Victoria.",
+        },
+        {
+            "name": "Buxton: Properties for Lease",
+            "category": "Direct Agency (Live)",
+            "url": "https://buxton.com.au/properties-for-lease/",
+            "note": "Direct Buxton rental listings across Box Hill, Camberwell, Glen Iris, Malvern & Melbourne.",
+        },
+        {
+            "name": "Fletchers: Eastern Suburbs Properties for Lease",
+            "category": "Direct Agency (Live)",
+            "url": "https://www.fletchers.net.au/properties-for-lease",
+            "note": "Direct Fletchers rental properties across Canterbury, Balwyn, Blackburn, Mitcham & Ringwood.",
+        },
+        {
             "name": "FB Marketplace: 2BR Lease Transfers (Ascending Distance)",
             "category": "Facebook Marketplace (Live)",
             "url": "https://www.facebook.com/marketplace/melbourne/search?sortBy=distance_ascend&query=lease%20transfer%202%20bedroom&exact=false",
@@ -197,7 +215,7 @@ def main() -> None:
         print(f"[Warn] Facebook Marketplace scraper error: {e}")
         errors_logged += 1
 
-    # 5. Collect from Direct Real Estate Agency Adapters (Barry Plant, Ray White, Nelson Alexander, Jellis Craig, Woodards, Belle Property)
+    # 5. Collect from all 10 Direct Real Estate Agency Adapters (Priority 1 & Priority 2)
     agency_properties, agency_health_map, agency_exec_logs = collect_all_agency_sources()
     for a_log in agency_exec_logs:
         db.log_execution(a_log)
@@ -256,6 +274,17 @@ def main() -> None:
 
     # Cross-source duplicate detection
     deduped_properties, flagged_duplicates = deduplicate_properties(processed_properties)
+
+    # Attribute merged cross-source duplicates back to source_health telemetry
+    for prop in deduped_properties:
+        prov = prop.source_provenance or prop.sources or []
+        if len(prov) > 1:
+            for entry in prov[1:]:
+                s_name = entry.get("source_name") or entry.get("source")
+                if s_name and s_name in agency_health_map:
+                    agency_health_map[s_name]["duplicates_count"] = (
+                        int(agency_health_map[s_name].get("duplicates_count", 0)) + 1
+                    )
 
     # Freshness and lifecycle tracking
     updated_catalog, freshness_stats = update_catalog_freshness(

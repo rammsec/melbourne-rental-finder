@@ -42,31 +42,44 @@ from .base import (
 )
 from .barry_plant import BarryPlantAdapter
 from .ray_white import RayWhiteAdapter
-from .nelson_alexander import NelsonAlexanderAdapter
 from .jellis_craig import JellisCraigAdapter
-from .woodards import WoodardsAdapter
+from .nelson_alexander import NelsonAlexanderAdapter
+from .harcourts import HarcourtsAdapter
 from .belle_property import BellePropertyAdapter
+from .mcgrath import McGrathAdapter
+from .woodards import WoodardsAdapter
+from .buxton import BuxtonAdapter
+from .fletchers import FletchersAdapter
 
 
+# Priority 1 (1-4) & Priority 2 (5-10) Agency Adapters
 AGENCY_ADAPTER_CLASSES = [
     BarryPlantAdapter,
     RayWhiteAdapter,
-    NelsonAlexanderAdapter,
     JellisCraigAdapter,
-    WoodardsAdapter,
+    NelsonAlexanderAdapter,
+    HarcourtsAdapter,
     BellePropertyAdapter,
+    McGrathAdapter,
+    WoodardsAdapter,
+    BuxtonAdapter,
+    FletchersAdapter,
 ]
 
 
 def get_default_agency_adapters() -> List[BaseAgencyAdapter]:
-    """Instantiate all registered direct real estate agency adapters."""
+    """Instantiate all registered direct real estate agency adapters in Phase 1 priority order."""
     return [
         BarryPlantAdapter(),
         RayWhiteAdapter(),
-        NelsonAlexanderAdapter(),
         JellisCraigAdapter(),
-        WoodardsAdapter(),
+        NelsonAlexanderAdapter(),
+        HarcourtsAdapter(),
         BellePropertyAdapter(),
+        McGrathAdapter(),
+        WoodardsAdapter(),
+        BuxtonAdapter(),
+        FletchersAdapter(),
     ]
 
 
@@ -124,10 +137,14 @@ __all__ = [
     "parse_weekly_rent",
     "BarryPlantAdapter",
     "RayWhiteAdapter",
-    "NelsonAlexanderAdapter",
     "JellisCraigAdapter",
-    "WoodardsAdapter",
+    "NelsonAlexanderAdapter",
+    "HarcourtsAdapter",
     "BellePropertyAdapter",
+    "McGrathAdapter",
+    "WoodardsAdapter",
+    "BuxtonAdapter",
+    "FletchersAdapter",
     "AGENCY_ADAPTER_CLASSES",
     "get_default_agency_adapters",
     "collect_all_agency_sources",

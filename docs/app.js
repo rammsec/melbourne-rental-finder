@@ -35,6 +35,7 @@ let filterState = {
   verifiedOnly: false,
   directTransitOnly: false,
   fbOnly: false,
+  selectedAgencies: [],
   activeMetric: 'all'
 };
 
@@ -592,7 +593,9 @@ function createListingCardHTML(item) {
       <div class="listing-body">
         <div class="listing-meta-row">
           <span class="suburb-pill">📍 ${escapeHtml(item.suburb || "Melbourne")} ${escapeHtml(item.postcode || "")}</span>
-          <span class="source-attribution-badge" title="Listing Source Attribution">🏢 ${escapeHtml(item.agency_office || item.source || "Verified Source")}${(Array.isArray(item.source_provenance || item.sources) && (item.source_provenance || item.sources).length > 1) ? ` (+${(item.source_provenance || item.sources).length - 1} more)` : ""}</span>
+          <a href="${escapeHtml(resolvedUrl)}" target="_blank" rel="noopener" class="source-attribution-badge" title="Open Original Agency Listing (${escapeHtml(item.agency_name || item.agency_office || item.source || "Direct Source")})" style="text-decoration: none; color: inherit;">
+            🏢 ${escapeHtml(item.agency_office || item.agency_name || item.source || "Verified Source")}${(Array.isArray(item.source_provenance || item.sources) && (item.source_provenance || item.sources).length > 1) ? ` (+${(item.source_provenance || item.sources).length - 1} more)` : ""} ↗
+          </a>
         </div>
 
         <h3 class="listing-title">${escapeHtml(item.title)}</h3>
@@ -712,6 +715,21 @@ function createListingCardHTML(item) {
 
 // --- Section B: Render Main Listings Grid ---
 
+function itemMatchesSelectedAgencies(item, selectedAgencies) {
+  if (!Array.isArray(selectedAgencies) || selectedAgencies.length === 0) return true;
+  const targets = selectedAgencies.map(s => s.toLowerCase());
+  const primarySrc = (item.source || '').toLowerCase();
+  if (targets.includes(primarySrc)) return true;
+  const provList = item.source_provenance || item.sources || [];
+  if (Array.isArray(provList)) {
+    for (const p of provList) {
+      const sName = (p.source_name || p.source || '').toLowerCase();
+      if (targets.includes(sName)) return true;
+    }
+  }
+  return false;
+}
+
 function renderListings() {
   const container = document.getElementById('listings-container');
   if (!container) return;
@@ -732,6 +750,9 @@ function renderListings() {
       if (st !== 'shortlist' && st !== 'inspecting' && st !== 'applied') return false;
     }
     if (filterState.activeMetric === 'lt' && !item.is_lease_transfer) return false;
+
+    // Multi-agency / source filter
+    if (!itemMatchesSelectedAgencies(item, filterState.selectedAgencies)) return false;
 
     // Direct Hawthorn transit filter (chip or dropdown option)
     if ((filterState.directTransitOnly || filterState.suburb === 'direct_hawthorn') && !item.has_direct_hawthorn_transit) return false;
@@ -1310,15 +1331,189 @@ function renderInsightsAndAnalytics() {
     <div><strong>Total Decisions Logged:</strong> ${decisions.length}</div>
   `;
 
-  // 3. Pipeline Health
+  // 3. Pipeline Health & Per-Agency Telemetry
   const stats = appData.stats || {};
+  const sourceHealth = appData.source_health || stats.source_health || {};
+  const healthEntries = Object.entries(sourceHealth);
+
+  const agencyHealthRows = healthEntries.map(([agencyName, h]) => {
+    const st = (h.status || h.integration_status || 'idle').toLowerCase();
+    const dot = st === 'success' ? '🟢' : st === 'partial' ? '🟡' : st === 'blocked' ? '🟠' : '🔴';
+    const tsRaw = h.last_successful_collection || h.scrape_completion_time || h.scrape_end_time;
+    const tsFmt = tsRaw
+      ? new Date(tsRaw).toLocaleString('en-AU', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : 'Blocked / WAF';
+    const validCnt = h.valid_listings !== undefined ? h.valid_listings : (h.listings_accepted || 0);
+    const discCnt = h.listings_discovered || 0;
+    return `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.3rem 0; border-bottom: 1px dashed var(--border-color); font-size: 0.78rem;">
+        <span>${dot} <strong>${escapeHtml(agencyName)}</strong> <span style="color: var(--text-muted);">(${escapeHtml(st)})</span></span>
+        <span><strong>${validCnt}</strong> valid / ${discCnt} scanned • <span style="color: var(--text-muted);">${escapeHtml(tsFmt)}</span></span>
+      </div>
+    `;
+  }).join('');
+
   pipelineContainer.innerHTML = `
     <div><strong>Total Verified Properties:</strong> ${stats.total_scanned || all.length}</div>
-    <div><strong>Active Corridor Suburbs Covered:</strong> Belgrave, Lilydale, Inner East (Ringwood, Mitcham, Bayswater)</div>
+    <div><strong>Active Corridor Suburbs Covered:</strong> Eastern &amp; South-Eastern Melbourne (Hawthorn, Camberwell, Box Hill, Mitcham, Ringwood, Bayswater, Boronia, Canterbury, Balwyn)</div>
     <div><strong>Fresh Discoveries (≤48h):</strong> ${stats.new_today || 0}</div>
     <div><strong>Duplicates Detected &amp; Merged:</strong> ${stats.duplicates_detected || 'Resolved'}</div>
-    <div><strong>Scraper Reliability:</strong> 100% (Gumtree RSS, Flatmates &amp; Portals Operational)</div>
+    ${agencyHealthRows ? `<div style="margin-top: 0.45rem;"><strong style="display:block; margin-bottom: 0.25rem;">Agency Source Health &amp; Last Scrape:</strong>${agencyHealthRows}</div>` : ''}
   `;
+}
+
+// --- Multi-Select Agency Filter & Source Health Bar ---
+
+function renderAgencyFilterBar() {
+  const bar = document.getElementById('agency-filter-bar');
+  if (!bar) return;
+
+  const all = getAllMergedListings();
+  const sourceHealth = appData.source_health || (appData.stats && appData.stats.source_health) || {};
+
+  // Compute active listing count per agency/source (including multi-source provenance)
+  const countsBySource = {};
+  for (const item of all) {
+    const seenForCard = new Set();
+    if (item.source) seenForCard.add(item.source);
+    const prov = item.source_provenance || item.sources || [];
+    if (Array.isArray(prov)) {
+      for (const p of prov) {
+        const sName = p.source_name || p.source;
+        if (sName) seenForCard.add(sName);
+      }
+    }
+    for (const s of seenForCard) {
+      countsBySource[s] = (countsBySource[s] || 0) + 1;
+    }
+  }
+
+  // Build ordered list of agencies (registered direct agencies first, then any community/other sources with listings)
+  const orderedSources = [];
+  const seenNames = new Set();
+  for (const agencyName of Object.keys(sourceHealth)) {
+    orderedSources.push(agencyName);
+    seenNames.add(agencyName);
+  }
+  for (const sName of Object.keys(countsBySource).sort()) {
+    if (!seenNames.has(sName)) {
+      orderedSources.push(sName);
+      seenNames.add(sName);
+    }
+  }
+
+  const selected = filterState.selectedAgencies || [];
+  const allSelected = selected.length === 0;
+
+  const pillsHtml = orderedSources.map(sourceName => {
+    const count = countsBySource[sourceName] || 0;
+    const h = sourceHealth[sourceName] || null;
+    const isActive = selected.includes(sourceName);
+
+    let healthDot = '🟢';
+    let healthStatusText = 'Live';
+    let lastScrapeText = 'Active';
+
+    if (h) {
+      const st = (h.status || h.integration_status || 'idle').toLowerCase();
+      if (st === 'success') {
+        healthDot = '🟢';
+        healthStatusText = 'Healthy (Live)';
+      } else if (st === 'partial') {
+        healthDot = '🟡';
+        healthStatusText = 'Partial';
+      } else if (st === 'blocked') {
+        healthDot = '🟠';
+        healthStatusText = `Blocked (${h.last_error || 'Anti-bot WAF'})`;
+      } else {
+        healthDot = '🔴';
+        healthStatusText = `Failed (${h.last_error || 'Error'})`;
+      }
+
+      const ts = h.last_successful_collection || h.scrape_completion_time || h.scrape_end_time;
+      if (ts) {
+        const dt = new Date(ts);
+        if (!isNaN(dt.getTime())) {
+          lastScrapeText = dt.toLocaleString('en-AU', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
+      } else {
+        lastScrapeText = 'Never (WAF Blocked)';
+      }
+    } else if (appData.last_updated) {
+      const dt = new Date(appData.last_updated);
+      if (!isNaN(dt.getTime())) {
+        lastScrapeText = dt.toLocaleString('en-AU', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+    }
+
+    const timeShort = lastScrapeText.includes(',') ? lastScrapeText.split(',').pop().trim() : lastScrapeText;
+    const tooltip = `${sourceName} • Status: ${healthStatusText} • Listings: ${count} • Last Scrape: ${lastScrapeText}`;
+
+    return `
+      <button
+        type="button"
+        class="toggle-chip agency-filter-chip ${isActive ? 'active' : ''}"
+        data-agency-source="${escapeHtml(sourceName)}"
+        title="${escapeHtml(tooltip)}"
+        style="display: inline-flex; align-items: center; gap: 0.32rem; font-size: 0.76rem; padding: 0.28rem 0.6rem;"
+      >
+        <span>${healthDot}</span>
+        <strong>${escapeHtml(sourceName)}</strong>
+        <span style="background: rgba(15, 23, 42, 0.08); padding: 0.05rem 0.38rem; border-radius: 999px; font-weight: 700;">${count}</span>
+        ${h && h.last_successful_collection ? `<span style="font-size: 0.68rem; opacity: 0.78;">• ${escapeHtml(timeShort)}</span>` : (h && h.status === 'blocked' ? `<span style="font-size: 0.68rem; opacity: 0.78;">• WAF</span>` : '')}
+      </button>
+    `;
+  }).join('');
+
+  bar.innerHTML = `
+    <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-secondary); margin-right: 0.2rem;">
+      🏢 Agencies &amp; Sources (Multi-Select):
+    </span>
+    <button
+      type="button"
+      class="toggle-chip ${allSelected ? 'active' : ''}"
+      id="btn-agency-filter-all"
+      title="Show listings from all agencies and sources"
+      style="font-size: 0.76rem; padding: 0.28rem 0.6rem;"
+    >
+      All Sources (${all.length})
+    </button>
+    ${pillsHtml}
+  `;
+
+  const allBtn = document.getElementById('btn-agency-filter-all');
+  if (allBtn) {
+    allBtn.addEventListener('click', () => {
+      filterState.selectedAgencies = [];
+      renderAgencyFilterBar();
+      renderListings();
+    });
+  }
+
+  bar.querySelectorAll('.agency-filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.getAttribute('data-agency-source');
+      if (!src) return;
+      const idx = filterState.selectedAgencies.indexOf(src);
+      if (idx >= 0) {
+        filterState.selectedAgencies.splice(idx, 1);
+      } else {
+        filterState.selectedAgencies.push(src);
+      }
+      renderAgencyFilterBar();
+      renderListings();
+    });
+  });
 }
 
 // --- Reset Filters Helper ---
@@ -1339,6 +1534,7 @@ function resetAllFilters() {
     verifiedOnly: false,
     directTransitOnly: false,
     fbOnly: false,
+    selectedAgencies: [],
     activeMetric: 'all'
   };
 
@@ -1446,6 +1642,7 @@ function updateOverviewMetrics() {
 function renderAll() {
   updateCountdownBanner();
   updateOverviewMetrics();
+  renderAgencyFilterBar();
   renderListings();
   renderNormalListings();
   renderComparisonView();
