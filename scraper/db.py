@@ -175,13 +175,17 @@ class PropertyDatabase:
             CREATE INDEX IF NOT EXISTS idx_sources_prop_id ON listing_sources(property_id);
             """)
 
-            # Schema migration: ensure photo and transit columns exist in older database files
+            # Schema migration: ensure photo, transit, and agency columns exist in older database files
             try:
                 conn.execute("ALTER TABLE properties ADD COLUMN photo TEXT;")
             except Exception:
                 pass
             try:
                 conn.execute("ALTER TABLE properties ADD COLUMN has_direct_hawthorn_transit INTEGER DEFAULT 0;")
+            except Exception:
+                pass
+            try:
+                conn.execute("ALTER TABLE listing_sources ADD COLUMN agency_office TEXT;")
             except Exception:
                 pass
 
@@ -193,6 +197,15 @@ class PropertyDatabase:
         """
         now_iso = datetime.now(timezone.utc).isoformat()
         is_new = False
+
+        # Ensure extended fields are stored in raw_metadata for seamless round-trip persistence
+        raw_meta = dict(prop.raw_metadata or {})
+        if prop.agency_office:
+            raw_meta["agency_office"] = prop.agency_office
+        if prop.images:
+            raw_meta["images"] = prop.images
+        if prop.inspection_times:
+            raw_meta["inspection_times"] = prop.inspection_times
 
         with self.get_connection() as conn:
             # Check existing record
@@ -270,6 +283,7 @@ class PropertyDatabase:
                     availability_fit = excluded.availability_fit,
                     pass_strict_filter = excluded.pass_strict_filter,
                     rejection_reason = excluded.rejection_reason,
+                    raw_metadata_json = excluded.raw_metadata_json,
                     updated_at = excluded.updated_at
                 """,
                 (
@@ -286,7 +300,7 @@ class PropertyDatabase:
                     prop.station_name, prop.station_distance_m, prop.station_walking_mins, prop.station_distance_display,
                     1 if prop.station_is_explicit else 0, prop.availability_display, prop.availability_fit,
                     1 if prop.is_student_only else 0, 1 if prop.is_sharehouse else 0, 1 if prop.is_new else 0,
-                    1 if prop.pass_strict_filter else 0, prop.rejection_reason, json.dumps(prop.raw_metadata),
+                    1 if prop.pass_strict_filter else 0, prop.rejection_reason, json.dumps(raw_meta),
                     prop.first_seen, now_iso
                 )
             )
@@ -301,9 +315,10 @@ class PropertyDatabase:
                     (prop.property_id, prop.weekly_rent, prop.available_date, prop.listing_status, now_iso)
                 )
 
-            # Sync multi-sources
-            if prop.sources:
-                for s in prop.sources:
+            # Sync multi-sources / source_provenance
+            provenance_entries = prop.source_provenance or prop.sources
+            if provenance_entries:
+                for s in provenance_entries:
                     s_url = s.get("source_url") or s.get("url")
                     if not s_url:
                         continue
@@ -316,8 +331,8 @@ class PropertyDatabase:
                             """
                             INSERT INTO listing_sources (
                                 property_id, source_name, source_listing_id, source_url,
-                                raw_title, raw_price_text, raw_description, first_seen, last_seen, is_active
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                raw_title, raw_price_text, raw_description, first_seen, last_seen, is_active, agency_office
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """,
                             (
                                 prop.property_id,
@@ -327,9 +342,25 @@ class PropertyDatabase:
                                 s.get("raw_title") or prop.title,
                                 s.get("raw_price_text") or "",
                                 s.get("raw_description") or "",
-                                s.get("first_seen") or now_iso,
+                                s.get("discovered_at") or s.get("first_seen") or now_iso,
                                 s.get("last_seen") or now_iso,
                                 1 if s.get("is_active", True) else 0,
+                                s.get("agency_office") or prop.agency_office or "",
+                            )
+                        )
+                    else:
+                        conn.execute(
+                            """
+                            UPDATE listing_sources
+                            SET last_seen = ?, is_active = ?, agency_office = coalesce(nullif(?, ''), agency_office)
+                            WHERE property_id = ? AND source_url = ?
+                            """,
+                            (
+                                s.get("last_seen") or now_iso,
+                                1 if s.get("is_active", True) else 0,
+                                s.get("agency_office") or prop.agency_office or "",
+                                prop.property_id,
+                                s_url,
                             )
                         )
 
@@ -422,6 +453,7 @@ class PropertyDatabase:
         output_file: Optional[Path | str] = None,
         criteria: Optional[Dict[str, Any]] = None,
         portal_links: Optional[List[Dict[str, str]]] = None,
+        source_health: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Export active database records to docs/data/listings.json for static site deployment."""
         target_path = Path(output_file or self.db_path.parent / "listings.json")
@@ -448,6 +480,7 @@ class PropertyDatabase:
             },
             "hawthorn_corridor_suburbs": HAWTHORN_DIRECT_SUBURBS,
             "portal_quick_links": portal_links or [],
+            "source_health": source_health or {},
             "listings": legacy_list,
         }
 
@@ -489,6 +522,11 @@ class PropertyDatabase:
             except Exception:
                 pass
 
+        photo_val = row["photo"] if ("photo" in row.keys() and row["photo"]) else ""
+        images_val = list(raw_meta.get("images") or ([photo_val] if photo_val else []))
+        inspections_val = list(raw_meta.get("inspection_times") or [])
+        agency_office_val = str(raw_meta.get("agency_office") or "")
+
         return Property(
             property_id=prop_id,
             source=row["source"],
@@ -510,7 +548,10 @@ class PropertyDatabase:
             available_date=row["available_date"],
             lease_duration=row["lease_duration"],
             description=row["description"] or "",
-            photo=row["photo"] if ("photo" in row.keys() and row["photo"]) else "",
+            photo=photo_val,
+            images=images_val,
+            inspection_times=inspections_val,
+            agency_office=agency_office_val,
             first_seen=row["first_seen"],
             last_seen=row["last_seen"],
             last_verified=row["last_verified"],
@@ -520,6 +561,7 @@ class PropertyDatabase:
             score_version=row["score_version"] or "2.0",
             score_confidence=row["score_confidence"] or "medium",
             sources=sources,
+            source_provenance=sources,
             score_breakdown=score_breakdown,
             positive_factors=pos_factors,
             potential_concerns=concerns,

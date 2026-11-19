@@ -41,6 +41,12 @@ def generate_property_id(source: str, source_listing_id: str, address: str = "",
     return f"prop_gen_{h}"
 
 
+def generate_source_key(source: str) -> str:
+    """Generate a snake_case source_key identifier from an agency or platform name."""
+    s = re.sub(r"[^a-zA-Z0-9]+", "_", (source or "unknown").strip().lower()).strip("_")
+    return s or "unknown"
+
+
 @dataclass
 class ListingSource:
     """Represents an individual source listing for a property (supports multi-source deduplication)."""
@@ -151,6 +157,9 @@ class Property:
     lease_duration: Optional[str] = None
     description: str = ""
     photo: str = ""
+    images: List[str] = field(default_factory=list)
+    inspection_times: List[str] = field(default_factory=list)
+    agency_office: str = ""
 
     first_seen: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     last_seen: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -165,6 +174,7 @@ class Property:
 
     # Multi-source and breakdown relationships
     sources: List[Dict[str, Any]] = field(default_factory=list)
+    source_provenance: List[Dict[str, Any]] = field(default_factory=list)
     score_breakdown: Dict[str, Any] = field(default_factory=dict)
     positive_factors: List[str] = field(default_factory=list)
     potential_concerns: List[str] = field(default_factory=list)
@@ -194,14 +204,90 @@ class Property:
     # Raw metadata preserved for rollback/extension
     raw_metadata: Dict[str, Any] = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        """Synchronize photo/images and sources/source_provenance structures."""
+        if not self.photo and self.images:
+            self.photo = self.images[0]
+        elif self.photo and not self.images:
+            self.images = [self.photo]
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+        first_seen = self.first_seen or now_iso
+        last_seen = self.last_seen or first_seen
+
+        if not self.sources and self.source_provenance:
+            self.sources = [dict(p) for p in self.source_provenance]
+
+        if not self.sources and self.source_url:
+            self.sources = [{
+                "source_name": self.source,
+                "source": self.source,
+                "source_listing_id": self.source_listing_id,
+                "source_url": self.source_url,
+                "url": self.source_url,
+                "agency_office": self.agency_office,
+                "discovered_at": first_seen,
+                "first_seen": first_seen,
+                "last_seen": last_seen,
+                "is_active": True,
+            }]
+
+        normalized_prov: List[Dict[str, Any]] = []
+        seen_urls = set()
+        raw_prov = self.source_provenance if self.source_provenance else self.sources
+        for item in raw_prov:
+            s_url = item.get("source_url") or item.get("url") or self.source_url
+            if not s_url or s_url in seen_urls:
+                continue
+            seen_urls.add(s_url)
+            s_name = item.get("source_name") or item.get("source") or self.source
+            s_id = str(item.get("source_listing_id") or item.get("id") or self.source_listing_id or "")
+            s_office = item.get("agency_office") or self.agency_office or ""
+            s_disc = item.get("discovered_at") or item.get("first_seen") or first_seen
+            s_last = item.get("last_seen") or last_seen
+            entry = {
+                "source_name": s_name,
+                "source": s_name,
+                "source_listing_id": s_id,
+                "source_url": s_url,
+                "url": s_url,
+                "agency_office": s_office,
+                "discovered_at": s_disc,
+                "first_seen": s_disc,
+                "last_seen": s_last,
+                "is_active": bool(item.get("is_active", True)),
+            }
+            if item.get("raw_title"):
+                entry["raw_title"] = item["raw_title"]
+            if item.get("raw_price_text"):
+                entry["raw_price_text"] = item["raw_price_text"]
+            normalized_prov.append(entry)
+
+        if normalized_prov:
+            self.source_provenance = normalized_prov
+            self.sources = [dict(p) for p in normalized_prov]
+
     def to_dict(self) -> Dict[str, Any]:
-        """Convert to fully normalized V2 dictionary."""
+        """Convert to fully normalized V2 & Phase 1 standardised dictionary."""
         d = asdict(self)
-        # Ensure id alias is present for frontend compatibility
+        source_key = generate_source_key(self.source)
+        agency_name = self.agency_office or self.source
+        # Ensure Phase 1 Section 4 standardised fields and frontend compatibility aliases
         d["id"] = self.property_id
+        d["source"] = self.source
+        d["source_key"] = source_key
+        d["agency_name"] = agency_name
         d["url"] = self.source_url
-        d["photo"] = self.photo
+        d["photo"] = self.photo or None
+        d["images"] = self.images
+        d["inspection_times"] = self.inspection_times
+        d["agency_office"] = self.agency_office
+        d["source_provenance"] = self.source_provenance
         d["is_furnished"] = self.furnished
+        d["date_available"] = self.available_date
+        d["listed_at"] = self.first_seen
+        d["scraped_at"] = self.last_seen
+        d["last_verified_at"] = self.last_verified
         d["is_lease_transfer"] = self.lease_transfer
         d["is_normal_listing"] = (not self.lease_transfer) and self.property_entire and (not self.is_student_only)
         d["is_under_600"] = self.weekly_rent is not None and 200 <= self.weekly_rent <= 600
@@ -210,24 +296,36 @@ class Property:
 
     def to_legacy_dict(self) -> Dict[str, Any]:
         """
-        Export dictionary compatible with both V1 and V2 frontends and scrapers.
-        Guarantees all legacy keys exist.
+        Export dictionary compatible with both V1/V2 frontends and Phase 1 standardised listing structure.
+        Guarantees all legacy and Phase 1 Section 4 keys exist.
         """
         d = self.to_dict()
-        # Aliases for legacy V1 consumer compatibility
+        source_key = generate_source_key(self.source)
+        agency_name = self.agency_office or self.source
+        # Aliases for legacy V1 consumer compatibility and Phase 1 Section 4 specification
         d.update({
             "id": self.property_id,
+            "source": self.source,
+            "source_key": source_key,
+            "agency_name": agency_name,
             "url": self.source_url,
-            "photo": self.photo,
+            "photo": self.photo or "",
+            "images": self.images,
+            "inspection_times": self.inspection_times,
+            "agency_office": self.agency_office,
             "title": self.title,
             "address": self.address or f"{self.suburb}, VIC {self.postcode}".strip(),
             "suburb": self.suburb,
             "postcode": self.postcode,
             "weekly_rent": self.weekly_rent,
-            "is_furnished": bool(self.furnished),
+            "is_furnished": self.furnished,
+            "date_available": self.available_date,
+            "available_date": self.available_date,
             "bedrooms": self.bedrooms,
             "bathrooms": self.bathrooms,
             "parking": self.parking,
+            "property_type": self.property_type,
+            "description": self.description,
             "is_lease_transfer": self.lease_transfer,
             "is_entire_property": self.property_entire,
             "is_sharehouse": self.is_sharehouse,
@@ -236,9 +334,11 @@ class Property:
             "is_under_600": self.weekly_rent is not None and 200 <= self.weekly_rent <= 600,
             "is_new": self.is_new,
             "listed_at": self.first_seen,
+            "scraped_at": self.last_seen,
             "first_seen": self.first_seen,
             "last_seen": self.last_seen,
             "last_verified": self.last_verified,
+            "last_verified_at": self.last_verified,
             "listing_status": self.listing_status,
             "verification_status": self.verification_status,
             "match_score": self.match_score,
@@ -262,10 +362,18 @@ class Property:
             "pass_strict_filter": self.pass_strict_filter,
             "rejection_reason": self.rejection_reason,
             "sources": self.sources if self.sources else [{
+                "source_name": self.source,
                 "source": self.source,
+                "source_key": source_key,
+                "agency_name": agency_name,
+                "source_listing_id": self.source_listing_id,
+                "source_url": self.source_url,
                 "url": self.source_url,
+                "agency_office": self.agency_office,
+                "discovered_at": self.first_seen,
                 "first_seen": self.first_seen,
             }],
+            "source_provenance": self.source_provenance if self.source_provenance else self.sources,
         })
         return d
 
@@ -273,8 +381,8 @@ class Property:
     def from_legacy(cls, d: Dict[str, Any]) -> Property:
         """Convert a legacy V1 listing dictionary into a normalized Property object."""
         source = d.get("source") or "unknown"
-        source_id = str(d.get("id") or d.get("source_id") or "")
-        prop_id = generate_property_id(source, source_id, d.get("address", ""), d.get("suburb", ""))
+        source_id = str(d.get("id") or d.get("source_listing_id") or d.get("source_id") or "")
+        prop_id = d.get("property_id") or generate_property_id(source, source_id, d.get("address", ""), d.get("suburb", ""))
 
         # Property type inference
         prop_type = "apartment"
@@ -318,23 +426,34 @@ class Property:
 
         first_seen = d.get("first_seen") or d.get("listed_at") or datetime.now(timezone.utc).isoformat()
         last_seen = d.get("last_seen") or datetime.now(timezone.utc).isoformat()
+        agency_office = d.get("agency_office") or ""
+        source_url = d.get("url") or d.get("source_url") or ""
 
-        sources = d.get("sources") or []
-        if not sources and d.get("url"):
+        sources = d.get("sources") or d.get("source_provenance") or []
+        if not sources and source_url:
             sources = [{
                 "source_name": source,
+                "source": source,
                 "source_listing_id": source_id,
-                "source_url": d.get("url", ""),
+                "source_url": source_url,
+                "url": source_url,
+                "agency_office": agency_office,
+                "discovered_at": first_seen,
                 "first_seen": first_seen,
                 "last_seen": last_seen,
                 "is_active": True,
             }]
 
+        images = list(d.get("images") or [])
+        photo = d.get("photo") or (images[0] if images else "")
+        if photo and not images:
+            images = [photo]
+
         return cls(
             property_id=prop_id,
             source=source,
             source_listing_id=source_id,
-            source_url=d.get("url") or d.get("source_url") or "",
+            source_url=source_url,
             title=d.get("title") or "",
             address=d.get("address"),
             suburb=d.get("suburb") or "",
@@ -351,7 +470,10 @@ class Property:
             available_date=d.get("available_date") or d.get("date_available"),
             lease_duration=d.get("lease_duration"),
             description=d.get("description") or d.get("subhead") or "",
-            photo=d.get("photo") or "",
+            photo=photo,
+            images=images,
+            inspection_times=list(d.get("inspection_times") or []),
+            agency_office=agency_office,
             first_seen=first_seen,
             last_seen=last_seen,
             last_verified=d.get("last_verified"),
@@ -361,6 +483,7 @@ class Property:
             score_version=d.get("score_version") or "2.0",
             score_confidence=d.get("score_confidence") or "medium",
             sources=sources,
+            source_provenance=d.get("source_provenance") or sources,
             score_breakdown=d.get("score_breakdown") or {},
             positive_factors=d.get("positive_factors") or d.get("match_badges") or [],
             potential_concerns=d.get("potential_concerns") or [],
@@ -388,6 +511,11 @@ class Property:
     def from_dict(cls, d: Dict[str, Any]) -> Property:
         """Parse from dictionary with fallback to from_legacy for robust deserialization."""
         if "property_id" in d and "source" in d:
+            images = list(d.get("images") or [])
+            photo = d.get("photo") or (images[0] if images else "")
+            if photo and not images:
+                images = [photo]
+            sources = d.get("sources") or d.get("source_provenance") or []
             # Direct V2 structure
             return cls(
                 property_id=d["property_id"],
@@ -410,6 +538,10 @@ class Property:
                 available_date=d.get("available_date"),
                 lease_duration=d.get("lease_duration"),
                 description=d.get("description", ""),
+                photo=photo,
+                images=images,
+                inspection_times=list(d.get("inspection_times") or []),
+                agency_office=d.get("agency_office", ""),
                 first_seen=d.get("first_seen") or datetime.now(timezone.utc).isoformat(),
                 last_seen=d.get("last_seen") or datetime.now(timezone.utc).isoformat(),
                 last_verified=d.get("last_verified"),
@@ -418,7 +550,8 @@ class Property:
                 match_score=float(d["match_score"]) if d.get("match_score") is not None else None,
                 score_version=d.get("score_version", "2.0"),
                 score_confidence=d.get("score_confidence", "medium"),
-                sources=d.get("sources", []),
+                sources=sources,
+                source_provenance=d.get("source_provenance") or sources,
                 score_breakdown=d.get("score_breakdown", {}),
                 positive_factors=d.get("positive_factors", []),
                 potential_concerns=d.get("potential_concerns", []),
