@@ -603,11 +603,11 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
         if m_bed:
             bedrooms = int(m_bed.group(1))
         elif "studio" in full_text.lower():
-            bedrooms = 1
+            bedrooms = 0
         else:
-            bedrooms = 1
+            bedrooms = None
 
-    # 2. Price & Furnished status with dynamic BHK-specific caps
+    # 2. Price & Furnished status with canonical 2+ BR caps
     weekly_rent = raw.get("weekly_rent")
     if weekly_rent is None:
         weekly_rent = parse_price_weekly(raw.get("price_text", ""), full_text)
@@ -616,9 +616,7 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     if is_furnished is None:
         is_furnished = detect_furnished(full_text)
 
-    # Dynamic Budget Caps:
-    # 2 BHK: Furnished <= 625, Unfurnished <= 560
-    # 1 BHK / Studio: Furnished <= 500, Unfurnished <= 400
+    # Canonical Budget Caps: Furnished <= 625, Unfurnished <= 560
     max_allowed_rent = get_budget_cap(bedrooms, is_furnished)
     within_budget = weekly_rent is not None and 200 <= weekly_rent <= max_allowed_rent
 
@@ -626,7 +624,7 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     is_sharehouse = detect_sharehouse(full_text, raw.get("listing_kind", ""))
     # Flag suspiciously cheap multi-room Flatmates listings (e.g. $240-$360 for 2-5 rooms = per-room sharehouse)
     if "flatmates" in (raw.get("source", "") or "").lower():
-        if bedrooms >= 3 and (weekly_rent or 0) <= 550:
+        if bedrooms and bedrooms >= 3 and (weekly_rent or 0) <= 550:
             is_sharehouse = True
         elif bedrooms == 2 and (weekly_rent or 0) < 380:
             is_sharehouse = True
@@ -655,12 +653,23 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
         rejection_reasons.append("Student-only accommodation")
     if is_sharehouse:
         rejection_reasons.append("Sharehouse / Room only")
+
+    # Property type constraint: Studios are strictly rejected
+    if (raw.get("property_type") or "").strip().lower() == "studio" or "studio" in full_text.lower():
+        rejection_reasons.append("Studio properties are ineligible (minimum 2 bedrooms required)")
+
+    # Bedroom count constraint: minimum 2 bedrooms, unverified excluded
+    if bedrooms is None:
+        rejection_reasons.append("Missing or unverified bedroom count (minimum 2 bedrooms required)")
+    elif bedrooms < 2:
+        rejection_reasons.append(f"Ineligible bedroom count ({bedrooms}BR; minimum 2 bedrooms required)")
+
     if weekly_rent is None:
         rejection_reasons.append("Price unlisted")
     elif weekly_rent < 200:
         rejection_reasons.append("Likely room/carpark price (<$200/wk)")
     elif not within_budget:
-        bhk_lbl = f"{bedrooms}BHK" if bedrooms else "1BHK"
+        bhk_lbl = f"{bedrooms}BHK" if bedrooms else "2BHK"
         furn_lbl = f"furnished (max ${max_allowed_rent})" if is_furnished else f"unfurnished (max ${max_allowed_rent})"
         rejection_reasons.append(f"Over budget: ${weekly_rent}/wk {bhk_lbl} {furn_lbl}")
 
@@ -684,10 +693,7 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
     if bedrooms == 2:
         score += 25
         badges.append("2 BHK (Preferred)")
-    elif bedrooms == 1:
-        score += 14
-        badges.append("1 BHK Entire Place")
-    elif bedrooms >= 3 and not is_sharehouse:
+    elif bedrooms is not None and bedrooms >= 3 and not is_sharehouse:
         score += 18
         badges.append(f"{bedrooms} BHK Entire Place")
 
@@ -742,6 +748,8 @@ def score_and_classify_listing(raw: Dict[str, Any]) -> Dict[str, Any]:
 
     score = min(100, max(0, score))
     pass_strict = len(rejection_reasons) == 0
+    if not pass_strict:
+        score = 0
 
     enriched = dict(raw)
     enriched.update({

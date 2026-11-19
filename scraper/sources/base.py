@@ -141,7 +141,7 @@ CORRIDOR_POSTCODES: List[str] = sorted(
     list({SUBURB_POSTCODE_MAP[s] for s in HAWTHORN_DIRECT_SUBURBS if s in SUBURB_POSTCODE_MAP})
 )
 
-ELIGIBLE_PROPERTY_TYPES = {"apartment", "unit", "townhouse", "house", "studio"}
+ELIGIBLE_PROPERTY_TYPES = {"apartment", "unit", "townhouse", "house"}
 INELIGIBLE_PROPERTY_KEYWORDS = (
     "car space",
     "carspace",
@@ -647,10 +647,13 @@ class BaseAgencyAdapter(ABC):
         else:
             weekly_rent = float(weekly_rent)
 
-        try:
-            bedrooms = int(parsed_item.get("bedrooms") if parsed_item.get("bedrooms") is not None else 1)
-        except (ValueError, TypeError):
-            bedrooms = 1
+        bedrooms_raw = parsed_item.get("bedrooms")
+        bedrooms = None
+        if bedrooms_raw is not None:
+            try:
+                bedrooms = int(bedrooms_raw)
+            except (ValueError, TypeError):
+                bedrooms = None
 
         try:
             bathrooms = int(parsed_item.get("bathrooms") if parsed_item.get("bathrooms") is not None else 1)
@@ -801,7 +804,9 @@ class BaseAgencyAdapter(ABC):
         ):
             reasons.append(f"Outside Melbourne/Victoria ({prop.suburb}, {prop.state})")
 
-        if prop.property_type not in ELIGIBLE_PROPERTY_TYPES:
+        if prop.property_type == "studio":
+            reasons.append("Studio properties are ineligible (minimum 2 bedrooms required)")
+        elif prop.property_type not in ELIGIBLE_PROPERTY_TYPES:
             reasons.append(f"Ineligible property type ({prop.property_type})")
 
         for bad_kw in INELIGIBLE_PROPERTY_KEYWORDS:
@@ -810,20 +815,23 @@ class BaseAgencyAdapter(ABC):
                 break
 
         if not prop.property_entire or prop.is_sharehouse:
-            reasons.append("Shared accommodation / room-only listing")
+            reasons.append("Shared accommodation / room-only listing (entire property required)")
 
         if prop.is_student_only:
             reasons.append("Student-only accommodation")
 
-        if prop.bedrooms < 1 or prop.bedrooms > 3:
-            reasons.append(f"Bedroom count outside 1-3BR criteria ({prop.bedrooms} BR)")
+        if prop.bedrooms is None:
+            reasons.append("Missing or unverified bedroom count (minimum 2 bedrooms required)")
+        elif prop.bedrooms < 2:
+            reasons.append(f"Ineligible bedroom count ({prop.bedrooms} BR; minimum 2 bedrooms required)")
 
+        budget_cap = 625 if prop.furnished else 560
         if prop.weekly_rent is None:
             reasons.append("Missing weekly rent")
         elif prop.weekly_rent < 200:
             reasons.append(f"Weekly rent below minimum threshold (${prop.weekly_rent}/wk)")
-        elif prop.weekly_rent > 650:
-            reasons.append(f"Weekly rent exceeds Melbourne filter cap (${prop.weekly_rent}/wk > $650/wk)")
+        elif prop.weekly_rent > budget_cap:
+            reasons.append(f"Weekly rent exceeds budget cap (${prop.weekly_rent}/wk > ${budget_cap}/wk)")
 
         return (len(reasons) == 0), reasons
 

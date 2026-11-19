@@ -80,10 +80,10 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
             "note": "Focused search for Mitcham, Ringwood, Bayswater, and Boronia on the direct Belgrave/Lilydale train line.",
         },
         {
-            "name": "Domain: 1–2BHK Furnished along Corridor (≤$625 Furnished)",
+            "name": "Domain: 2+ BHK Furnished along Corridor (≤$625 Furnished)",
             "category": "Domain.com.au (Live)",
-            "url": "https://www.domain.com.au/rent/?suburb=hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,kew-vic-3101,richmond-vic-3121,box-hill-vic-3128,mitcham-vic-3132,ringwood-vic-3134,bayswater-vic-3153,boronia-vic-3155,melbourne-vic-3000&bedrooms=1-2&price=0-625&features=furnished&excludedeposittaken=1&sort=dateupdated-desc",
-            "note": "Furnished 1-2BR properties up to $625/wk on direct train/tram lines to Hawthorn.",
+            "url": "https://www.domain.com.au/rent/?suburb=hawthorn-vic-3122,hawthorn-east-vic-3123,camberwell-vic-3124,kew-vic-3101,richmond-vic-3121,box-hill-vic-3128,mitcham-vic-3132,ringwood-vic-3134,bayswater-vic-3153,boronia-vic-3155,melbourne-vic-3000&bedrooms=2-3&price=0-625&features=furnished&excludedeposittaken=1&sort=dateupdated-desc",
+            "note": "Furnished 2+ BR properties up to $625/wk on direct train/tram lines to Hawthorn.",
         },
         {
             "name": "Realestate.com.au: 2BR Hawthorn, Mitcham, Ringwood, Bayswater, Boronia ≤$560/wk",
@@ -247,6 +247,15 @@ def main() -> None:
         if enriched.get("is_student_only"):
             continue
 
+        # Exclude studios, 1BR listings, and sharehouses (exclusively 2+ bedrooms entire properties)
+        if (enriched.get("property_type") or "").lower() == "studio":
+            continue
+        beds = enriched.get("bedrooms")
+        if beds is None or beds < 2:
+            continue
+        if enriched.get("is_sharehouse") or not enriched.get("is_entire_property", True):
+            continue
+
         # Exclude missing prices or sub-$200 listings
         weekly_rent = enriched.get("weekly_rent")
         if weekly_rent is None or weekly_rent < 200:
@@ -317,6 +326,10 @@ def main() -> None:
     )
     db.log_execution(exec_log)
 
+    # Re-evaluate all existing stored listings against canonical 2+ BR eligibility
+    reeval_stats = db.reevaluate_stored_listings()
+    print(f"[Database] Re-evaluated stored listings: {reeval_stats['active']} active (2+ BR), {reeval_stats['ineligible']} historical/ineligible preserved for audit.")
+
     # Export to docs/data/listings.json for static site deployment
     portal_links = build_portal_quick_links()
     export_payload = db.export_to_listings_json(
@@ -334,9 +347,10 @@ def main() -> None:
     digest_lines = [
         f"# Melbourne Rental & Lease Transfer Digest ({now_iso[:10]})",
         "",
+        f"- **Requirement**: `Entire properties · 2+ bedrooms · No sharehouses`",
         f"- **Decision Goal**: `Dec 3, 2026` (Current contract ends `Jan 10, 2027`)",
         f"- **Move-In Window**: `Dec 5, 2026 – Jan 15, 2027`",
-        f"- **Budget Cap**: `≤ $525/wk` Unfurnished | `≤ $560/wk` Furnished",
+        f"- **Budget Cap**: `≤ $560/wk` Unfurnished | `≤ $625/wk` Furnished",
         f"- **Scanned Live Ads**: `{len(all_listings)}` | **Strict Hawthorn Matches**: `{len(strict_matches)}`",
         "",
         "## Top Matching Entire Properties (Direct Train/Tram to Hawthorn)",

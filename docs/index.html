@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Melbourne Lease Transfer & 2BHK Rental Finder — Direct to Hawthorn</title>
-  <meta name="description" content="Daily automated Melbourne rental and lease transfer tracker filtered for entire 1–2BHK properties under $525/$560 per week with direct train or tram commute to Hawthorn.">
+  <title>Melbourne Lease Transfer &amp; Rental Finder — 2+ Bedrooms Direct to Hawthorn</title>
+  <meta name="description" content="Daily automated Melbourne rental and lease transfer tracker exclusively for entire 2+ bedroom properties under $560/$625 per week with direct train or tram commute to Hawthorn.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
       <div class="app-title-group">
         <h1>Melbourne Lease Transfer &amp; Hawthorn Commute Finder</h1>
         <p class="app-subtitle">
-          Solo entire-property search (<strong>2BHK preferred</strong>, zero sharehouses). Scored for direct train/tram access to <strong>Hawthorn</strong> across all Belgrave, Lilydale &amp; Inner-East line suburbs including <strong>Mitcham, Ringwood, Bayswater, Boronia</strong>.
+          Solo entire-property search (<strong>Entire properties · 2+ bedrooms · No sharehouses</strong>). Scored for direct train/tram access to <strong>Hawthorn</strong> across all Belgrave, Lilydale &amp; Inner-East line suburbs including <strong>Mitcham, Ringwood, Bayswater, Boronia</strong>.
         </p>
       </div>
       <div class="header-actions">
@@ -48,13 +48,13 @@
     <section class="criteria-strip" aria-label="Strict search criteria">
       <div class="criteria-card">
         <span class="criteria-label">Budget Cap (Weekly)</span>
-        <span class="criteria-value">2BHK: ≤$560 Unfurn / ≤$625 Furn</span>
-        <span class="criteria-note">1BHK: ≤$400 Unfurn / ≤$500 Furn</span>
+        <span class="criteria-value">≤$560 Unfurn / ≤$625 Furn</span>
+        <span class="criteria-note">2BR+ Entire Properties</span>
       </div>
       <div class="criteria-card">
         <span class="criteria-label">Property Configuration</span>
-        <span class="criteria-value">2 BHK Preferred (Solo)</span>
-        <span class="criteria-note">Entire place only • Rejects sharehouses &amp; rooms</span>
+        <span class="criteria-value">Entire properties · 2+ bedrooms · No sharehouses</span>
+        <span class="criteria-note">2 BHK preferred • Rejects studios &amp; rooms</span>
       </div>
       <div class="criteria-card">
         <span class="criteria-label">Commute Requirement</span>
@@ -194,23 +194,20 @@
             </optgroup>
           </select>
           <select id="bedroom-filter" class="filter-select" aria-label="Filter by BHK">
-            <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
-            <option value="1">1 BHK / Studio</option>
+            <option value="all">BHK: All (2+ BHK)</option>
             <option value="2">2 BHK (Preferred)</option>
-            <option value="3">3 BHK</option>
+            <option value="3">3+ BHK</option>
           </select>
           <select id="rent-filter" class="filter-select" aria-label="Filter by maximum rent">
             <option value="all">Max Rent: Any</option>
-            <option value="400">≤ $400 / wk (1BHK Unfurn Cap)</option>
-            <option value="500">≤ $500 / wk (1BHK Furn Cap)</option>
-            <option value="560">≤ $560 / wk (2BHK Unfurn Cap)</option>
-            <option value="625">≤ $625 / wk (2BHK Furn Cap)</option>
+            <option value="560">≤ $560 / wk (2BR Unfurn Cap)</option>
+            <option value="625">≤ $625 / wk (2BR Furn Cap)</option>
             <option value="650">≤ $650 / week</option>
           </select>
           <select id="furn-filter" class="filter-select" aria-label="Filter by furnished status">
             <option value="all">Furnished &amp; Unfurnished (All)</option>
-            <option value="furnished">Furnished Only (≤$500 1BHK / ≤$625 2BHK)</option>
-            <option value="unfurnished">Unfurnished Only (≤$400 1BHK / ≤$560 2BHK)</option>
+            <option value="furnished">Furnished Only (≤$625/wk)</option>
+            <option value="unfurnished">Unfurnished Only (≤$560/wk)</option>
           </select>
           <select id="commute-filter" class="filter-select" aria-label="Filter by commute time">
             <option value="all">Commute: Any Distance</option>
@@ -284,7 +281,7 @@
       <div class="panel-card" style="margin-bottom: 1.25rem;">
         <h2>🏠 Normal Property Rentals (Below $600 / week)</h2>
         <p class="helper-text">
-          Standard residential leases (whole properties: 1 BHK, 2 BHK &amp; 3 BHK, zero sharehouses, no student-only housing) asking <strong>≤ $600/wk</strong> across Hawthorn, Mitcham, Ringwood, Bayswater, Boronia, Box Hill, Camberwell, Richmond, and direct transit lines.
+          Standard residential leases (whole properties: 2 BHK &amp; 3+ BHK, zero sharehouses, no student-only housing) asking <strong>≤ $600/wk</strong> across Hawthorn, Mitcham, Ringwood, Bayswater, Boronia, Box Hill, Camberwell, Richmond, and direct transit lines.
         </p>
       </div>
 
@@ -339,10 +336,9 @@
             </optgroup>
           </select>
           <select id="bedroom-filter-normal" class="filter-select" aria-label="Filter by BHK">
-            <option value="all">BHK: All (1, 2 &amp; 3 BHK)</option>
-            <option value="1">1 BHK / Studio</option>
+            <option value="all">BHK: All (2+ BHK)</option>
             <option value="2">2 BHK (Preferred)</option>
-            <option value="3">3 BHK</option>
+            <option value="3">3+ BHK</option>
           </select>
           <select id="furn-filter-normal" class="filter-select" aria-label="Filter by furnished status">
             <option value="all">Furnished &amp; Unfurnished (All)</option>
@@ -512,8 +508,8 @@
           <div id="fb-analysis-output" style="font-size: 0.9rem; color: var(--text-secondary);">
             <ul style="list-style: none; display: grid; gap: 0.6rem; margin-top: 0.75rem;">
               <li>🚆 <strong>Suburb Alignment:</strong> Checks against 27 direct train/tram corridors to Hawthorn</li>
-              <li>💰 <strong>Budget Rules:</strong> 2BHK ≤ $560 Unfurn / ≤ $625 Furn | 1BHK ≤ $400 Unfurn / ≤ $500 Furn</li>
-              <li>🏠 <strong>Solo Entire Property:</strong> 2BHK preferred (auto-flags sharehouses)</li>
+              <li>💰 <strong>Budget Rules:</strong> Unfurnished ≤ $560/wk | Furnished ≤ $625/wk</li>
+              <li>🏠 <strong>Requirement:</strong> Entire properties · 2+ bedrooms · No sharehouses</li>
               <li>📅 <strong>Move-in Window:</strong> Dec 5, 2026 – Jan 15, 2027</li>
             </ul>
           </div>
@@ -526,7 +522,7 @@
       <div class="panel-card" style="margin-bottom: 1.25rem;">
         <h2>One-Click Pre-Filtered Search Portals (Hawthorn Corridor)</h2>
         <p class="helper-text">
-          These links open Facebook Marketplace, Domain, Realestate.com.au, Flatmates (Whole Properties), and Gumtree with your exact filters (<strong>2BHK, ≤$525/$560, Hawthorn + direct transit suburbs, newest first</strong>) already applied.
+          These links open Facebook Marketplace, Domain, Realestate.com.au, Flatmates (Whole Properties), and Gumtree with your exact filters (<strong>2+ BHK, ≤$560/$625, Hawthorn + direct transit suburbs, newest first</strong>) already applied.
         </p>
       </div>
       <div class="quick-links-grid" id="portal-links-container"></div>

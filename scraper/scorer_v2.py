@@ -33,13 +33,19 @@ def evaluate_hard_eligibility(
     is_entire_property: bool,
     is_student_only: bool,
     is_sharehouse: bool,
-    max_budget_cap: float = 650.0,
+    max_budget_cap: float = 625.0,
     is_interstate: bool = False,
     bedrooms: Optional[int] = None,
+    property_type: str = "apartment",
 ) -> Tuple[bool, List[str]]:
     """
-    Evaluate strict non-negotiable eligibility constraints.
-    Returns (is_eligible, disqualification_reasons).
+    Evaluate strict non-negotiable eligibility constraints:
+    - Entire properties ONLY with at least 2 bedrooms (2+ BR required).
+    - Rejects studio and 1-bedroom listings completely.
+    - Rejects room-only and sharehouse listings.
+    - Missing or ambiguous bedroom counts are treated as unverified and excluded.
+    - 3BR or larger entire properties remain eligible subject to budget.
+    - Budget: Unfurnished <= $560/week, Furnished <= $625/week.
     """
     reasons: List[str] = []
 
@@ -50,9 +56,19 @@ def evaluate_hard_eligibility(
         reasons.append("Restricted to student-only accommodation")
 
     if is_sharehouse or not is_entire_property:
-        reasons.append("Sharehouse or individual room (solo entire place required)")
+        reasons.append("Sharehouse or individual room (solo entire place with 2+ bedrooms required)")
 
-    effective_cap = get_budget_cap(bedrooms, is_furnished) if bedrooms is not None else max_budget_cap
+    # Property type constraint: Studios are strictly rejected
+    if (property_type or "").strip().lower() == "studio":
+        reasons.append("Studio properties are ineligible (minimum 2 bedrooms required)")
+
+    # Bedroom constraint: Treat missing/ambiguous bedroom count as unverified, reject <2BR
+    if bedrooms is None:
+        reasons.append("Missing or unverified bedroom count (minimum 2 bedrooms required)")
+    elif bedrooms < 2:
+        reasons.append(f"Ineligible bedroom count ({bedrooms}BR; minimum 2 bedrooms required)")
+
+    effective_cap = get_budget_cap(bedrooms, is_furnished)
 
     if weekly_rent is None:
         reasons.append("No rental price specified")
@@ -77,7 +93,7 @@ def score_property_v2(prop: Property) -> Property:
     is_furnished = bool(prop.furnished)
     is_entire = prop.property_entire and not prop.is_sharehouse
     suburb_clean = (prop.suburb or "").strip().lower()
-    bedrooms = prop.bedrooms or 1
+    bedrooms = prop.bedrooms
 
     # Check for direct Hawthorn transit
     prop.has_direct_hawthorn_transit = suburb_clean in HAWTHORN_DIRECT_SUBURBS
@@ -85,7 +101,7 @@ def score_property_v2(prop: Property) -> Property:
     # Check if outside Greater Melbourne / Interstate
     is_interstate = is_outside_melbourne(prop.address or "", prop.title, prop.description, prop.suburb)
 
-    # 1. Evaluate Hard Eligibility Criteria with dynamic BHK-specific caps
+    # 1. Evaluate Hard Eligibility Criteria with canonical 2+ BR caps
     budget_target = get_budget_cap(bedrooms, is_furnished)
     is_eligible, disqualification_reasons = evaluate_hard_eligibility(
         weekly_rent=weekly_rent,
@@ -96,16 +112,18 @@ def score_property_v2(prop: Property) -> Property:
         max_budget_cap=budget_target,
         is_interstate=is_interstate,
         bedrooms=bedrooms,
+        property_type=prop.property_type,
     )
 
     prop.pass_strict_filter = is_eligible and (weekly_rent is not None and weekly_rent <= budget_target) and prop.has_direct_hawthorn_transit
     prop.rejection_reasons = disqualification_reasons
     if not is_eligible:
         prop.rejection_reason = "; ".join(disqualification_reasons)
+        prop.listing_status = "ineligible"
     elif not prop.has_direct_hawthorn_transit:
         prop.rejection_reason = "No direct train/tram to Hawthorn"
     elif not prop.pass_strict_filter:
-        bhk_lbl = f"{bedrooms}BHK"
+        bhk_lbl = f"{bedrooms}BHK" if bedrooms is not None else "2BHK"
         furn_lbl = "furnished" if is_furnished else "unfurnished"
         prop.rejection_reason = f"Above target budget (${int(weekly_rent)}/wk > ${budget_target}/wk {bhk_lbl} {furn_lbl})"
     else:
@@ -197,19 +215,16 @@ def score_property_v2(prop: Property) -> Property:
 
     if beds == 2:
         suitability_pts = 20.0
-        suitability_reason = f"2-bedroom {ptype} perfectly matches preferred solo space requirement"
-        positive_factors.append(f"2 Bedrooms (Preferred layout)")
-    elif beds == 1:
-        suitability_pts = 14.0
-        suitability_reason = f"1-bedroom {ptype} provides private solo accommodation"
-        positive_factors.append("1 Bedroom entire place")
-    elif beds >= 3 and is_entire:
-        suitability_pts = 16.0
+        suitability_reason = f"2-bedroom {ptype} perfectly matches required 2BR layout"
+        positive_factors.append("2 Bedrooms (Preferred layout)")
+    elif beds is not None and beds >= 3 and is_entire:
+        suitability_pts = 18.0
         suitability_reason = f"{beds}-bedroom entire property offers generous living area"
         positive_factors.append(f"{beds} Bedrooms entire property")
     else:
-        suitability_pts = 8.0
-        suitability_reason = f"Studio / compact living format"
+        suitability_pts = 0.0
+        suitability_reason = "Ineligible bedroom count (fewer than 2 bedrooms or unverified)"
+        potential_concerns.append("Ineligible bedroom count (minimum 2 bedrooms required)")
 
     # ----------------------------------------------------
     # Category 4: Move-in Timing & Lease Fit (Max 15 pts)

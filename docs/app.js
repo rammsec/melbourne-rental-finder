@@ -234,8 +234,7 @@ function getUserDecisionLogs() {
 }
 
 function getBudgetCap(bedrooms, isFurnished) {
-  if ((bedrooms || 1) >= 2) return isFurnished ? 625 : 560;
-  return isFurnished ? 500 : 400;
+  return isFurnished ? 625 : 560;
 }
 
 function isOutsideMelbourneListing(item) {
@@ -307,15 +306,21 @@ function getAllMergedListings() {
     // 1. Exclude Student Only Accommodation
     if (isStudentOnlyListing(item)) return false;
 
-    // 2. Exclude if user marked as leased / gone
+    // 2. Exclude studios, 1-bedroom listings, room-only, sharehouses, or unverified bedrooms
+    // (Requirement: Exclusively entire properties with at least 2 bedrooms)
+    if (item.is_sharehouse || !item.is_entire_property) return false;
+    if ((item.property_type || '').toLowerCase() === 'studio') return false;
+    if (item.bedrooms == null || isNaN(item.bedrooms) || Number(item.bedrooms) < 2) return false;
+
+    // 3. Exclude if user marked as leased / gone
     if (statuses[item.id] === 'leased') return false;
 
-    // 3. Exclude missing price or invalid dummy listings
+    // 4. Exclude missing price or invalid dummy listings
     const rent = item.weekly_rent;
     if (!rent || rent < 200) return false;
     if ((item.title || '').trim().toLowerCase() === 'lease listing') return false;
 
-    // 4. Enforce strict freshness cutoffs:
+    // 5. Enforce strict freshness cutoffs:
     // - Lease transfers: within last 15 days
     // - Normal listings: within last 10 days
     const ageDays = getListingAgeDays(item.listed_at);
@@ -378,10 +383,9 @@ function computeExplainableBreakdown(item) {
   else if (commuteMins <= 40) commuteScore = 14;
 
   // 3. Property Suitability (20 pts)
-  let suitScore = 12;
+  let suitScore = 0;
   if (bedrooms === 2) suitScore = 20;
-  else if (bedrooms === 1) suitScore = 14;
-  else if (bedrooms >= 3) suitScore = 16;
+  else if (bedrooms >= 3) suitScore = 18;
 
   // 4. Move-in Compatibility (15 pts)
   let moveInScore = 10;
@@ -417,8 +421,8 @@ function computeExplainableBreakdown(item) {
 
   if (bedrooms === 2) {
     positive.push('Two bedrooms — matches your preferred solo 2BHK requirement');
-  } else if (bedrooms === 1) {
-    positive.push('Entire 1-bedroom / studio property — zero flatmates');
+  } else if (bedrooms >= 3) {
+    positive.push(`${bedrooms} Bedrooms entire property — generous living area`);
   }
 
   if (commuteMins <= 20) {
@@ -538,8 +542,10 @@ function createListingCardHTML(item) {
   const badgePills = [];
   if (item.bedrooms === 2) {
     badgePills.push(`<span class="spec-badge highlight-2bhk">★ 2 BHK (Preferred)</span>`);
+  } else if (item.bedrooms >= 3) {
+    badgePills.push(`<span class="spec-badge">${item.bedrooms} BHK Entire Place</span>`);
   } else {
-    badgePills.push(`<span class="spec-badge">${item.bedrooms || 1} BHK Entire Place</span>`);
+    badgePills.push(`<span class="spec-badge">${item.bedrooms || 2} BHK</span>`);
   }
   badgePills.push(`<span class="spec-badge highlight-dec">📅 ${escapeHtml(item.availability_display || item.date_available || "Dec 2026")}</span>`);
 
@@ -773,7 +779,6 @@ function renderListings() {
     }
 
     // Bedroom filter
-    if (filterState.bedrooms === '1' && item.bedrooms !== 1) return false;
     if (filterState.bedrooms === '2' && item.bedrooms !== 2) return false;
     if (filterState.bedrooms === '3' && item.bedrooms < 3) return false;
 
@@ -948,7 +953,6 @@ function renderNormalListings() {
       if (!sub.includes(q) && !addr.includes(q)) return false;
     }
 
-    if (filterStateNormal.bedrooms === '1' && item.bedrooms !== 1) return false;
     if (filterStateNormal.bedrooms === '2' && item.bedrooms !== 2) return false;
     if (filterStateNormal.bedrooms === '3' && item.bedrooms < 3) return false;
 
@@ -1290,7 +1294,7 @@ function renderInsightsAndAnalytics() {
     preferences.push({
       type: 'budget',
       title: 'Upper-Bracket Budget Tolerance Detected',
-      desc: `You have shortlisted ${stretchShortlisted} properties near the upper limit of your budget rules. They will continue to be shown without exceeding your hard caps (≤$625 2BHK Furn / ≤$560 2BHK Unfurn / ≤$500 1BHK Furn / ≤$400 1BHK Unfurn).`,
+      desc: `You have shortlisted ${stretchShortlisted} properties near the upper limit of your budget rules. They will continue to be shown without exceeding your hard caps (≤$625 2BR+ Furn / ≤$560 2BR+ Unfurn).`,
       actionText: 'Within Stated Rules',
       actionFn: null
     });
@@ -2018,11 +2022,12 @@ async function initApp() {
       if (!rawText) return;
 
       const lower = rawText.toLowerCase();
+      const isStudio = /\bstudio\b/.test(lower);
       const isUnfurn = /\bunfurnished\b|\bnot\s+furnished\b/.test(lower);
       const isFurn = !isUnfurn && (/\bfully\s+furnished\b|\bfurnished\b|\bincludes\s+furniture\b/.test(lower));
       const mBed = lower.match(/\b(\d)\s*(?:bed|br|bhk|bedroom)/);
-      const bedrooms = mBed ? parseInt(mBed[1], 10) : 2;
-      const maxCap = getBudgetCap(bedrooms, isFurn);
+      const bedrooms = mBed ? parseInt(mBed[1], 10) : (isStudio ? 0 : null);
+      const maxCap = getBudgetCap(bedrooms || 2, isFurn);
 
       // Extract price
       const mPrice = rawText.replace(/,/g, '').match(/\$\s*(\d{3,4})/);
@@ -2045,6 +2050,12 @@ async function initApp() {
       if (!isAligned) {
         passStrict = false;
         rejectionReason = `Suburb (${suburbInfo.name}) is outside your 27 Hawthorn direct train/tram corridors`;
+      } else if (isStudio || (bedrooms !== null && bedrooms < 2)) {
+        passStrict = false;
+        rejectionReason = `Ineligible property (${isStudio ? 'Studio' : bedrooms + 'BR'}; minimum 2 bedrooms required)`;
+      } else if (bedrooms === null) {
+        passStrict = false;
+        rejectionReason = 'Unverified bedroom count (minimum 2 bedrooms required)';
       } else if (isSharehouse) {
         passStrict = false;
         rejectionReason = 'Sharehouse / Room only (user requires entire property)';
@@ -2054,18 +2065,19 @@ async function initApp() {
       }
 
       // 100-pt Explainable Score
-      let score = 50;
-      if (isAligned) score += 25;
-      if (!isSharehouse) score += 15;
-      if (weeklyRent <= maxCap) {
-        score += 20;
-        const diff = maxCap - weeklyRent;
-        if (diff >= 30) score += 10;
-      } else {
-        score -= 20;
+      let score = 0;
+      if (passStrict) {
+        score = 50;
+        if (isAligned) score += 25;
+        if (!isSharehouse) score += 15;
+        if (weeklyRent <= maxCap) {
+          score += 20;
+          const diff = maxCap - weeklyRent;
+          if (diff >= 30) score += 10;
+        }
+        if (isLeaseTransfer) score += 10;
+        score = Math.max(20, Math.min(100, score));
       }
-      if (isLeaseTransfer) score += 10;
-      score = Math.max(20, Math.min(100, score));
 
       const customItem = {
         id: 'fb-custom-' + Date.now(),
