@@ -258,6 +258,10 @@ class PropertyDatabase:
                     address = coalesce(excluded.address, properties.address),
                     suburb = excluded.suburb,
                     postcode = excluded.postcode,
+                    property_type = excluded.property_type,
+                    bedrooms = excluded.bedrooms,
+                    bathrooms = excluded.bathrooms,
+                    parking = excluded.parking,
                     weekly_rent = excluded.weekly_rent,
                     furnished = excluded.furnished,
                     property_entire = excluded.property_entire,
@@ -448,6 +452,48 @@ class PropertyDatabase:
             )
             return [dict(r) for r in cur.fetchall()]
 
+    def reevaluate_stored_listings(self) -> Dict[str, int]:
+        """
+        Re-evaluate all existing stored listings against the canonical eligibility rules:
+        - Entire properties with 2+ bedrooms only (min_bedrooms = 2).
+        - Exclude studios, 1BR, sharehouses, and unverified bedroom counts from active status.
+        - Preserves historical records for audit purposes by setting listing_status = 'ineligible'.
+        Returns dict with counts of active vs ineligible listings.
+        """
+        from .scorer_v2 import score_property_v2
+        active_count = 0
+        ineligible_count = 0
+
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT property_id FROM properties")
+            all_ids = [r[0] for r in cur.fetchall()]
+
+        for pid in all_ids:
+            prop = self.get_property(pid)
+            if not prop:
+                continue
+            scored_prop = score_property_v2(prop)
+            is_eligible = (
+                scored_prop.property_type != "studio"
+                and scored_prop.bedrooms is not None
+                and scored_prop.bedrooms >= 2
+                and scored_prop.property_entire
+                and not scored_prop.is_sharehouse
+                and (scored_prop.weekly_rent is None or scored_prop.weekly_rent <= (625 if scored_prop.furnished else 560))
+            )
+            if is_eligible:
+                scored_prop.listing_status = "active"
+                active_count += 1
+            else:
+                scored_prop.listing_status = "ineligible"
+                scored_prop.pass_strict_filter = False
+                scored_prop.match_score = 0.0
+                ineligible_count += 1
+            self.upsert_property(scored_prop)
+
+        return {"active": active_count, "ineligible": ineligible_count}
+
     def export_to_listings_json(
         self,
         output_file: Optional[Path | str] = None,
@@ -455,12 +501,24 @@ class PropertyDatabase:
         portal_links: Optional[List[Dict[str, str]]] = None,
         source_health: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        """Export active database records to docs/data/listings.json for static site deployment."""
+        """
+        Export active, eligible database records (2+ bedrooms, no studios, no sharehouses)
+        to docs/data/listings.json for static site deployment.
+        """
         target_path = Path(output_file or self.db_path.parent / "listings.json")
         target_path.parent.mkdir(parents=True, exist_ok=True)
 
         props = self.list_properties(status="active", limit=1000)
-        legacy_list = [p.to_legacy_dict() for p in props]
+        # Strictly ensure ineligible listings (studios, <2BR, sharehouses) are excluded from active export
+        eligible_props = [
+            p for p in props
+            if p.property_type != "studio"
+            and p.bedrooms is not None
+            and p.bedrooms >= 2
+            and p.property_entire
+            and not p.is_sharehouse
+        ]
+        legacy_list = [p.to_legacy_dict() for p in eligible_props]
 
         now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         strict_matches = [x for x in legacy_list if x.get("pass_strict_filter")]
@@ -476,6 +534,7 @@ class PropertyDatabase:
                 "total_under_600": sum(1 for x in legacy_list if x.get("is_under_600")),
                 "lease_transfers": sum(1 for x in legacy_list if x.get("is_lease_transfer")),
                 "two_bhk_matches": sum(1 for x in legacy_list if x.get("bedrooms") == 2 and x.get("is_under_600")),
+                "three_plus_bhk_matches": sum(1 for x in legacy_list if (x.get("bedrooms") or 0) >= 3 and x.get("is_under_600")),
                 "new_today": sum(1 for x in legacy_list if x.get("is_new")),
             },
             "hawthorn_corridor_suburbs": HAWTHORN_DIRECT_SUBURBS,
@@ -538,7 +597,7 @@ class PropertyDatabase:
             postcode=row["postcode"] or "",
             state=row["state"] or "VIC",
             property_type=row["property_type"] or "apartment",
-            bedrooms=int(row["bedrooms"] or 1),
+            bedrooms=int(row["bedrooms"]) if row["bedrooms"] is not None else None,
             bathrooms=int(row["bathrooms"] or 1),
             parking=int(row["parking"] or 0),
             weekly_rent=float(row["weekly_rent"]) if row["weekly_rent"] is not None else None,

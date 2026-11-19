@@ -418,33 +418,58 @@ class TestV1Regression(unittest.TestCase):
 
 
 class TestBHKBudgetRules(unittest.TestCase):
-    """Test granular BHK & furnishing budget rules:
-    - 2 BHK house: Furnished up to $625/wk, Unfurnished up to $560/wk
-    - 1 BHK: Furnished up to $500/wk, Unfurnished up to $400/wk
+    """Test strict 2+ bedroom minimum requirement and budget rules:
+    - Studio: rejected
+    - 1BR: rejected
+    - 2BR unfurnished at $560: eligible
+    - 2BR unfurnished above $560: over budget
+    - 2BR furnished at $625: eligible
+    - 2BR furnished above $625: over budget
+    - Entire 3BR property: eligible if within budget
+    - Sharehouse: rejected
+    - Unknown bedroom count: unverified and excluded from eligible recommendations
     """
 
     def test_budget_cap_helper(self):
-        # 2 BHK
+        # 2+ BHK caps
         self.assertEqual(get_budget_cap(2, is_furnished=True), 625)
         self.assertEqual(get_budget_cap(2, is_furnished=False), 560)
         self.assertEqual(get_budget_cap(3, is_furnished=True), 625)
         self.assertEqual(get_budget_cap(3, is_furnished=False), 560)
-        # 1 BHK
-        self.assertEqual(get_budget_cap(1, is_furnished=True), 500)
-        self.assertEqual(get_budget_cap(1, is_furnished=False), 400)
-        self.assertEqual(get_budget_cap(0, is_furnished=True), 500)
-        self.assertEqual(get_budget_cap(0, is_furnished=False), 400)
+        # Fallback / backward compat defaults to canonical caps
+        self.assertEqual(get_budget_cap(1, is_furnished=True), 625)
+        self.assertEqual(get_budget_cap(1, is_furnished=False), 560)
+        self.assertEqual(get_budget_cap(None, is_furnished=False), 560)
 
-    def test_2bhk_furnished_budget_enforcement(self):
-        # $620 <= $625: passes
+    def test_2br_unfurnished_at_560_eligible(self):
+        # 2BR unfurnished at exactly $560: eligible
         ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=620.0, is_furnished=True, is_entire_property=True,
+            weekly_rent=560.0, is_furnished=False, is_entire_property=True,
             is_student_only=False, is_sharehouse=False, bedrooms=2
         )
         self.assertTrue(ok)
         self.assertEqual(len(reasons), 0)
 
-        # $630 > $625: fails
+    def test_2br_unfurnished_above_560_over_budget(self):
+        # 2BR unfurnished above $560: over budget
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=565.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=2
+        )
+        self.assertFalse(ok)
+        self.assertTrue(any("Over budget" in r and "560" in r for r in reasons))
+
+    def test_2br_furnished_at_625_eligible(self):
+        # 2BR furnished at exactly $625: eligible
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=625.0, is_furnished=True, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=2
+        )
+        self.assertTrue(ok)
+        self.assertEqual(len(reasons), 0)
+
+    def test_2br_furnished_above_625_over_budget(self):
+        # 2BR furnished above $625: over budget
         ok, reasons = evaluate_hard_eligibility(
             weekly_rent=630.0, is_furnished=True, is_entire_property=True,
             is_student_only=False, is_sharehouse=False, bedrooms=2
@@ -452,56 +477,83 @@ class TestBHKBudgetRules(unittest.TestCase):
         self.assertFalse(ok)
         self.assertTrue(any("Over budget" in r and "625" in r for r in reasons))
 
-    def test_2bhk_unfurnished_budget_enforcement(self):
-        # $550 <= $560: passes
-        ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=550.0, is_furnished=False, is_entire_property=True,
-            is_student_only=False, is_sharehouse=False, bedrooms=2
+    def test_entire_3br_property_eligible_within_budget(self):
+        # Entire 3BR property within budget ($540 unfurnished, $600 furnished): eligible
+        ok_unfurn, reasons_unfurn = evaluate_hard_eligibility(
+            weekly_rent=540.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=3
         )
-        self.assertTrue(ok)
-        self.assertEqual(len(reasons), 0)
+        self.assertTrue(ok_unfurn)
+        self.assertEqual(len(reasons_unfurn), 0)
 
-        # $575 > $560: fails
+        ok_furn, reasons_furn = evaluate_hard_eligibility(
+            weekly_rent=600.0, is_furnished=True, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=3
+        )
+        self.assertTrue(ok_furn)
+        self.assertEqual(len(reasons_furn), 0)
+
+        # 3BR above budget: over budget
+        ok_over, reasons_over = evaluate_hard_eligibility(
+            weekly_rent=650.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=3
+        )
+        self.assertFalse(ok_over)
+        self.assertTrue(any("Over budget" in r for r in reasons_over))
+
+    def test_studio_rejected(self):
+        # Studio properties explicitly rejected
         ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=575.0, is_furnished=False, is_entire_property=True,
-            is_student_only=False, is_sharehouse=False, bedrooms=2
+            weekly_rent=350.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=0,
+            property_type="studio"
         )
         self.assertFalse(ok)
-        self.assertTrue(any("Over budget" in r and "560" in r for r in reasons))
+        self.assertTrue(any("Studio properties are ineligible" in r for r in reasons))
 
-    def test_1bhk_furnished_budget_enforcement(self):
-        # $490 <= $500: passes
+    def test_1br_rejected(self):
+        # 1-bedroom properties explicitly rejected
         ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=490.0, is_furnished=True, is_entire_property=True,
-            is_student_only=False, is_sharehouse=False, bedrooms=1
-        )
-        self.assertTrue(ok)
-        self.assertEqual(len(reasons), 0)
-
-        # $510 > $500: fails
-        ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=510.0, is_furnished=True, is_entire_property=True,
-            is_student_only=False, is_sharehouse=False, bedrooms=1
+            weekly_rent=380.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=1,
+            property_type="apartment"
         )
         self.assertFalse(ok)
-        self.assertTrue(any("Over budget" in r and "500" in r for r in reasons))
+        self.assertTrue(any("Ineligible bedroom count (1BR; minimum 2 bedrooms required)" in r for r in reasons))
 
-    def test_1bhk_unfurnished_budget_enforcement(self):
-        # $395 <= $400: passes
+    def test_sharehouse_rejected(self):
+        # Sharehouse explicitly rejected even with 2+ bedrooms
         ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=395.0, is_furnished=False, is_entire_property=True,
-            is_student_only=False, is_sharehouse=False, bedrooms=1
-        )
-        self.assertTrue(ok)
-        self.assertEqual(len(reasons), 0)
-
-        # $430 > $400: fails
-        ok, reasons = evaluate_hard_eligibility(
-            weekly_rent=430.0, is_furnished=False, is_entire_property=True,
-            is_student_only=False, is_sharehouse=False, bedrooms=1
+            weekly_rent=300.0, is_furnished=True, is_entire_property=False,
+            is_student_only=False, is_sharehouse=True, bedrooms=2
         )
         self.assertFalse(ok)
-        self.assertTrue(any("Over budget" in r and "400" in r for r in reasons))
+        self.assertTrue(any("Sharehouse" in r for r in reasons))
+
+    def test_unknown_bedroom_count_unverified_and_excluded(self):
+        # Unknown/missing bedroom count: unverified and excluded
+        ok, reasons = evaluate_hard_eligibility(
+            weekly_rent=500.0, is_furnished=False, is_entire_property=True,
+            is_student_only=False, is_sharehouse=False, bedrooms=None
+        )
+        self.assertFalse(ok)
+        self.assertTrue(any("Missing or unverified bedroom count" in r for r in reasons))
+
+        # Scorer v2 sets pass_strict_filter=False and match_score=0.0
+        prop_unknown = Property(
+            property_id="p_unknown_beds",
+            source="domain",
+            source_listing_id="999",
+            source_url="https://domain.com/999",
+            title="Apartment in Hawthorn",
+            suburb="Hawthorn",
+            weekly_rent=500.0,
+            bedrooms=None,
+        )
+        scored = score_property_v2(prop_unknown)
+        self.assertFalse(scored.pass_strict_filter)
+        self.assertEqual(scored.match_score, 0.0)
+        self.assertEqual(scored.listing_status, "ineligible")
 
 
 class TestInterstateListingExclusion(unittest.TestCase):

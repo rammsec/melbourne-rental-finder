@@ -72,21 +72,26 @@ class BellePropertyAdapter(BaseAgencyAdapter):
 
         # 2. Check standard Belle Property card blocks if present
         card_matches = re.finditer(
-            r'<article[^>]*data-listing-id="([^"]+)"[^>]*>(.*?)</article>',
+            r'<article([^>]*)>(.*?)</article>',
             html_text,
             flags=re.DOTALL | re.IGNORECASE,
         )
         for m in card_matches:
-            lid = m.group(1).strip()
+            attrs = m.group(1)
             block = m.group(2)
+            m_lid = re.search(r'data-listing-id="([^"]+)"', attrs, flags=re.I)
+            if not m_lid:
+                continue
+            lid = m_lid.group(1).strip()
+
             m_href = re.search(r'href="([^"]+)"', block, flags=re.I)
             m_addr = re.search(r'class="[^"]*address[^"]*"[^>]*>(.*?)</', block, flags=re.DOTALL | re.I)
             m_price = re.search(r'class="[^"]*price[^"]*"[^>]*>(.*?)</', block, flags=re.DOTALL | re.I)
             m_avail = re.search(r'class="[^"]*avail[^"]*"[^>]*>(.*?)</', block, flags=re.DOTALL | re.I)
             m_office = re.search(r'class="[^"]*office[^"]*"[^>]*>(.*?)</', block, flags=re.DOTALL | re.I)
-            m_bed = re.search(r'data-beds="(\d+)"', block, flags=re.I)
-            m_bath = re.search(r'data-baths="(\d+)"', block, flags=re.I)
-            m_car = re.search(r'data-cars="(\d+)"', block, flags=re.I)
+            m_bed = re.search(r'data-beds="(\d+)"', attrs, flags=re.I) or re.search(r'data-beds="(\d+)"', block, flags=re.I)
+            m_bath = re.search(r'data-baths="(\d+)"', attrs, flags=re.I) or re.search(r'data-baths="(\d+)"', block, flags=re.I)
+            m_car = re.search(r'data-cars="(\d+)"', attrs, flags=re.I) or re.search(r'data-cars="(\d+)"', block, flags=re.I)
             m_img = re.search(r'<img[^>]+src="([^"]+)"', block, flags=re.I)
 
             rel_url = m_href.group(1).strip() if m_href else f"/listings/{lid}/"
@@ -99,7 +104,7 @@ class BellePropertyAdapter(BaseAgencyAdapter):
                 "price_text": clean_html_text(m_price.group(1)) if m_price else "",
                 "available_date": clean_html_text(m_avail.group(1)) if m_avail else None,
                 "agency_office": clean_html_text(m_office.group(1)) if m_office else "Belle Property",
-                "bedrooms": int(m_bed.group(1)) if m_bed else 1,
+                "bedrooms": int(m_bed.group(1)) if m_bed else None,
                 "bathrooms": int(m_bath.group(1)) if m_bath else 1,
                 "parking": int(m_car.group(1)) if m_car else 0,
                 "images": [m_img.group(1).strip()] if m_img else [],
@@ -154,7 +159,7 @@ class BellePropertyAdapter(BaseAgencyAdapter):
         )
 
         available_date = parse_availability_date(item.get("available_date"))
-        bedrooms = item.get("bedrooms", 1)
+        bedrooms = item.get("bedrooms")
         bathrooms = item.get("bathrooms", 1)
         parking = item.get("parking", 0)
         title = clean_html_text(item.get("title") or address)

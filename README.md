@@ -4,10 +4,10 @@ A zero-dependency, automated daily rental and lease-transfer finder built for se
 
 ## Built-In Search Criteria & Scoring Rules
 
-- **Occupancy**: Solo entire property only (**2 BHK preferred**, 1 BHK accepted; sharehouses, flatshares, and student rooms are automatically filtered out).
+- **Occupancy**: Entire property only (**minimum 2 bedrooms required**, 2BR preferred; 1BR, studios, sharehouses, flatshares, and student rooms are automatically filtered out).
 - **Weekly Rent Cap**:
-  - **Unfurnished**: max **\$525/week**
-  - **Furnished**: max **\$560/week**
+  - **Unfurnished (2+ BR)**: max **\$560/week**
+  - **Furnished (2+ BR)**: max **\$625/week**
 - **Direct Commute to Hawthorn (`3122`)**:
   - **Belgrave / Lilydale / Alamein Train Lines**: Hawthorn, Glenferrie, Auburn, Richmond, Burnley, Camberwell, Canterbury, Surrey Hills, Mont Albert, Box Hill, Blackburn, Nunawading, Mitcham, Ringwood, Hartwell, Burwood, Ashburton, East Melbourne, Melbourne CBD.
   - **Direct Tram Routes 70, 75 & 16**: Kew, Kooyong, Toorak, Malvern, Armadale, Caulfield North, St Kilda East, Docklands.

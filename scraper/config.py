@@ -3,28 +3,24 @@ Hawthorn Commute & Criteria Configuration for Melbourne Rental & Lease Transfer 
 
 User Criteria:
 - Solo occupant ("only for me")
-- Entire property only (2BR preferred, 1BR/Studio acceptable; NO sharehouses/room-only)
+- Entire properties ONLY with 2+ bedrooms (min_bedrooms = 2, preferred_bedrooms = 2; NO 1BR, NO studios, NO sharehouses/room-only)
 - Budget:
-  - Unfurnished: max $525/week
-  - Furnished: max $560/week
+  - 2BR+ Unfurnished: max $560/week
+  - 2BR+ Furnished: max $625/week
 - Move-in window: Dec 5, 2026 to Jan 15, 2027 (must find before Dec 3, 2026; current lease ends Jan 10, 2027)
 - Direct train or tram commute to Hawthorn (Station / Burwood Rd / Riversdale Rd / Glenferrie Rd)
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 
 USER_CRITERIA = {
-    # 2 BHK caps (Preferred)
+    # 2+ BHK budget caps
     "max_rent_2bhk_unfurnished": 560,
     "max_rent_2bhk_furnished": 625,
-    # 1 BHK / Studio caps
-    "max_rent_1bhk_unfurnished": 400,
-    "max_rent_1bhk_furnished": 500,
-    # General / 2BHK default backward-compatibility
     "max_rent_unfurnished": 560,
     "max_rent_furnished": 625,
+    "min_bedrooms": 2,
     "preferred_bedrooms": 2,
-    "min_bedrooms": 1,
     "allow_sharehouse": False,
     "decision_deadline": "2026-12-03",
     "current_lease_end": "2027-01-10",
@@ -34,15 +30,13 @@ USER_CRITERIA = {
 }
 
 
-def get_budget_cap(bedrooms: int = 1, is_furnished: bool = False) -> int:
+def get_budget_cap(bedrooms: Optional[int] = 2, is_furnished: bool = False) -> int:
     """
-    Granular user budget caps:
-    - 2 BHK (and 3+ BHK): Furnished <= 625, Unfurnished <= 560
-    - 1 BHK / Studio: Furnished <= 500, Unfurnished <= 400
+    Canonical budget caps for 2+ bedroom entire properties:
+    - Furnished: max $625/week
+    - Unfurnished: max $560/week
     """
-    if (bedrooms or 1) >= 2:
-        return 625 if is_furnished else 560
-    return 500 if is_furnished else 400
+    return 625 if is_furnished else 560
 
 
 # Suburbs with a DIRECT train (Belgrave / Lilydale / Alamein lines),

@@ -144,7 +144,7 @@ class Property:
     state: str = "VIC"
 
     property_type: str = "apartment"  # "apartment", "unit", "townhouse", "house", "studio"
-    bedrooms: int = 1
+    bedrooms: Optional[int] = None
     bathrooms: int = 1
     parking: int = 0
 
@@ -396,14 +396,14 @@ class Property:
         elif "studio" in title_desc:
             prop_type = "studio"
 
-        # Safe parsing of numeric values
-        bedrooms = d.get("bedrooms")
-        if bedrooms is None:
-            bedrooms = 1
-        try:
-            bedrooms = int(bedrooms)
-        except (ValueError, TypeError):
-            bedrooms = 1
+        # Safe parsing of numeric values (bedrooms: keep None if missing/unparseable)
+        bedrooms_raw = d.get("bedrooms")
+        bedrooms = None
+        if bedrooms_raw is not None:
+            try:
+                bedrooms = int(bedrooms_raw)
+            except (ValueError, TypeError):
+                bedrooms = None
 
         bathrooms = d.get("bathrooms", 1)
         try:

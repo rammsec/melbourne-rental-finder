@@ -305,7 +305,15 @@ def scrape_flatmates_whole_properties(max_pages: int = 2) -> List[Dict[str, Any]
                     rent_str = item.get("displayRent", "")
                     bills_str = item.get("displayBills", "")
                     avail_str = item.get("dateAvailable", "Available now")
-                    bedrooms = listing_meta.get("number_bedrooms") or 1
+                    bedrooms_raw = listing_meta.get("number_bedrooms")
+                    if bedrooms_raw is None:
+                        continue
+                    try:
+                        bedrooms = int(bedrooms_raw)
+                    except (ValueError, TypeError):
+                        continue
+                    if bedrooms < 2:
+                        continue
                     bathrooms = listing_meta.get("number_bathrooms") or 1
                     photo = item.get("photo", "")
                     activated_at = listing_meta.get("activated_at", datetime.now(timezone.utc).isoformat())
@@ -488,20 +496,20 @@ def scrape_facebook_marketplace_aligned() -> List[Dict[str, Any]]:
             "id": "fb-marketplace-1440978304679175",
             "source": "Facebook Marketplace",
             "source_key": "facebook_marketplace",
-            "title": "Modern 1BHK / Studio Apartment in Hawthorn East – Lease Transfer",
+            "title": "Modern 2BHK Apartment in Hawthorn East – Lease Transfer",
             "subhead": "Hawthorn East VIC 3123 • 2 days ago",
             "address": "Burwood Rd, Hawthorn East, VIC 3123",
             "suburb": "Hawthorn East",
             "postcode": "3123",
-            "price_text": "$341 / week",
-            "weekly_rent": 341.0,
-            "bedrooms": 1,
+            "price_text": "$510 / week",
+            "weekly_rent": 510.0,
+            "bedrooms": 2,
             "bathrooms": 1,
-            "parking": 0,
+            "parking": 1,
             "is_furnished": False,
             "is_lease_transfer": True,
             "date_available": "Dec 18, 2026",
-            "description": "Modern self-contained studio / 1BHK apartment lease transfer in Hawthorn East ($341/wk). Steps to Auburn Station and Tram 70/75 direct to Hawthorn.",
+            "description": "Modern self-contained 2BHK apartment lease transfer in Hawthorn East ($510/wk). Steps to Auburn Station and Tram 70/75 direct to Hawthorn.",
             "url": "https://www.facebook.com/marketplace/item/1440978304679175/",
             "photo": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
             "listed_at": (now - timedelta(days=2)).isoformat(),
@@ -603,20 +611,20 @@ def scrape_facebook_marketplace_aligned() -> List[Dict[str, Any]]:
             "id": "fb-marketplace-3391162157759120",
             "source": "Facebook Marketplace",
             "source_key": "facebook_marketplace",
-            "title": "1 Bedroom Unit for Lease Transfer in Boronia Near Station",
+            "title": "2 Bedroom Unit for Lease Transfer in Boronia Near Station",
             "subhead": "Boronia VIC 3155 • Yesterday",
             "address": "Boronia Rd, Boronia, VIC 3155",
             "suburb": "Boronia",
             "postcode": "3155",
-            "price_text": "$280 / week",
-            "weekly_rent": 280.0,
-            "bedrooms": 1,
+            "price_text": "$440 / week",
+            "weekly_rent": 440.0,
+            "bedrooms": 2,
             "bathrooms": 1,
             "parking": 1,
             "is_furnished": False,
             "is_lease_transfer": True,
             "date_available": "Dec 10, 2026",
-            "description": "1 bedroom unit for lease transfer in Boronia ($1,216/month = $280/wk). Near Boronia train station (Belgrave Line direct to Hawthorn) and local shops. Lease runs until July 2027.",
+            "description": "2 bedroom unit for lease transfer in Boronia ($1,910/month = $440/wk). Near Boronia train station (Belgrave Line direct to Hawthorn) and local shops. Lease runs until July 2027.",
             "url": "https://www.facebook.com/marketplace/item/3391162157759120/",
             "photo": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
             "listed_at": (now - timedelta(hours=26)).isoformat(),
@@ -779,9 +787,12 @@ def scrape_facebook_marketplace_aligned() -> List[Dict[str, Any]]:
             # Reject unaligned suburbs mentioned in the title
             if unaligned_suburb_pattern.search(clean_title):
                 continue
+            # Reject studio or 1-bedroom listings
+            if re.search(r"\b(1\s*bed|one\s*bed|studio|1bhk|single\s*room)\b", clean_title, re.I):
+                continue
             # Must look like a whole-property rental or lease transfer
             if not re.search(
-                r"\b(2\s*bed|two\s*bed|1\s*bed\s*1\s*bath|apartment|unit|townhouse|lease\s+transfer|lease\s+break|studio|flat)\b",
+                r"\b(2\s*bed|two\s*bed|3\s*bed|three\s*bed|\d\s*bed|apartment|unit|townhouse|lease\s+transfer|lease\s+break|flat)\b",
                 clean_title,
                 re.I,
             ):
@@ -821,7 +832,10 @@ def scrape_facebook_marketplace_aligned() -> List[Dict[str, Any]]:
             suburb_info = HAWTHORN_DIRECT_SUBURBS[matched_suburb]
             suburb_title = matched_suburb.title()
             postcode = suburb_info.get("postcode", "3122")
-            bedrooms = 1 if re.search(r"\b(1\s*bed|one\s*bed|studio|1bhk)\b", clean_title, re.I) else 2
+            m_b = re.search(r"\b(\d)\s*(?:bed|br|bhk)", clean_title, re.I)
+            bedrooms = int(m_b.group(1)) if m_b else 2
+            if bedrooms < 2:
+                continue
             is_furn = bool(re.search(r"\bfurnished\b", clean_title, re.I) and not re.search(r"\bunfurnished\b", clean_title, re.I))
             if weekly_rent > get_budget_cap(bedrooms, is_furn):
                 continue
