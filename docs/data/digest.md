@@ -1,10 +1,10 @@
-# Melbourne Rental & Lease Transfer Digest (2026-11-21)
+# Melbourne Rental & Lease Transfer Digest (2026-11-22)
 
 - **Requirement**: `Entire properties · 2+ bedrooms · No sharehouses`
 - **Decision Goal**: `Dec 3, 2026` (Current contract ends `Jan 10, 2027`)
 - **Move-In Window**: `Dec 5, 2026 – Jan 15, 2027`
 - **Budget Cap**: `≤ $560/wk` Unfurnished | `≤ $625/wk` Furnished
-- **Scanned Live Ads**: `187` | **Strict Hawthorn Matches**: `83`
+- **Scanned Live Ads**: `188` | **Strict Hawthorn Matches**: `84`
 
 ## Top Matching Entire Properties (Direct Train/Tram to Hawthorn)
 
