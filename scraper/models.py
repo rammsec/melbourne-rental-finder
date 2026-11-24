@@ -201,6 +201,9 @@ class Property:
     rejection_reason: Optional[str] = None
     rejection_reasons: List[str] = field(default_factory=list)
 
+    # AI Evaluator Agent Assessment
+    ai_evaluation: Optional[Dict[str, Any]] = None
+
     # Raw metadata preserved for rollback/extension
     raw_metadata: Dict[str, Any] = field(default_factory=dict)
 
@@ -292,6 +295,7 @@ class Property:
         d["is_normal_listing"] = (not self.lease_transfer) and self.property_entire and (not self.is_student_only)
         d["is_under_600"] = self.weekly_rent is not None and 200 <= self.weekly_rent <= 600
         d["has_direct_hawthorn_transit"] = self.has_direct_hawthorn_transit
+        d["ai_evaluation"] = self.ai_evaluation
         return d
 
     def to_legacy_dict(self) -> Dict[str, Any]:
@@ -361,6 +365,7 @@ class Property:
             "availability_fit": self.availability_fit,
             "pass_strict_filter": self.pass_strict_filter,
             "rejection_reason": self.rejection_reason,
+            "ai_evaluation": self.ai_evaluation,
             "sources": self.sources if self.sources else [{
                 "source_name": self.source,
                 "source": self.source,
@@ -504,6 +509,7 @@ class Property:
             is_new=bool(d.get("is_new", False)),
             pass_strict_filter=bool(d.get("pass_strict_filter", True)),
             rejection_reason=d.get("rejection_reason"),
+            ai_evaluation=d.get("ai_evaluation"),
             raw_metadata=d.get("raw_metadata") or {},
         )
 
@@ -572,6 +578,7 @@ class Property:
                 is_new=bool(d.get("is_new", False)),
                 pass_strict_filter=bool(d.get("pass_strict_filter", True)),
                 rejection_reason=d.get("rejection_reason"),
+                ai_evaluation=d.get("ai_evaluation"),
                 raw_metadata=d.get("raw_metadata", {}),
             )
         return cls.from_legacy(d)

@@ -34,6 +34,7 @@ from scraper.freshness import (
 from scraper.scorer_v2 import score_property_v2, evaluate_hard_eligibility
 from scraper.scorer import score_and_classify_listing
 from scraper.db import PropertyDatabase
+from scraper.ai_agent import RentalAIEvaluatorAgent, evaluate_property_ai
 
 
 class TestUnifiedPropertyModel(unittest.TestCase):
@@ -786,6 +787,100 @@ class TestFacebookMarketplaceSource(unittest.TestCase):
         self.assertGreater(len(fb_links), 0)
         self.assertEqual(fb_links[0]["url"], FB_MARKETPLACE_PRIMARY_URL)
         self.assertIn("lease%20transfer%202%20bedroom", fb_links[0]["url"])
+
+
+class TestAIEvaluatorAgent(unittest.TestCase):
+    """Test AI Evaluator Agent assessments for solo renter lifestyle, WFH, noise, and amenities."""
+
+    def setUp(self):
+        self.agent = RentalAIEvaluatorAgent()
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.db = PropertyDatabase(Path(self.temp_dir.name) / "test_ai.sqlite")
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_high_match_wfh_lifestyle_evaluation(self):
+        p = Property(
+            property_id="ai_p1",
+            source="jelliscraig",
+            source_listing_id="jc1",
+            source_url="https://jelliscraig.com.au/rent/jc1",
+            title="Sunny 2 Bedroom Unit with Study Potential",
+            address="14 Victoria Rd, Camberwell",
+            suburb="Camberwell",
+            bedrooms=2,
+            bathrooms=1,
+            parking=1,
+            weekly_rent=500.0,
+            commute_mins=4,
+            commute_mode="Train",
+            has_direct_hawthorn_transit=True,
+            description="Tucked away in a quiet street, this sun-drenched rear of block apartment offers split-system heating and cooling, dishwasher, internal laundry, balcony, and a generous second bedroom ideal for a work-from-home study.",
+        )
+        eval_res = self.agent.evaluate(p)
+        self.assertEqual(eval_res["verdict"], "HIGH_MATCH")
+        self.assertGreaterEqual(eval_res["match_score"], 82)
+        self.assertIn("Top AI Match", eval_res["badge_label"])
+        self.assertTrue(any("study" in s.lower() or "work-from-home" in s.lower() or "work and rest" in s.lower() for s in eval_res["strengths"]))
+        self.assertTrue(any("split-system" in s.lower() for s in eval_res["strengths"]))
+
+    def test_noisy_corridor_and_communal_laundry_cautions(self):
+        p = Property(
+            property_id="ai_p2",
+            source="barryplant",
+            source_listing_id="bp2",
+            source_url="https://barryplant.com.au/rent/bp2",
+            title="2 Bedroom Flat on Burwood Road",
+            address="520 Burwood Rd, Hawthorn",
+            suburb="Hawthorn",
+            bedrooms=2,
+            weekly_rent=540.0,
+            commute_mins=2,
+            commute_mode="Train",
+            has_direct_hawthorn_transit=True,
+            description="Standard 2BR apartment. Electric wall panel heaters. Shared communal laundry facilities in the building. Close to shops and transport.",
+        )
+        eval_res = self.agent.evaluate(p)
+        self.assertIn(eval_res["verdict"], ("CONSIDER_WITH_CAUTION", "NOT_RECOMMENDED"))
+        self.assertLess(eval_res["match_score"], 70)
+        self.assertTrue(any("major road" in c.lower() or "burwood" in c.lower() for c in eval_res["cautions"]))
+        self.assertTrue(any("communal" in c.lower() or "laundry" in c.lower() for c in eval_res["cautions"]))
+
+    def test_sqlite_persistence_and_roundtrip(self):
+        p = Property(
+            property_id="ai_p3_db",
+            source="raywhite",
+            source_listing_id="rw3",
+            source_url="https://raywhite.com/rent/rw3",
+            title="Modern 2BR in Hawthorn East",
+            address="20 Auburn Rd, Hawthorn East",
+            suburb="Hawthorn East",
+            bedrooms=2,
+            weekly_rent=520.0,
+            commute_mins=4,
+            has_direct_hawthorn_transit=True,
+            description="Lovely 2-bedroom home with split-system cooling and dishwasher.",
+        )
+        eval_res = self.agent.evaluate(p)
+        p.ai_evaluation = eval_res
+
+        # Upsert into database
+        self.db.upsert_property(p)
+
+        # Retrieve from database and verify ai_evaluation preserved
+        retrieved = self.db.get_property("ai_p3_db")
+        self.assertIsNotNone(retrieved)
+        self.assertIsNotNone(retrieved.ai_evaluation)
+        self.assertEqual(retrieved.ai_evaluation["verdict"], eval_res["verdict"])
+        self.assertEqual(retrieved.ai_evaluation["match_score"], eval_res["match_score"])
+
+        # Verify export_to_listings_json includes ai_evaluation
+        out_file = Path(self.temp_dir.name) / "test_export.json"
+        payload = self.db.export_to_listings_json(out_file)
+        self.assertEqual(len(payload["listings"]), 1)
+        self.assertIn("ai_evaluation", payload["listings"][0])
+        self.assertEqual(payload["listings"][0]["ai_evaluation"]["verdict"], eval_res["verdict"])
 
 
 if __name__ == "__main__":

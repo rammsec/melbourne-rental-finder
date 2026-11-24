@@ -29,6 +29,7 @@ from .scorer_v2 import score_property_v2
 from .dedup import deduplicate_properties
 from .freshness import update_property_freshness, update_catalog_freshness
 from .db import PropertyDatabase
+from .ai_agent import evaluate_property_ai
 from .sources import (
     scrape_gumtree_lease_transfers,
     scrape_flatmates_whole_properties,
@@ -353,6 +354,13 @@ def main() -> None:
     reeval_stats = db.reevaluate_stored_listings()
     print(f"[Database] Re-evaluated stored listings: {reeval_stats['active']} active (2+ BR), {reeval_stats['ineligible']} historical/ineligible preserved for audit.")
 
+    # Run AI Evaluator Agent on all active eligible properties
+    print("[AI Agent] Running AI Evaluator Agent to assess personal lifestyle & WFH fit...")
+    active_props = db.list_properties(status="active", limit=1000)
+    for p in active_props:
+        p.ai_evaluation = evaluate_property_ai(p)
+        db.upsert_property(p)
+
     # Export to docs/data/listings.json for static site deployment
     portal_links = build_portal_quick_links()
     export_payload = db.export_to_listings_json(
@@ -390,6 +398,66 @@ def main() -> None:
         digest_lines.append(
             f"| **{score_val}%** | {rent_badge} | {bed_badge} | {transit} | {station} | {item.get('availability_display', 'Flexible')} | [Open Property]({item['url']}) |"
         )
+
+    # -----------------------------------------------------------------
+    # AI Evaluator Agent Verdict Section
+    # -----------------------------------------------------------------
+    ai_candidates = [x for x in strict_matches if x.get("ai_evaluation")]
+    # Sort by AI lifestyle match score
+    ai_candidates.sort(key=lambda x: (x.get("ai_evaluation", {}).get("match_score", 0)), reverse=True)
+
+    if ai_candidates:
+        digest_lines.extend([
+            "",
+            "## 🤖 AI Evaluator Agent – Lifestyle & WFH Compatibility",
+            "",
+            "> [!NOTE]",
+            "> Evaluated for solo occupant: 2nd bedroom dedicated as quiet WFH office, split-system heating/cooling, street noise levels, and kitchen/laundry essentials.",
+            "",
+            "| AI Verdict | Lifestyle | Rent | Suburb | WFH & Second Room | Climate & Noise | Link |",
+            "| :--- | :---: | :---: | :--- | :--- | :--- | :---: |",
+        ])
+
+        for item in ai_candidates[:12]:
+            ai = item.get("ai_evaluation", {})
+            fit = ai.get("lifestyle_fit", {})
+            badge = ai.get("badge_label", "🎯 Top Match")
+            ai_score = ai.get("match_score", item.get("match_score", 0))
+            rent_str = f"${item['weekly_rent']}/wk"
+            wfh = fit.get("wfh_suitability", "2BR Layout")
+            climate_noise = f"{fit.get('climate_comfort', 'Standard')}; {fit.get('noise_level', 'Quiet')}"
+            digest_lines.append(
+                f"| **{badge}** | **{ai_score}/100** | {rent_str} | **{item['suburb']}** | {wfh} | {climate_noise} | [Open Listing]({item['url']}) |"
+            )
+
+        # Detailed breakdown of top 3 AI picks
+        digest_lines.extend([
+            "",
+            "### 🎯 Top AI Advisor Property Deep-Dives",
+            "",
+        ])
+        for idx, item in enumerate(ai_candidates[:3], 1):
+            ai = item.get("ai_evaluation", {})
+            strengths = ai.get("strengths", [])
+            cautions = ai.get("cautions", [])
+            tips = ai.get("inspection_tips", [])
+            digest_lines.extend([
+                f"#### {idx}. {item.get('address', item['suburb'])} – {ai.get('badge_label', 'Top Match')} ({ai.get('match_score', item.get('match_score', 0))}/100)",
+                f"- **Rent**: `${item['weekly_rent']}/wk` ({'Furnished' if item['is_furnished'] else 'Unfurnished'}) · **Commute**: {item.get('commute_mode', 'Train')} to Hawthorn (~{item.get('commute_mins', 12)} mins)",
+                f"- **Agent Appraisal**: *\"{ai.get('one_liner', 'Strong match for 2BR solo occupant.')}\"*",
+                "- **Key Lifestyle Fits**:",
+            ])
+            for s in strengths[:3]:
+                digest_lines.append(f"  - ✅ {s}")
+            if cautions:
+                digest_lines.append("- **Points of Caution / Tradeoffs**:")
+                for c in cautions[:2]:
+                    digest_lines.append(f"  - ⚠️ {c}")
+            if tips:
+                digest_lines.append("- **Inspection Advice**:")
+                for t in tips[:2]:
+                    digest_lines.append(f"  - 📋 {t}")
+            digest_lines.append(f"- **Listing**: [View Property on {item.get('source', 'Web')}]({item['url']})\n")
 
     DIGEST_FILE.write_text("\n".join(digest_lines) + "\n", encoding="utf-8")
     print(

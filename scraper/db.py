@@ -116,6 +116,7 @@ class PropertyDatabase:
                 pass_strict_filter INTEGER DEFAULT 1,
                 rejection_reason TEXT,
                 raw_metadata_json TEXT,
+                ai_evaluation_json TEXT,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL
             );
@@ -200,6 +201,10 @@ class PropertyDatabase:
                 conn.execute("ALTER TABLE listing_sources ADD COLUMN agency_office TEXT;")
             except Exception:
                 pass
+            try:
+                conn.execute("ALTER TABLE properties ADD COLUMN ai_evaluation_json TEXT;")
+            except Exception:
+                pass
 
     def upsert_property(self, prop: Property) -> bool:
         """
@@ -251,7 +256,7 @@ class PropertyDatabase:
                     commute_mode, commute_line, commute_mins, commute_tier, has_direct_hawthorn_transit,
                     station_name, station_distance_m, station_walking_mins, station_distance_display, station_is_explicit,
                     availability_display, availability_fit, is_student_only, is_sharehouse, is_new,
-                    pass_strict_filter, rejection_reason, raw_metadata_json, created_at, updated_at
+                    pass_strict_filter, rejection_reason, raw_metadata_json, ai_evaluation_json, created_at, updated_at
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?,
@@ -261,7 +266,7 @@ class PropertyDatabase:
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?
                 )
                 ON CONFLICT(property_id) DO UPDATE SET
                     source = excluded.source,
@@ -300,6 +305,7 @@ class PropertyDatabase:
                     pass_strict_filter = excluded.pass_strict_filter,
                     rejection_reason = excluded.rejection_reason,
                     raw_metadata_json = excluded.raw_metadata_json,
+                    ai_evaluation_json = coalesce(excluded.ai_evaluation_json, properties.ai_evaluation_json),
                     updated_at = excluded.updated_at
                 """,
                 (
@@ -317,6 +323,7 @@ class PropertyDatabase:
                     1 if prop.station_is_explicit else 0, prop.availability_display, prop.availability_fit,
                     1 if prop.is_student_only else 0, 1 if prop.is_sharehouse else 0, 1 if prop.is_new else 0,
                     1 if prop.pass_strict_filter else 0, prop.rejection_reason, json.dumps(raw_meta),
+                    json.dumps(prop.ai_evaluation) if prop.ai_evaluation else None,
                     prop.first_seen, now_iso
                 )
             )
@@ -784,6 +791,13 @@ class PropertyDatabase:
             except Exception:
                 pass
 
+        ai_eval_val = None
+        if "ai_evaluation_json" in row.keys() and row["ai_evaluation_json"]:
+            try:
+                ai_eval_val = json.loads(row["ai_evaluation_json"])
+            except Exception:
+                pass
+
         photo_val = row["photo"] if ("photo" in row.keys() and row["photo"]) else ""
         images_val = list(raw_meta.get("images") or ([photo_val] if photo_val else []))
         inspections_val = list(raw_meta.get("inspection_times") or [])
@@ -844,6 +858,7 @@ class PropertyDatabase:
             is_new=bool(row["is_new"]),
             pass_strict_filter=bool(row["pass_strict_filter"]),
             rejection_reason=row["rejection_reason"],
+            ai_evaluation=ai_eval_val,
             raw_metadata=raw_meta,
         )
 

@@ -37,6 +37,7 @@ let filterState = {
   strictOnly: false,
   verifiedOnly: false,
   directTransitOnly: false,
+  aiTopOnly: false,
   fbOnly: false,
   selectedAgencies: [],
   activeMetric: 'all'
@@ -803,6 +804,58 @@ function createListingCardHTML(item) {
           </div>
         ` : ""}
 
+        ${item.ai_evaluation ? `
+          <div class="ai-agent-card-box" style="margin-top: 0.35rem; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 0.55rem 0.7rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                <span style="font-size: 0.88rem;">🤖</span>
+                <strong style="font-size: 0.8rem; color: #166534;">AI Lifestyle Fit:</strong>
+                <span style="font-size: 0.75rem; font-weight: 700; background: ${item.ai_evaluation.badge_color || '#16a34a'}; color: white; padding: 0.15rem 0.45rem; border-radius: 4px;">
+                  ${escapeHtml(item.ai_evaluation.badge_label || 'Top Match')} (${item.ai_evaluation.match_score || 80}/100)
+                </span>
+              </div>
+              <button type="button" class="btn-toggle-ai-details" data-ai-id="${escapeHtml(item.id)}" style="background: none; border: none; color: #166534; font-size: 0.75rem; cursor: pointer; text-decoration: underline; font-weight: 600; padding: 0;">
+                Fit Details ▼
+              </button>
+            </div>
+            <p style="font-size: 0.78rem; color: #15803d; line-height: 1.35; margin: 0; font-weight: 500;">
+              ${escapeHtml(item.ai_evaluation.one_liner || '')}
+            </p>
+            <div class="ai-expanded-details" id="ai-details-${escapeHtml(item.id)}" style="display: none; margin-top: 0.45rem; padding-top: 0.45rem; border-top: 1px dashed #bbf7d0; font-size: 0.76rem; color: #1e293b;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; margin-bottom: 0.4rem;">
+                <div><strong>💻 WFH:</strong> ${escapeHtml(item.ai_evaluation.lifestyle_fit?.wfh_suitability || '2BR Layout')}</div>
+                <div><strong>🔇 Noise:</strong> ${escapeHtml(item.ai_evaluation.lifestyle_fit?.noise_level || 'Quiet')}</div>
+                <div><strong>❄️ Climate:</strong> ${escapeHtml(item.ai_evaluation.lifestyle_fit?.climate_comfort || 'Standard')}</div>
+                <div><strong>🍽️ Kitchen:</strong> ${escapeHtml(item.ai_evaluation.lifestyle_fit?.kitchen_laundry || 'Standard')}</div>
+              </div>
+              ${item.ai_evaluation.strengths && item.ai_evaluation.strengths.length ? `
+                <div style="margin-top: 0.3rem;">
+                  <strong style="color: #166534;">Key Lifestyle Strengths:</strong>
+                  <ul style="margin: 0.15rem 0 0 1rem; padding: 0;">
+                    ${item.ai_evaluation.strengths.map(s => `<li>${escapeHtml(s)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+              ${item.ai_evaluation.cautions && item.ai_evaluation.cautions.length ? `
+                <div style="margin-top: 0.3rem;">
+                  <strong style="color: #b45309;">Points of Caution / Compromises:</strong>
+                  <ul style="margin: 0.15rem 0 0 1rem; padding: 0;">
+                    ${item.ai_evaluation.cautions.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+              ${item.ai_evaluation.inspection_tips && item.ai_evaluation.inspection_tips.length ? `
+                <div style="margin-top: 0.3rem;">
+                  <strong style="color: #0369a1;">Inspection Checklist:</strong>
+                  <ul style="margin: 0.15rem 0 0 1rem; padding: 0;">
+                    ${item.ai_evaluation.inspection_tips.map(t => `<li>${escapeHtml(t)}</li>`).join('')}
+                  </ul>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        ` : ''}
+
         <!-- Progressive Disclosure Accordion -->
         <button type="button" class="drawer-toggle-btn" data-drawer-id="${escapeHtml(item.id)}" style="margin-top: 0.35rem; width: 100%; padding: 0.45rem 0.65rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--brand-forest); cursor: pointer; font-weight: 600;">
           Show 100-Point Breakdown &amp; Description ▼
@@ -934,6 +987,10 @@ function renderListings() {
     if (filterState.fbOnly && !(item.source || '').toLowerCase().includes('facebook')) return false;
     if (filterState.newOnly && !isRecentNewListing(item)) return false;
     if (filterState.budgetOnly && (item.weekly_rent || 0) > getBudgetCap(item.bedrooms, item.is_furnished)) return false;
+    if (filterState.aiTopOnly) {
+      const aiScore = (item.ai_evaluation && item.ai_evaluation.match_score) || 0;
+      if (aiScore < 75) return false;
+    }
 
     // Suburb filter
     if (filterState.suburb && filterState.suburb !== 'all' && filterState.suburb !== 'direct_hawthorn') {
@@ -1269,6 +1326,20 @@ function bindCardInteractions(rootElement) {
         btn.textContent = isOpen
           ? 'Hide 100-Point Breakdown ▲'
           : 'Show 100-Point Breakdown & Description ▼';
+      }
+    });
+  });
+
+  // 6. AI Details expand/collapse toggle
+  rootElement.querySelectorAll('.btn-toggle-ai-details').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const lid = btn.getAttribute('data-ai-id');
+      const box = document.getElementById(`ai-details-${lid}`);
+      if (box) {
+        const isHidden = box.style.display === 'none' || !box.style.display;
+        box.style.display = isHidden ? 'block' : 'none';
+        btn.textContent = isHidden ? 'Fit Details ▲' : 'Fit Details ▼';
       }
     });
   });
@@ -1955,6 +2026,7 @@ async function initApp() {
     }
   };
 
+  bindChip('chip-ai-top', 'aiTopOnly');
   bindChip('chip-direct-transit', 'directTransitOnly');
   bindChip('chip-new-only', 'newOnly');
   bindChip('chip-lease-transfer', 'leaseTransferOnly');
