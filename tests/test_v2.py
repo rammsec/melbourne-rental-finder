@@ -377,6 +377,119 @@ class TestPersistentDatabase(unittest.TestCase):
         self.assertEqual(payload["listings"][0]["id"], "prop_db_export")
         self.assertEqual(payload["listings"][0]["suburb"], "Ringwood")
 
+    def test_sync_user_decisions_and_skipped_suppression(self):
+        # 1. Insert 3 active properties (one matched by ID, one by address, one by URL)
+        p1 = Property(
+            property_id="prop_skip_id",
+            source="raywhite",
+            source_listing_id="rw_1",
+            source_url="https://raywhite.com/rent/prop1",
+            address="15 Burwood Rd, Hawthorn",
+            suburb="Hawthorn",
+            bedrooms=2,
+            weekly_rent=500.0,
+            match_score=85.0,
+            pass_strict_filter=True,
+            listing_status="active",
+        )
+        p2 = Property(
+            property_id="prop_skip_addr",
+            source="barryplant",
+            source_listing_id="bp_2",
+            source_url="https://barryplant.com.au/rent/prop2",
+            address="10 Glenferrie Road, Hawthorn VIC 3122",
+            suburb="Hawthorn",
+            bedrooms=2,
+            weekly_rent=520.0,
+            match_score=88.0,
+            pass_strict_filter=True,
+            listing_status="active",
+        )
+        p3 = Property(
+            property_id="prop_skip_url",
+            source="jelliscraig",
+            source_listing_id="jc_3",
+            source_url="https://www.jelliscraig.com.au/property/123-church-st-richmond?utm_source=ad",
+            address="123 Church St, Richmond",
+            suburb="Richmond",
+            bedrooms=2,
+            weekly_rent=540.0,
+            match_score=82.0,
+            pass_strict_filter=True,
+            listing_status="active",
+        )
+        p4 = Property(
+            property_id="prop_active_keep",
+            source="woodards",
+            source_listing_id="wd_4",
+            source_url="https://woodards.com.au/rent/prop4",
+            address="88 Riversdale Rd, Hawthorn",
+            suburb="Hawthorn",
+            bedrooms=2,
+            weekly_rent=510.0,
+            match_score=90.0,
+            pass_strict_filter=True,
+            listing_status="active",
+        )
+
+        for p in (p1, p2, p3, p4):
+            self.db.upsert_property(p)
+
+        # 2. Write a mock user_decisions.json
+        decisions_path = Path(self.temp_dir.name) / "test_user_decisions.json"
+        decisions_data = {
+            "version": "1.0",
+            "updated_at": "2026-11-24T00:00:00Z",
+            "statuses": {
+                "prop_skip_id": "skipped",
+                "prop_active_keep": "shortlist",
+            },
+            "skipped_addresses": [
+                "10 glenferrie rd hawthorn",
+            ],
+            "skipped_urls": [
+                "https://www.jelliscraig.com.au/property/123-church-st-richmond",
+            ],
+            "inspections": {},
+            "notes": {},
+        }
+        decisions_path.write_text(json.dumps(decisions_data), encoding="utf-8")
+
+        # 3. Sync decisions
+        sync_result = self.db.sync_user_decisions(decisions_path)
+        self.assertGreater(sync_result.get("skipped_marked", 0), 0)
+
+        # 4. Verify skipped properties are marked in DB
+        with self.db.get_connection() as conn:
+            cur = conn.cursor()
+            for pid in ("prop_skip_id", "prop_skip_addr", "prop_skip_url"):
+                cur.execute("SELECT listing_status, pass_strict_filter, match_score FROM properties WHERE property_id = ?", (pid,))
+                row = cur.fetchone()
+                self.assertEqual(row["listing_status"], "skipped", f"Property {pid} should be marked skipped")
+                self.assertEqual(row["pass_strict_filter"], 0, f"Property {pid} should fail strict filter")
+                self.assertEqual(row["match_score"], 0.0, f"Property {pid} match score should be 0.0")
+
+            # p4 must remain active
+            cur.execute("SELECT listing_status, pass_strict_filter FROM properties WHERE property_id = ?", ("prop_active_keep",))
+            row = cur.fetchone()
+            self.assertEqual(row["listing_status"], "active")
+            self.assertEqual(row["pass_strict_filter"], 1)
+
+        # 5. Verify get_skipped_identifiers
+        skipped = self.db.get_skipped_identifiers()
+        self.assertIn("prop_skip_id", skipped["ids"])
+        self.assertIn("10 glenferrie rd hawthorn", skipped["addresses"])
+        self.assertIn("https://www.jelliscraig.com.au/property/123-church-st-richmond", skipped["urls"])
+
+        # 6. Verify export_to_listings_json completely excludes skipped properties
+        export_file = Path(self.temp_dir.name) / "test_clean_export.json"
+        exported = self.db.export_to_listings_json(export_file)
+        exported_ids = [item["id"] for item in exported["listings"]]
+        self.assertEqual(exported_ids, ["prop_active_keep"])
+        self.assertNotIn("prop_skip_id", exported_ids)
+        self.assertNotIn("prop_skip_addr", exported_ids)
+        self.assertNotIn("prop_skip_url", exported_ids)
+
 
 class TestV1Regression(unittest.TestCase):
     """Ensure all V1 criteria, suburb transit mappings, and scoring baselines remain intact."""

@@ -44,6 +44,7 @@ DATA_DIR = ROOT_DIR / "docs" / "data"
 LISTINGS_FILE = DATA_DIR / "listings.json"
 DIGEST_FILE = DATA_DIR / "digest.md"
 DATABASE_FILE = DATA_DIR / "database.sqlite"
+DECISIONS_FILE = DATA_DIR / "user_decisions.json"
 
 
 def load_existing_listings() -> Dict[str, Dict[str, Any]]:
@@ -180,8 +181,12 @@ def build_portal_quick_links() -> List[Dict[str, str]]:
 
 def main() -> None:
     start_time = time.time()
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
     db = PropertyDatabase(DATABASE_FILE)
+    # Sync persistent user decisions (skips, shortlists, inspections) into SQLite
+    decision_stats = db.sync_user_decisions(DECISIONS_FILE)
+    if decision_stats["synced"] or decision_stats["skipped_properties"]:
+        print(f"[User Decisions] Synced {decision_stats['synced']} user actions, {decision_stats['skipped_properties']} properties marked skipped.")
+    skipped_ident = db.get_skipped_identifiers()
     existing_map = load_existing_listings()
 
     raw_listings: List[Dict[str, Any]] = []
@@ -232,12 +237,27 @@ def main() -> None:
     seen_ids = set()
 
     for prop_obj in agency_properties:
+        if prop_obj.property_id in skipped_ident["ids"]:
+            continue
+        if prop_obj.address and any(a in prop_obj.address.lower() for a in skipped_ident["addresses"]):
+            continue
+        if prop_obj.source_url and prop_obj.source_url.lower() in skipped_ident["urls"]:
+            continue
         processed_properties.append(prop_obj)
         seen_ids.add(prop_obj.property_id)
         seen_ids.add(prop_obj.source_listing_id)
 
     for raw in raw_listings:
         enriched = score_and_classify_listing(raw)
+        prop_id_check = enriched.get("id") or enriched.get("property_id") or ""
+        raw_addr = (enriched.get("address") or "").lower()
+        raw_url = (enriched.get("url") or "").lower()
+        if prop_id_check in skipped_ident["ids"]:
+            continue
+        if raw_addr and any(a in raw_addr for a in skipped_ident["addresses"]):
+            continue
+        if raw_url and raw_url in skipped_ident["urls"]:
+            continue
 
         # Exclude non-Melbourne / interstate listings (e.g. Canberra, Sydney, NSW, ACT)
         if is_outside_melbourne(enriched.get("address", ""), enriched.get("title", ""), enriched.get("description", ""), enriched.get("suburb", "")):
@@ -325,6 +345,9 @@ def main() -> None:
         status="success" if errors_logged == 0 else "partial",
     )
     db.log_execution(exec_log)
+
+    # Sync user decisions into DB before re-evaluation and export
+    db.sync_user_decisions(DECISIONS_FILE)
 
     # Re-evaluate all existing stored listings against canonical 2+ BR eligibility
     reeval_stats = db.reevaluate_stored_listings()

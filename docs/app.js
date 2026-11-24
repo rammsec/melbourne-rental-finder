@@ -10,6 +10,9 @@ const STORAGE_CUSTOM_POSTS_KEY = 'melb_rental_custom_fb_v1';
 const STORAGE_INSPECTIONS_KEY = 'melb_rental_inspections_v2';
 const STORAGE_COMPARE_KEY = 'melb_rental_compare_v2';
 const STORAGE_USER_PREFS_KEY = 'melb_rental_user_prefs_v2';
+const STORAGE_SKIPPED_ADDRS_KEY = 'melb_rental_skipped_addrs_v1';
+const STORAGE_SKIPPED_URLS_KEY = 'melb_rental_skipped_urls_v1';
+const STORAGE_GITHUB_TOKEN_KEY = 'melb_rental_gh_token_v1';
 
 let appData = {
   listings: [],
@@ -50,7 +53,38 @@ let filterStateNormal = {
   directTransitOnly: false
 };
 
-// --- Storage Utilities ---
+// --- Storage Utilities & Multi-Key Skipped Tracking ---
+
+function normalizeAddressKey(addr) {
+  if (!addr) return '';
+  return addr.toLowerCase().replace(/[,.-]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function cleanUrlKey(u) {
+  if (!u) return '';
+  try {
+    const parsed = new URL(u);
+    return (parsed.origin + parsed.pathname).toLowerCase().replace(/\/$/, '');
+  } catch {
+    return u.split('?')[0].toLowerCase().replace(/\/$/, '');
+  }
+}
+
+function getSkippedAddresses() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_SKIPPED_ADDRS_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function getSkippedUrls() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_SKIPPED_URLS_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
 
 function getSavedStatuses() {
   try {
@@ -60,15 +94,73 @@ function getSavedStatuses() {
   }
 }
 
+function isItemSkipped(item, statuses) {
+  if (!item) return false;
+  if (!statuses) statuses = getSavedStatuses();
+  const st = statuses[item.id] || (item.property_id ? statuses[item.property_id] : null);
+  if (st === 'skipped' || st === 'hidden') return true;
+
+  // Multi-key address match (prevents property reappearing across re-scrapes or portals)
+  if (item.address) {
+    const norm = normalizeAddressKey(item.address);
+    const skippedAddrs = getSkippedAddresses();
+    if (skippedAddrs.some(a => a && (norm.includes(a) || a.includes(norm)))) return true;
+  }
+
+  // Multi-key URL match
+  if (item.url) {
+    const clean = cleanUrlKey(item.url);
+    const skippedUrls = getSkippedUrls();
+    if (skippedUrls.includes(clean)) return true;
+  }
+
+  return false;
+}
+
 function setSavedStatus(listingId, status) {
   const current = getSavedStatuses();
+  const allListings = getAllMergedListings();
+  const matchedItem = allListings.find(i => i.id === listingId || i.property_id === listingId);
+
   if (!status || status === 'none') {
     delete current[listingId];
+    if (matchedItem) {
+      if (matchedItem.property_id) delete current[matchedItem.property_id];
+      // Remove from skipped addresses and URLs if un-skipping
+      if (matchedItem.address) {
+        const norm = normalizeAddressKey(matchedItem.address);
+        const filteredAddrs = getSkippedAddresses().filter(a => a !== norm);
+        localStorage.setItem(STORAGE_SKIPPED_ADDRS_KEY, JSON.stringify(filteredAddrs));
+      }
+      if (matchedItem.url) {
+        const clean = cleanUrlKey(matchedItem.url);
+        const filteredUrls = getSkippedUrls().filter(u => u !== clean);
+        localStorage.setItem(STORAGE_SKIPPED_URLS_KEY, JSON.stringify(filteredUrls));
+      }
+    }
   } else {
     current[listingId] = status;
+    if (matchedItem && matchedItem.property_id) {
+      current[matchedItem.property_id] = status;
+    }
+
+    if (status === 'skipped' || status === 'hidden') {
+      if (matchedItem && matchedItem.address) {
+        const norm = normalizeAddressKey(matchedItem.address);
+        const addrs = new Set(getSkippedAddresses());
+        addrs.add(norm);
+        localStorage.setItem(STORAGE_SKIPPED_ADDRS_KEY, JSON.stringify(Array.from(addrs)));
+      }
+      if (matchedItem && matchedItem.url) {
+        const clean = cleanUrlKey(matchedItem.url);
+        const urls = new Set(getSkippedUrls());
+        urls.add(clean);
+        localStorage.setItem(STORAGE_SKIPPED_URLS_KEY, JSON.stringify(Array.from(urls)));
+      }
+    }
   }
   localStorage.setItem(STORAGE_STATUS_KEY, JSON.stringify(current));
-  recordUserDecision(listingId, status);
+  recordUserDecision(listingId, status, matchedItem);
   renderAll();
 }
 
@@ -129,7 +221,7 @@ function cycleStarStatus(listingId) {
     showToast('⭐ Added to Shortlist & Applied!');
   } else if (st === 'shortlist' || st === 'inspecting' || st === 'applied') {
     setSavedStatus(listingId, 'skipped');
-    showToast('Moved to Skipped section at bottom 🔴', 'Undo', () => {
+    showToast('Property hidden & skipped 🚫', 'Undo', () => {
       setSavedStatus(listingId, 'none');
     });
   } else {
@@ -138,18 +230,89 @@ function cycleStarStatus(listingId) {
   }
 }
 
-function recordUserDecision(listingId, action) {
+function recordUserDecision(listingId, action, matchedItem) {
   const logKey = 'melb_rental_decision_log_v2';
   try {
     const logs = JSON.parse(localStorage.getItem(logKey) || '[]');
     logs.push({
       listing_id: listingId,
       action: action,
+      address: matchedItem ? matchedItem.address : null,
+      url: matchedItem ? matchedItem.url : null,
       timestamp: new Date().toISOString()
     });
     // Keep last 150 decisions
     localStorage.setItem(logKey, JSON.stringify(logs.slice(-150)));
   } catch {}
+}
+
+async function loadServerUserDecisions() {
+  try {
+    const res = await fetch('data/user_decisions.json?t=' + Date.now());
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data) return;
+
+    const localStatuses = getSavedStatuses();
+    const serverStatuses = data.statuses || {};
+    let statusChanged = false;
+    for (const [id, val] of Object.entries(serverStatuses)) {
+      const st = typeof val === 'string' ? val : (val.status || 'none');
+      if (!localStatuses[id]) {
+        localStatuses[id] = st;
+        statusChanged = true;
+      }
+    }
+    if (statusChanged) {
+      localStorage.setItem(STORAGE_STATUS_KEY, JSON.stringify(localStatuses));
+    }
+
+    if (Array.isArray(data.skipped_addresses)) {
+      const currentAddrs = new Set(getSkippedAddresses());
+      let addrChanged = false;
+      for (const a of data.skipped_addresses) {
+        const norm = normalizeAddressKey(a);
+        if (norm && !currentAddrs.has(norm)) {
+          currentAddrs.add(norm);
+          addrChanged = true;
+        }
+      }
+      if (addrChanged) {
+        localStorage.setItem(STORAGE_SKIPPED_ADDRS_KEY, JSON.stringify(Array.from(currentAddrs)));
+      }
+    }
+
+    if (Array.isArray(data.skipped_urls)) {
+      const currentUrls = new Set(getSkippedUrls());
+      let urlChanged = false;
+      for (const u of data.skipped_urls) {
+        const clean = cleanUrlKey(u);
+        if (clean && !currentUrls.has(clean)) {
+          currentUrls.add(clean);
+          urlChanged = true;
+        }
+      }
+      if (urlChanged) {
+        localStorage.setItem(STORAGE_SKIPPED_URLS_KEY, JSON.stringify(Array.from(currentUrls)));
+      }
+    }
+
+    if (data.inspections && typeof data.inspections === 'object') {
+      const localInspections = getSavedInspections();
+      let inspChanged = false;
+      for (const [id, details] of Object.entries(data.inspections)) {
+        if (!localInspections[id]) {
+          localInspections[id] = details;
+          inspChanged = true;
+        }
+      }
+      if (inspChanged) {
+        localStorage.setItem(STORAGE_INSPECTIONS_KEY, JSON.stringify(localInspections));
+      }
+    }
+  } catch (e) {
+    console.warn('[Sync] Could not fetch server user decisions:', e);
+  }
 }
 
 function showToast(message, actionLabel, actionFn) {
@@ -221,6 +384,8 @@ function restoreAllSkipped() {
     }
   }
   localStorage.setItem(STORAGE_STATUS_KEY, JSON.stringify(current));
+  localStorage.setItem(STORAGE_SKIPPED_ADDRS_KEY, JSON.stringify([]));
+  localStorage.setItem(STORAGE_SKIPPED_URLS_KEY, JSON.stringify([]));
   renderAll();
   showToast(`Restored ${restored} properties back to active discoveries! ↺`);
 }
@@ -483,23 +648,23 @@ function createListingCardHTML(item) {
 
   const breakdown = computeExplainableBreakdown(item);
 
-  const isGreenStar = userStatus === "shortlist" || userStatus === "inspecting" || userStatus === "applied";
-  const isRedStar = userStatus === "skipped" || userStatus === "hidden";
+  const isRedStar = isItemSkipped(item, statuses);
+  const isGreenStar = !isRedStar && (userStatus === "shortlist" || userStatus === "inspecting" || userStatus === "applied");
 
   let starBtnClass = "star-btn";
   let starIcon = "☆";
   let starLabel = "Star";
-  let starTitle = "Click once for Green Star (Interested), twice for Red Star (Skip to bottom)";
+  let starTitle = "Click once for Green Star (Interested), twice to hide & skip";
   if (isGreenStar) {
     starBtnClass = "star-btn star-green";
     starIcon = "★";
     starLabel = "Interested";
-    starTitle = "Green Star (Interested) — Click again for Red Star (Skip to bottom)";
+    starTitle = "Green Star (Interested) — Click again to hide & skip";
   } else if (isRedStar) {
     starBtnClass = "star-btn star-red";
     starIcon = "★";
     starLabel = "Skipped";
-    starTitle = "Red Star (Skipped) — Click again to reset star";
+    starTitle = "Red Star (Skipped) — Click again to restore";
   }
 
   const scoreVal = item.match_score || 70;
@@ -818,8 +983,7 @@ function renderListings() {
   const activeListings = [];
   const skippedListings = [];
   for (const item of matchingFilter) {
-    const st = statuses[item.id] || 'none';
-    if (st === 'skipped' || st === 'hidden') {
+    if (isItemSkipped(item, statuses)) {
       skippedListings.push(item);
     } else {
       activeListings.push(item);
@@ -836,15 +1000,19 @@ function renderListings() {
     return (a.weekly_rent || 9999) - (b.weekly_rent || 9999);
   });
 
+  const skippedDetails = document.getElementById('skipped-details');
+  const countSkippedHeader = document.getElementById('count-skipped-header');
+
   // Render main active listings (or skipped if user clicked the Skipped metric pill)
   if (filterState.activeMetric === 'skipped') {
+    if (skippedDetails) skippedDetails.style.display = 'none';
     if (skippedListings.length === 0) {
       container.innerHTML = `
         <div class="state-container">
           <div class="state-icon">🔴</div>
           <div class="state-title">You haven't skipped any properties yet</div>
           <div class="state-desc">
-            Click <strong>👎 Don't Like</strong> or <strong>👎 Skip</strong> on any property card you aren't interested in to move it here.
+            Click <strong>👎 Don't Like</strong> or <strong>👎 Skip</strong> on any property card you aren't interested in to remove it from your feed.
           </div>
           <button type="button" class="btn btn-primary" id="btn-empty-reset" style="margin-top: 0.5rem;">
             ↺ Back to All Discoveries
@@ -854,9 +1022,21 @@ function renderListings() {
       const emptyResetBtn = document.getElementById('btn-empty-reset');
       if (emptyResetBtn) emptyResetBtn.addEventListener('click', resetAllFilters);
     } else {
-      container.innerHTML = skippedListings.map(createListingCardHTML).join('');
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 0.75rem 1rem; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="font-weight: 700; color: #991b1b;">🔴 Viewing ${skippedListings.length} Skipped Properties (Hidden from main feed)</div>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-back-to-active">↺ Return to Active Listings</button>
+        </div>
+      ` + skippedListings.map(createListingCardHTML).join('');
+      const btnBack = document.getElementById('btn-back-to-active');
+      if (btnBack) btnBack.addEventListener('click', () => {
+        filterState.activeMetric = 'all';
+        document.querySelectorAll('.metric-pill').forEach(p => p.classList.remove('active'));
+        const tileAll = document.getElementById('tile-all');
+        if (tileAll) tileAll.classList.add('active');
+        renderListings();
+      });
     }
-    if (skippedSection) skippedSection.style.display = 'none';
   } else {
     if (activeListings.length === 0) {
       container.innerHTML = `
@@ -877,14 +1057,15 @@ function renderListings() {
       container.innerHTML = activeListings.map(createListingCardHTML).join('');
     }
 
-    // Render Skipped section at bottom
-    if (skippedSection && skippedContainer) {
+    // Render Skipped section at bottom inside collapsed details (NEVER shown open by default)
+    if (skippedDetails && skippedContainer) {
       if (skippedListings.length > 0) {
-        skippedSection.style.display = 'block';
+        skippedDetails.style.display = 'block';
         if (countSkippedEl) countSkippedEl.textContent = skippedListings.length;
+        if (countSkippedHeader) countSkippedHeader.textContent = skippedListings.length;
         skippedContainer.innerHTML = skippedListings.map(createListingCardHTML).join('');
       } else {
-        skippedSection.style.display = 'none';
+        skippedDetails.style.display = 'none';
         skippedContainer.innerHTML = '';
       }
     }
@@ -971,8 +1152,7 @@ function renderNormalListings() {
   const activeNormal = [];
   const skippedNormal = [];
   for (const item of matchingNormal) {
-    const st = statuses[item.id] || 'none';
-    if (st === 'skipped' || st === 'hidden') {
+    if (isItemSkipped(item, statuses)) {
       skippedNormal.push(item);
     } else {
       activeNormal.push(item);
@@ -1000,13 +1180,16 @@ function renderNormalListings() {
     container.innerHTML = activeNormal.map(createListingCardHTML).join('');
   }
 
-  if (skippedSection && skippedContainer) {
+  const normalSkippedDetails = document.getElementById('normal-skipped-details');
+  const countNormalSkippedHeader = document.getElementById('count-normal-skipped-header');
+  if (normalSkippedDetails && skippedContainer) {
     if (skippedNormal.length > 0) {
-      skippedSection.style.display = 'block';
+      normalSkippedDetails.style.display = 'block';
       if (countSkippedEl) countSkippedEl.textContent = skippedNormal.length;
+      if (countNormalSkippedHeader) countNormalSkippedHeader.textContent = skippedNormal.length;
       skippedContainer.innerHTML = skippedNormal.map(createListingCardHTML).join('');
     } else {
-      skippedSection.style.display = 'none';
+      normalSkippedDetails.style.display = 'none';
       skippedContainer.innerHTML = '';
     }
   }
@@ -1034,14 +1217,15 @@ function bindCardInteractions(rootElement) {
       e.preventDefault();
       e.stopPropagation();
       const lid = btn.getAttribute('data-dislike-id');
-      const current = getSavedStatuses();
-      const st = current[lid] || 'none';
-      if (st === 'skipped' || st === 'hidden') {
+      const allListings = getAllMergedListings();
+      const matched = allListings.find(i => i.id === lid || i.property_id === lid);
+      const isSkipped = isItemSkipped(matched || { id: lid, property_id: lid });
+      if (isSkipped) {
         setSavedStatus(lid, 'none');
         showToast('Restored property back to active listings! ↩');
       } else {
         setSavedStatus(lid, 'skipped');
-        showToast('Moved to Skipped section at bottom 🔴', 'Undo', () => {
+        showToast('Property hidden & skipped 🚫', 'Undo', () => {
           setSavedStatus(lid, 'none');
         });
       }
@@ -2141,6 +2325,218 @@ async function initApp() {
       renderAll();
     });
   }
+
+  // Wire up Modal 3: Feedback Sync & Backup
+  function updateSyncModalStats() {
+    const statuses = getSavedStatuses();
+    let shortlisted = 0;
+    let skipped = 0;
+    Object.values(statuses).forEach(v => {
+      if (v === 'shortlist' || v === 'inspecting' || v === 'applied') shortlisted++;
+      else if (v === 'skipped') skipped++;
+    });
+    const skippedAddrs = getSkippedAddresses().size;
+    const skippedUrls = getSkippedUrls().size;
+    const inspections = Object.keys(getSavedInspections()).length;
+
+    const elShort = document.getElementById('sync-count-shortlisted');
+    const elSkip = document.getElementById('sync-count-skipped');
+    const elInsp = document.getElementById('sync-count-inspections');
+
+    if (elShort) elShort.textContent = shortlisted;
+    if (elSkip) elSkip.textContent = `${skipped} (addresses: ${skippedAddrs}, urls: ${skippedUrls})`;
+    if (elInsp) elInsp.textContent = inspections;
+  }
+
+  function buildUserDecisionsPayload() {
+    const statuses = getSavedStatuses();
+    const skippedAddrs = Array.from(getSkippedAddresses());
+    const skippedUrls = Array.from(getSkippedUrls());
+    const inspections = getSavedInspections();
+    const notes = getSavedNotes();
+
+    return {
+      version: "1.0",
+      updated_at: new Date().toISOString(),
+      statuses: statuses,
+      skipped_addresses: skippedAddrs,
+      skipped_urls: skippedUrls,
+      inspections: inspections,
+      notes: notes
+    };
+  }
+
+  const btnOpenSync = document.getElementById('btn-open-sync-modal');
+  if (btnOpenSync) {
+    btnOpenSync.addEventListener('click', () => {
+      updateSyncModalStats();
+      const tokenInput = document.getElementById('input-github-token');
+      if (tokenInput) {
+        tokenInput.value = localStorage.getItem(STORAGE_GITHUB_TOKEN_KEY) || '';
+      }
+      const statusEl = document.getElementById('github-sync-status');
+      if (statusEl) statusEl.textContent = '';
+      document.getElementById('modal-sync').classList.add('is-open');
+    });
+  }
+
+  const btnCloseSyncModal = document.getElementById('btn-close-sync-modal');
+  if (btnCloseSyncModal) {
+    btnCloseSyncModal.addEventListener('click', () => {
+      document.getElementById('modal-sync').classList.remove('is-open');
+    });
+  }
+
+  const btnCloseSync = document.getElementById('btn-close-sync');
+  if (btnCloseSync) {
+    btnCloseSync.addEventListener('click', () => {
+      document.getElementById('modal-sync').classList.remove('is-open');
+    });
+  }
+
+  const btnDownloadDecisions = document.getElementById('btn-download-decisions');
+  if (btnDownloadDecisions) {
+    btnDownloadDecisions.addEventListener('click', () => {
+      const payload = buildUserDecisionsPayload();
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'user_decisions.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('💾 user_decisions.json backup downloaded!');
+    });
+  }
+
+  const fileImportDecisions = document.getElementById('file-import-decisions');
+  if (fileImportDecisions) {
+    fileImportDecisions.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          if (data.statuses) {
+            const current = getSavedStatuses();
+            Object.assign(current, data.statuses);
+            localStorage.setItem(STORAGE_STATUS_KEY, JSON.stringify(current));
+          }
+          if (Array.isArray(data.skipped_addresses)) {
+            const addrs = getSkippedAddresses();
+            data.skipped_addresses.forEach(a => addrs.add(normalizeAddressKey(a)));
+            localStorage.setItem(STORAGE_SKIPPED_ADDRS_KEY, JSON.stringify(Array.from(addrs)));
+          }
+          if (Array.isArray(data.skipped_urls)) {
+            const urls = getSkippedUrls();
+            data.skipped_urls.forEach(u => urls.add(cleanUrlKey(u)));
+            localStorage.setItem(STORAGE_SKIPPED_URLS_KEY, JSON.stringify(Array.from(urls)));
+          }
+          if (data.inspections) {
+            const insp = getSavedInspections();
+            Object.assign(insp, data.inspections);
+            localStorage.setItem(STORAGE_INSPECTION_KEY, JSON.stringify(insp));
+          }
+          if (data.notes) {
+            const notes = getSavedNotes();
+            Object.assign(notes, data.notes);
+            localStorage.setItem(STORAGE_NOTES_KEY, JSON.stringify(notes));
+          }
+          updateSyncModalStats();
+          renderAll();
+          showToast('✅ Decisions successfully restored from file!');
+        } catch (err) {
+          alert('Invalid JSON file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+  }
+
+  const btnGitHubPush = document.getElementById('btn-github-push');
+  if (btnGitHubPush) {
+    btnGitHubPush.addEventListener('click', async () => {
+      const tokenInput = document.getElementById('input-github-token');
+      const token = tokenInput ? tokenInput.value.trim() : '';
+      const statusEl = document.getElementById('github-sync-status');
+      if (!token) {
+        if (statusEl) {
+          statusEl.style.color = '#ef4444';
+          statusEl.textContent = '❌ Please enter a GitHub Personal Access Token.';
+        }
+        return;
+      }
+      localStorage.setItem(STORAGE_GITHUB_TOKEN_KEY, token);
+
+      if (statusEl) {
+        statusEl.style.color = '#3b82f6';
+        statusEl.textContent = '⏳ Syncing to GitHub repo...';
+      }
+
+      try {
+        const repo = 'rammsec/melbourne-rental-finder';
+        const path = 'docs/data/user_decisions.json';
+        const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+
+        // 1. Get current file sha
+        let sha = null;
+        const getResp = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json'
+          }
+        });
+        if (getResp.ok) {
+          const getJson = await getResp.json();
+          sha = getJson.sha;
+        }
+
+        // 2. Prepare payload
+        const payload = buildUserDecisionsPayload();
+        const contentBase64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+
+        const body = {
+          message: 'chore(feedback): sync user decisions from web dashboard',
+          content: contentBase64,
+          branch: 'main'
+        };
+        if (sha) body.sha = sha;
+
+        const putResp = await fetch(url, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (!putResp.ok) {
+          const errJson = await putResp.json().catch(() => ({}));
+          throw new Error(errJson.message || `HTTP ${putResp.status}`);
+        }
+
+        if (statusEl) {
+          statusEl.style.color = '#16a34a';
+          statusEl.textContent = '✅ Synced to GitHub! Daily scraper will respect your skips.';
+        }
+        showToast('☁️ Feedback synced to GitHub repo!');
+      } catch (err) {
+        if (statusEl) {
+          statusEl.style.color = '#ef4444';
+          statusEl.textContent = `❌ Error: ${err.message}`;
+        }
+      }
+    });
+  }
+
+  // Load server-persisted user decisions (if any) and merge into local storage
+  await loadServerUserDecisions();
 
   // Fetch listings data
   try {

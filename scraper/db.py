@@ -23,11 +23,20 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List, Optional, Tuple, Set
 
 from .models import Property, ListingSource, ListingSnapshot, PropertyScore, ScraperExecutionLog
 from .freshness import parse_iso_datetime
 from .config import HAWTHORN_DIRECT_SUBURBS
+from .dedup import normalize_address
+
+
+def clean_url(url: Optional[str]) -> str:
+    """Normalize and clean URL for duplicate tracking by stripping query params and trailing slashes."""
+    if not url:
+        return ""
+    u = url.strip().lower()
+    return u.split("?")[0].split("#")[0].rstrip("/")
 
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "docs" / "data" / "database.sqlite"
@@ -41,6 +50,9 @@ class PropertyDatabase:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         self._supabase_url = os.getenv("SUPABASE_URL", "").rstrip("/")
         self._supabase_key = os.getenv("SUPABASE_KEY", "")
+        self._skipped_ids_cache: Set[str] = set()
+        self._skipped_addrs_cache: Set[str] = set()
+        self._skipped_urls_cache: Set[str] = set()
         self.init_db()
 
     def get_connection(self) -> sqlite3.Connection:
@@ -426,6 +438,188 @@ class PropertyDatabase:
                 (property_id, action_type, json.dumps(payload or {}), now_iso)
             )
 
+    def sync_user_decisions(self, decisions_path: Path) -> Dict[str, int]:
+        """
+        Load user feedback decisions from user_decisions.json, insert into
+        user_interactions table in SQLite, and update properties to 'skipped'
+        status so they are permanently excluded from active results.
+        """
+        stats = {"synced": 0, "skipped_properties": 0, "skipped_marked": 0}
+        if not decisions_path or not decisions_path.exists():
+            return stats
+
+        try:
+            with open(decisions_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"[Warn] Could not read user decisions file: {e}")
+            return stats
+
+        statuses = data.get("statuses", {})
+        inspections = data.get("inspections", {})
+        skipped_addresses: Set[str] = {a.strip().lower() for a in data.get("skipped_addresses", []) if a}
+        skipped_urls: Set[str] = {clean_url(u) for u in data.get("skipped_urls", []) if u}
+
+        # Cache skipped identifiers in memory
+        for k, v in statuses.items():
+            act = v if isinstance(v, str) else (v.get("status") if isinstance(v, dict) else "")
+            if act in ("skipped", "hidden"):
+                self._skipped_ids_cache.add(k)
+        for a in skipped_addresses:
+            self._skipped_addrs_cache.add(a)
+            self._skipped_addrs_cache.add(normalize_address(a))
+        for u in skipped_urls:
+            self._skipped_urls_cache.add(u)
+
+        now_iso = datetime.now(timezone.utc).isoformat()
+
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+
+            # Record status decisions (shortlist, skipped, etc.)
+            for prop_id, info in statuses.items():
+                if isinstance(info, str):
+                    action = info
+                    payload = {}
+                elif isinstance(info, dict):
+                    action = info.get("status", "none")
+                    payload = info
+                    if info.get("address"):
+                        addr_val = info["address"].strip().lower()
+                        skipped_addresses.add(addr_val)
+                        self._skipped_addrs_cache.add(addr_val)
+                        self._skipped_addrs_cache.add(normalize_address(addr_val))
+                    if info.get("url"):
+                        url_val = clean_url(info["url"])
+                        skipped_urls.add(url_val)
+                        self._skipped_urls_cache.add(url_val)
+                else:
+                    continue
+
+                if action in ("skipped", "hidden"):
+                    self._skipped_ids_cache.add(prop_id)
+
+                # Only insert into user_interactions if property exists to satisfy foreign key constraint
+                cur.execute("SELECT property_id FROM properties WHERE property_id = ?", (prop_id,))
+                if cur.fetchone():
+                    if action in ("skipped", "hidden", "shortlist", "inspecting", "applied"):
+                        cur.execute(
+                            "SELECT id FROM user_interactions WHERE property_id = ? AND action_type = ?",
+                            (prop_id, action)
+                        )
+                        if not cur.fetchone():
+                            cur.execute(
+                                "INSERT INTO user_interactions (property_id, action_type, payload_json, created_at) VALUES (?, ?, ?, ?)",
+                                (prop_id, action, json.dumps(payload), now_iso)
+                            )
+                            stats["synced"] += 1
+
+                if action in ("skipped", "hidden"):
+                    cur.execute(
+                        "UPDATE properties SET listing_status = 'skipped', pass_strict_filter = 0, match_score = 0.0 WHERE property_id = ?",
+                        (prop_id,)
+                    )
+                    if cur.rowcount > 0:
+                        stats["skipped_properties"] += cur.rowcount
+
+            # Mark active properties matching skipped addresses or URLs as skipped
+            cur.execute("SELECT property_id, address, source_url FROM properties WHERE listing_status != 'skipped'")
+            active_rows = cur.fetchall()
+
+            norm_skipped_addrs = {normalize_address(a) for a in skipped_addresses if a}
+            clean_skipped_urls = {clean_url(u) for u in skipped_urls if u}
+
+            for row in active_rows:
+                row_pid = row["property_id"]
+                row_addr = row["address"] or ""
+                row_url = clean_url(row["source_url"])
+                norm_row_addr = normalize_address(row_addr)
+
+                matched = False
+                if row_url and row_url in clean_skipped_urls:
+                    matched = True
+                elif norm_row_addr and any(sa and (sa == norm_row_addr or sa in norm_row_addr or norm_row_addr in sa) for sa in norm_skipped_addrs):
+                    matched = True
+
+                if matched:
+                    cur.execute(
+                        "UPDATE properties SET listing_status = 'skipped', pass_strict_filter = 0, match_score = 0.0 WHERE property_id = ?",
+                        (row_pid,)
+                    )
+                    stats["skipped_properties"] += 1
+                    self._skipped_ids_cache.add(row_pid)
+
+                    # Log interaction for this property
+                    cur.execute(
+                        "SELECT id FROM user_interactions WHERE property_id = ? AND action_type = 'skipped'",
+                        (row_pid,)
+                    )
+                    if not cur.fetchone():
+                        cur.execute(
+                            "INSERT INTO user_interactions (property_id, action_type, payload_json, created_at) VALUES (?, 'skipped', ?, ?)",
+                            (row_pid, json.dumps({"reason": "matched_skipped_addr_or_url"}), now_iso)
+                        )
+                        stats["synced"] += 1
+
+            # Record inspection notes
+            for prop_id, insp in inspections.items():
+                cur.execute("SELECT property_id FROM properties WHERE property_id = ?", (prop_id,))
+                if cur.fetchone():
+                    cur.execute(
+                        "SELECT id FROM user_interactions WHERE property_id = ? AND action_type = 'inspection'",
+                        (prop_id,)
+                    )
+                    if not cur.fetchone():
+                        cur.execute(
+                            "INSERT INTO user_interactions (property_id, action_type, payload_json, created_at) VALUES (?, 'inspection', ?, ?)",
+                            (prop_id, json.dumps(insp if isinstance(insp, dict) else {"details": str(insp)}), now_iso)
+                        )
+                        stats["synced"] += 1
+
+            conn.commit()
+
+        stats["skipped_marked"] = stats["skipped_properties"]
+        return stats
+
+    def get_skipped_identifiers(self) -> Dict[str, Set[str]]:
+        """Return sets of property_ids, normalised addresses, and urls that the user has skipped."""
+        skipped_ids: Set[str] = set(self._skipped_ids_cache)
+        skipped_addrs: Set[str] = set(self._skipped_addrs_cache)
+        skipped_urls: Set[str] = set(self._skipped_urls_cache)
+
+        with self.get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT property_id, payload_json FROM user_interactions WHERE action_type IN ('skipped', 'hidden')")
+            for row in cur.fetchall():
+                pid = row["property_id"]
+                skipped_ids.add(pid)
+                try:
+                    payload = json.loads(row["payload_json"] or "{}")
+                    if payload.get("address"):
+                        skipped_addrs.add(payload["address"].strip().lower())
+                        skipped_addrs.add(normalize_address(payload["address"]))
+                    if payload.get("norm_address"):
+                        skipped_addrs.add(payload["norm_address"].strip().lower())
+                    if payload.get("url"):
+                        skipped_urls.add(payload["url"].strip().lower())
+                        skipped_urls.add(clean_url(payload["url"]))
+                    if payload.get("clean_url"):
+                        skipped_urls.add(payload["clean_url"].strip().lower())
+                except Exception:
+                    pass
+
+            cur.execute("SELECT property_id, address, source_url FROM properties WHERE listing_status = 'skipped'")
+            for row in cur.fetchall():
+                skipped_ids.add(row["property_id"])
+                if row["address"]:
+                    skipped_addrs.add(row["address"].strip().lower())
+                    skipped_addrs.add(normalize_address(row["address"]))
+                if row["source_url"]:
+                    skipped_urls.add(row["source_url"].strip().lower())
+                    skipped_urls.add(clean_url(row["source_url"]))
+
+        return {"ids": skipped_ids, "addresses": skipped_addrs, "urls": skipped_urls}
+
     def log_execution(self, log: ScraperExecutionLog) -> None:
         """Record scraper execution metrics."""
         with self.get_connection() as conn:
@@ -508,8 +702,13 @@ class PropertyDatabase:
         target_path = Path(output_file or self.db_path.parent / "listings.json")
         target_path.parent.mkdir(parents=True, exist_ok=True)
 
+        skipped_ident = self.get_skipped_identifiers()
+        skipped_ids = skipped_ident["ids"]
+        skipped_addrs = skipped_ident["addresses"]
+        skipped_urls = skipped_ident["urls"]
+
         props = self.list_properties(status="active", limit=1000)
-        # Strictly ensure ineligible listings (studios, <2BR, sharehouses) are excluded from active export
+        # Strictly ensure ineligible listings (studios, <2BR, sharehouses) and user-skipped listings are excluded from active export
         eligible_props = [
             p for p in props
             if p.property_type != "studio"
@@ -517,6 +716,10 @@ class PropertyDatabase:
             and p.bedrooms >= 2
             and p.property_entire
             and not p.is_sharehouse
+            and p.listing_status != "skipped"
+            and p.property_id not in skipped_ids
+            and not (p.address and any(addr in p.address.lower() for addr in skipped_addrs))
+            and not (p.source_url and p.source_url.lower() in skipped_urls)
         ]
         legacy_list = [p.to_legacy_dict() for p in eligible_props]
 

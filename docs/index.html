@@ -98,6 +98,10 @@
         <span class="metric-pill-num" id="stat-skipped-top">0</span>
         <span class="metric-pill-label">🔴 Skipped</span>
       </button>
+      <button class="metric-pill" id="btn-open-sync-modal" type="button" title="Sync or backup your shortlists and skipped properties across devices" style="border-color: #cbd5e1; background: #f8fafc;">
+        <span class="metric-pill-num">💾</span>
+        <span class="metric-pill-label">Sync / Backup</span>
+      </button>
       <div class="metric-pill-refresh" title="Scraper automation refresh status">
         🕒 Refreshed: <span id="stat-last-refresh">Today 6:00 PM</span>
       </div>
@@ -259,21 +263,27 @@
         <!-- Populated dynamically by app.js -->
       </div>
 
-      <!-- Bottom Section for Red-Starred (Skipped / Not Interested) Listings -->
-      <div id="skipped-section" class="skipped-section" style="display: none; margin-top: 2.5rem;">
-        <div class="panel-card skipped-header-card">
-          <div>
-            <h3>🔴 Not Interested / Skipped Properties (<span id="count-skipped">0</span>)</h3>
-            <p class="helper-text">
-              Properties you marked with <strong>👎 Don't Like</strong> or <strong>Red Star ★</strong> are kept here so you don't have to review them again. Click <strong>↩ Restore</strong> on any card to bring it back.
-            </p>
+      <!-- Collapsible Bottom Section for Skipped Listings (Hidden by default) -->
+      <details id="skipped-details" class="skipped-details" style="display: none; margin-top: 2rem;">
+        <summary class="skipped-summary" style="cursor: pointer; padding: 0.65rem 1.1rem; background: #fee2e2; color: #991b1b; font-weight: 700; border-radius: 8px; border: 1px solid #fecaca; display: inline-flex; align-items: center; gap: 0.5rem; user-select: none;">
+          <span>🔴 Hidden / Skipped Properties (<span id="count-skipped">0</span>)</span>
+          <span style="font-weight: 400; font-size: 0.8rem; color: #b91c1c;">(Click to expand or restore)</span>
+        </summary>
+        <div id="skipped-section" class="skipped-section" style="margin-top: 1rem;">
+          <div class="panel-card skipped-header-card">
+            <div>
+              <h3>🔴 Skipped Properties (<span id="count-skipped-header">0</span>)</h3>
+              <p class="helper-text">
+                These properties were excluded from your active recommendations. Click <strong>↩ Restore</strong> on any card to bring it back.
+              </p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-restore-all-skipped" style="font-weight: 700; border-color: #fca5a5; color: #b91c1c;">
+              ↺ Restore All Skipped
+            </button>
           </div>
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-restore-all-skipped" style="font-weight: 700; border-color: #fca5a5; color: #b91c1c;">
-            ↺ Restore All Skipped
-          </button>
+          <div class="listings-grid skipped-grid" id="skipped-container"></div>
         </div>
-        <div class="listings-grid skipped-grid" id="skipped-container"></div>
-      </div>
+      </details>
     </section>
 
     <!-- PANEL: NORMAL LISTINGS (BELOW $600) -->
@@ -370,21 +380,27 @@
         <!-- Populated dynamically by app.js -->
       </div>
 
-      <!-- Bottom Section for Red-Starred (Skipped / Not Interested) Listings on Normal tab -->
-      <div id="normal-skipped-section" class="skipped-section" style="display: none; margin-top: 2.5rem;">
-        <div class="panel-card skipped-header-card">
-          <div>
-            <h3>🔴 Not Interested / Skipped Properties (<span id="count-normal-skipped">0</span>)</h3>
-            <p class="helper-text">
-              Properties you marked with <strong>👎 Don't Like</strong> or <strong>Red Star ★</strong> are kept here. Click <strong>↩ Restore</strong> on any card to bring it back.
-            </p>
+      <!-- Collapsible Bottom Section for Skipped Listings on Normal tab (Hidden by default) -->
+      <details id="normal-skipped-details" class="skipped-details" style="display: none; margin-top: 2rem;">
+        <summary class="skipped-summary" style="cursor: pointer; padding: 0.65rem 1.1rem; background: #fee2e2; color: #991b1b; font-weight: 700; border-radius: 8px; border: 1px solid #fecaca; display: inline-flex; align-items: center; gap: 0.5rem; user-select: none;">
+          <span>🔴 Hidden / Skipped Properties (<span id="count-normal-skipped">0</span>)</span>
+          <span style="font-weight: 400; font-size: 0.8rem; color: #b91c1c;">(Click to expand or restore)</span>
+        </summary>
+        <div id="normal-skipped-section" class="skipped-section" style="margin-top: 1rem;">
+          <div class="panel-card skipped-header-card">
+            <div>
+              <h3>🔴 Skipped Properties (<span id="count-normal-skipped-header">0</span>)</h3>
+              <p class="helper-text">
+                These properties were excluded from your active recommendations. Click <strong>↩ Restore</strong> on any card to bring it back.
+              </p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-restore-all-normal-skipped" style="font-weight: 700; border-color: #fca5a5; color: #b91c1c;">
+              ↺ Restore All Skipped
+            </button>
           </div>
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-restore-all-normal-skipped" style="font-weight: 700; border-color: #fca5a5; color: #b91c1c;">
-            ↺ Restore All Skipped
-          </button>
+          <div class="listings-grid skipped-grid" id="normal-skipped-container"></div>
         </div>
-        <div class="listings-grid skipped-grid" id="normal-skipped-container"></div>
-      </div>
+      </details>
     </section>
 
     <!-- PANEL 2: SHORTLIST & TRACKER -->
@@ -614,6 +630,63 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="btn-close-comparison">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Feedback Sync & Backup Dialog -->
+  <div id="modal-sync" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-sync-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-sync-title" style="font-size: 1.15rem; margin: 0;">💾 Sync &amp; Backup Your Feedback</h3>
+        <button type="button" id="btn-close-sync-modal" class="btn-action-sm" style="border:none; font-size: 1.1rem;">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="panel-card" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 0.85rem;">
+          <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.35rem;">Current Saved Statuses</div>
+          <div style="font-size: 0.85rem; color: #475569;">
+            ⭐ Shortlisted: <strong id="sync-count-shortlisted">0</strong> &nbsp;|&nbsp;
+            🔴 Skipped: <strong id="sync-count-skipped">0</strong> &nbsp;|&nbsp;
+            🗓️ Inspections: <strong id="sync-count-inspections">0</strong>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-size: 0.92rem; margin: 0 0 0.35rem 0;">Option 1: Export / Import File (Instant &amp; Works on any device)</h4>
+          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem;">
+            Download your decision backup as <code>user_decisions.json</code>, or restore a previously saved backup file.
+          </p>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-download-decisions">
+              📥 Download Backup (user_decisions.json)
+            </button>
+            <label class="btn btn-secondary btn-sm" style="cursor: pointer; margin: 0;">
+              📤 Restore from File
+              <input type="file" id="file-import-decisions" accept=".json" style="display: none;">
+            </label>
+          </div>
+        </div>
+
+        <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0.25rem 0;">
+
+        <div>
+          <h4 style="font-size: 0.92rem; margin: 0 0 0.35rem 0;">Option 2: Direct GitHub Cloud Sync (Recommended for Cross-Device)</h4>
+          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 0.5rem;">
+            Save your decisions directly to the repository's <code>docs/data/user_decisions.json</code> so the daily scraper and your other devices automatically exclude your skipped properties.
+          </p>
+          <div style="margin-bottom: 0.5rem;">
+            <input type="password" id="input-github-token" class="filter-input" style="width: 100%; font-size: 0.82rem;" placeholder="GitHub Personal Access Token (classic or fine-grained with Contents:write)">
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-github-push">
+              ☁️ Push Decisions to GitHub
+            </button>
+            <span id="github-sync-status" style="font-size: 0.8rem; color: #16a34a; font-weight: 600;"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-close-sync">Close</button>
       </div>
     </div>
   </div>
