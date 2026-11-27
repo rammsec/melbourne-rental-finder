@@ -1,10 +1,10 @@
-# Melbourne Rental & Lease Transfer Digest (2026-11-26)
+# Melbourne Rental & Lease Transfer Digest (2026-11-27)
 
 - **Requirement**: `Entire properties · 2+ bedrooms · No sharehouses`
 - **Decision Goal**: `Dec 3, 2026` (Current contract ends `Jan 10, 2027`)
 - **Move-In Window**: `Dec 5, 2026 – Jan 15, 2027`
 - **Budget Cap**: `≤ $560/wk` Unfurnished | `≤ $625/wk` Furnished
-- **Scanned Live Ads**: `275` | **Strict Hawthorn Matches**: `111`
+- **Scanned Live Ads**: `308` | **Strict Hawthorn Matches**: `115`
 
 ## Top Matching Entire Properties (Direct Train/Tram to Hawthorn)
 
@@ -15,7 +15,6 @@
 | **91.0%** | $550.0/wk (Furn) | 2BHK 🔄 Lease Transfer | **Richmond** (Train / Tram 70, 75, ~4m) | ~860m to Richmond Station (~11 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/958935150377129/) |
 | **90.0%** | $326.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Camberwell** (Train / Tram 70, 75, ~6m) | ~420m to Camberwell Station (~5 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/1188215120403578/) |
 | **90.0%** | $480.0/wk (Furn) | 2BHK | **Melbourne Cbd** (Train / Tram 70, 75, ~12m) | ~390m to Melbourne Central Station (~5 min walk) | Dec 2026 | [Open Property](https://www.gumtree.com.au/web/listing/property-for-rent/1345693811) |
-| **90.0%** | $500.0/wk (Unfurn) | 2BHK | **Box Hill** (Train, ~15m) | ~400m to Box Hill Station (~5 min walk) | Available Now | [Open Property](https://www.jelliscraig.com.au/property-details-3-5-kent-road-box-hill/2007702) |
 | **90.0%** | $510.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Hawthorn East** (Train / Tram 70, 75, ~4m) | ~280m to Hawthorn / Glenferrie Station (~4 min walk) | Dec 18, 2026 | [Open Property](https://www.facebook.com/marketplace/item/1440978304679175/) |
 | **89.0%** | $280.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Kew** (Tram 16 / Bus 609, ~8m) | ~830m to Glenferrie Station (via Tram 16) (~10 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/1165574535972235/) |
 | **89.0%** | $480.0/wk (Furn) | 2BHK | **Camberwell** (Train / Tram 70, 75, ~6m) | ~1010m to Camberwell Station (~13 min walk) | Dec 2026 | [Open Property](https://www.gumtree.com.au/web/listing/property-for-rent/1345707620) |
@@ -29,7 +28,8 @@
 | **88.0%** | $435.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Richmond** (Train / Tram 70, 75, ~4m) | ~580m to Richmond Station (~7 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/1456234606676789/) |
 | **88.0%** | $450.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Hawthorn** (Train / Tram 70, 75, 16, ~2m) | ~1060m to Hawthorn Station (~13 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/1073527582363822/) |
 | **88.0%** | $476.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Richmond** (Train / Tram 70, 75, ~4m) | ~920m to Richmond Station (~12 min walk) | Dec 12, 2026 | [Open Property](https://www.facebook.com/marketplace/item/1681566596982430/) |
-| **88.0%** | $500.0/wk (Unfurn) | 2BHK | **Melbourne Cbd** (Train / Tram 70, 75, ~12m) | ~580m to Flinders Street Station (~7 min walk) | Dec 2026 | [Open Property](https://www.gumtree.com.au/web/listing/property-for-rent/1345905344) |
+| **88.0%** | $500.0/wk (Unfurn) | 2BHK | **Box Hill** (Train, ~15m) | ~400m to Box Hill Station (~5 min walk) | Check Listing | [Open Property](https://www.jelliscraig.com.au/property-details-3-5-kent-road-box-hill/2007702) |
+| **88.0%** | $615.0/wk (Furn) | 2BHK 🔄 Lease Transfer | **Camberwell** (Train / Tram 70, 75, ~6m) | ~620m to Camberwell Station (~8 min walk) | Dec 16, 2026 | [Open Property](https://www.facebook.com/marketplace/item/2557182924721818/) |
 
 ## 🤖 AI Evaluator Agent – Lifestyle & WFH Compatibility
 
@@ -42,8 +42,8 @@
 | **🎯 Top AI Match** | **98/100** | $560.0/wk | **Box Hill North** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.barryplant.com.au/rental-properties/5-502-elgar-road-box-hill-north-vic-3129-213621/) |
 | **🎯 Top AI Match** | **98/100** | $500.0/wk | **Croydon** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Quiet / Low Traffic | [Open Listing](https://www.raywhite.com/vic/croydon/3620221) |
 | **🎯 Top AI Match** | **98/100** | $525.0/wk | **Lilydale** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345603137) |
-| **🎯 Top AI Match** | **98/100** | $560.0/wk | **Mitcham** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345821733) |
 | **🎯 Top AI Match** | **98/100** | $545.0/wk | **Boronia** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345747581) |
+| **🎯 Top AI Match** | **98/100** | $560.0/wk | **Mitcham** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345821733) |
 | **🎯 Top AI Match** | **98/100** | $500.0/wk | **Croydon** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.barryplant.com.au/rental-properties/20-jarvis-avenue-croydon-vic-3136-213150/) |
 | **🎯 Top AI Match** | **97/100** | $550.0/wk | **Kew** | High (Spacious Layout for Desk/WFH) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345743112) |
 | **🎯 Top AI Match** | **97/100** | $500.0/wk | **Forest Hill** | High (Spacious Layout for Desk/WFH) | Standard / Unspecified; Quiet / Low Traffic | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345803285) |
