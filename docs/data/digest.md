@@ -1,10 +1,10 @@
-# Melbourne Rental & Lease Transfer Digest (2026-11-27)
+# Melbourne Rental & Lease Transfer Digest (2026-11-28)
 
 - **Requirement**: `Entire properties · 2+ bedrooms · No sharehouses`
 - **Decision Goal**: `Dec 3, 2026` (Current contract ends `Jan 10, 2027`)
 - **Move-In Window**: `Dec 5, 2026 – Jan 15, 2027`
 - **Budget Cap**: `≤ $560/wk` Unfurnished | `≤ $625/wk` Furnished
-- **Scanned Live Ads**: `308` | **Strict Hawthorn Matches**: `115`
+- **Scanned Live Ads**: `312` | **Strict Hawthorn Matches**: `116`
 
 ## Top Matching Entire Properties (Direct Train/Tram to Hawthorn)
 
@@ -28,8 +28,8 @@
 | **88.0%** | $435.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Richmond** (Train / Tram 70, 75, ~4m) | ~580m to Richmond Station (~7 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/1456234606676789/) |
 | **88.0%** | $450.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Hawthorn** (Train / Tram 70, 75, 16, ~2m) | ~1060m to Hawthorn Station (~13 min walk) | Dec 2026 | [Open Property](https://www.facebook.com/marketplace/item/1073527582363822/) |
 | **88.0%** | $476.0/wk (Unfurn) | 2BHK 🔄 Lease Transfer | **Richmond** (Train / Tram 70, 75, ~4m) | ~920m to Richmond Station (~12 min walk) | Dec 12, 2026 | [Open Property](https://www.facebook.com/marketplace/item/1681566596982430/) |
-| **88.0%** | $500.0/wk (Unfurn) | 2BHK | **Box Hill** (Train, ~15m) | ~400m to Box Hill Station (~5 min walk) | Check Listing | [Open Property](https://www.jelliscraig.com.au/property-details-3-5-kent-road-box-hill/2007702) |
 | **88.0%** | $615.0/wk (Furn) | 2BHK 🔄 Lease Transfer | **Camberwell** (Train / Tram 70, 75, ~6m) | ~620m to Camberwell Station (~8 min walk) | Dec 16, 2026 | [Open Property](https://www.facebook.com/marketplace/item/2557182924721818/) |
+| **87.0%** | $500.0/wk (Unfurn) | 2BHK | **Box Hill** (Train, ~15m) | ~400m to Box Hill Station (~5 min walk) | Check Listing | [Open Property](https://www.jelliscraig.com.au/property-details-3-5-kent-road-box-hill/2007702) |
 
 ## 🤖 AI Evaluator Agent – Lifestyle & WFH Compatibility
 
@@ -39,9 +39,9 @@
 | AI Verdict | Lifestyle | Rent | Suburb | WFH & Second Room | Climate & Noise | Link |
 | :--- | :---: | :---: | :--- | :--- | :--- | :---: |
 | **🎯 Top AI Match** | **98/100** | $470.0/wk | **Bayswater** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.facebook.com/marketplace/item/1457455759669966/) |
-| **🎯 Top AI Match** | **98/100** | $560.0/wk | **Box Hill North** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.barryplant.com.au/rental-properties/5-502-elgar-road-box-hill-north-vic-3129-213621/) |
 | **🎯 Top AI Match** | **98/100** | $500.0/wk | **Croydon** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Quiet / Low Traffic | [Open Listing](https://www.raywhite.com/vic/croydon/3620221) |
 | **🎯 Top AI Match** | **98/100** | $525.0/wk | **Lilydale** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345603137) |
+| **🎯 Top AI Match** | **98/100** | $560.0/wk | **Box Hill North** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.barryplant.com.au/rental-properties/5-502-elgar-road-box-hill-north-vic-3129-213621/) |
 | **🎯 Top AI Match** | **98/100** | $545.0/wk | **Boronia** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345747581) |
 | **🎯 Top AI Match** | **98/100** | $560.0/wk | **Mitcham** | Exceptional (Study/Office Highlighted) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.gumtree.com.au/web/listing/property-for-rent/1345821733) |
 | **🎯 Top AI Match** | **98/100** | $500.0/wk | **Croydon** | Good (2BR for Dedicated Study) | Split-System A/C & Heating; Moderate Residential | [Open Listing](https://www.barryplant.com.au/rental-properties/20-jarvis-avenue-croydon-vic-3136-213150/) |
@@ -64,18 +64,7 @@
   - 📋 Inspect bedroom 2 dimensions to ensure comfortable desk/workstation fit alongside storage.
 - **Listing**: [View Property on Facebook Marketplace](https://www.facebook.com/marketplace/item/1457455759669966/)
 
-#### 2. 5/502 Elgar Road, Box Hill North, VIC 3129 – 🎯 Top AI Match (98/100)
-- **Rent**: `$560.0/wk` (Unfurnished) · **Commute**: Train to Hawthorn (~18 mins)
-- **Agent Appraisal**: *"High-confidence match: Excellent 2BR WFH layout, split-system a/c & heating, and fast direct commute to Hawthorn."*
-- **Key Lifestyle Fits**:
-  - ✅ Entire 2-bedroom property provides dedicated separation for work and rest
-  - ✅ Equipped with split-system reverse-cycle heating and cooling for year-round Melbourne comfort
-  - ✅ Modern kitchen complete with dishwasher
-- **Inspection Advice**:
-  - 📋 Inspect bedroom 2 dimensions to ensure comfortable desk/workstation fit alongside storage.
-- **Listing**: [View Property on Barry Plant](https://www.barryplant.com.au/rental-properties/5-502-elgar-road-box-hill-north-vic-3129-213621/)
-
-#### 3. 83A Bayswater Road Croydon Victoria 3136 – 🎯 Top AI Match (98/100)
+#### 2. 83A Bayswater Road Croydon Victoria 3136 – 🎯 Top AI Match (98/100)
 - **Rent**: `$500.0/wk` (Unfurnished) · **Commute**: Train to Hawthorn (~35 mins)
 - **Agent Appraisal**: *"High-confidence match: Excellent 2BR WFH layout, split-system a/c & heating, and fast direct commute to Hawthorn."*
 - **Key Lifestyle Fits**:
@@ -85,4 +74,15 @@
 - **Inspection Advice**:
   - 📋 Inspect bedroom 2 dimensions to ensure comfortable desk/workstation fit alongside storage.
 - **Listing**: [View Property on Ray White](https://www.raywhite.com/vic/croydon/3620221)
+
+#### 3. Lilydale, VIC – 🎯 Top AI Match (98/100)
+- **Rent**: `$525.0/wk` (Unfurnished) · **Commute**: Train to Hawthorn (~44 mins)
+- **Agent Appraisal**: *"High-confidence match: Excellent 2BR WFH layout, split-system a/c & heating, and fast direct commute to Hawthorn."*
+- **Key Lifestyle Fits**:
+  - ✅ Second bedroom or dedicated study area ideal for a quiet work-from-home setup
+  - ✅ Equipped with split-system reverse-cycle heating and cooling for year-round Melbourne comfort
+  - ✅ Modern kitchen complete with dishwasher
+- **Inspection Advice**:
+  - 📋 Inspect bedroom 2 dimensions to ensure comfortable desk/workstation fit alongside storage.
+- **Listing**: [View Property on Gumtree Melbourne](https://www.gumtree.com.au/web/listing/property-for-rent/1345603137)
 
